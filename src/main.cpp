@@ -22,8 +22,9 @@ class Set
     void addCell(int cell_name, int size);
     void deleteCell(int cell_name, int size);
     int getArea()  { return area; }
+    bool isIn(int cell_num) { return cellSet.count(cell_num); }
 
-};
+}A, B;
 
 void Set::addCell(int cell_name, int size)
 {
@@ -35,6 +36,52 @@ void Set::deleteCell(int cell_name, int size)
 {
   cellSet.erase(cell_name);
   area -= size;
+}
+
+int calCutSize()
+{
+  int cut_cnt = 0;
+  for(const auto& net: NetArray)
+  {
+    bool first_in_A = true;
+    for(auto it = net.second.begin(); it != net.second.end(); ++it)
+    {
+      if(it == net.second.begin())
+      {
+        if(B.isIn(*it)) first_in_A = false;
+      }
+      if(first_in_A & B.isIn(*it))
+      {
+        ++cut_cnt;
+        break;
+      }
+      else if(!first_in_A & A.isIn(*it))
+      {
+        ++cut_cnt;
+        break;
+      }
+    }
+  }
+  return cut_cnt;
+}
+
+
+int calCellGain(int cell_num)
+{
+  int gain = 0;
+  bool baseCellinA = A.isIn(cell_num);
+  for(const auto& net: CellArray[cell_num])
+  {
+    int to = 0, from = 0;
+    for(const auto& cell:NetArray[net])
+    {
+      if(A.isIn(cell))  ++to;
+      else  ++from;
+    }
+    if(from == 1) ++gain;
+    else  --gain;
+  }
+  return gain;
 }
 
 int Area_A = 0, Area_B = 0;
@@ -74,11 +121,10 @@ int main(int argc , char *argv[])
   }
 
   // TODO 3:Init Partition
-  Set A, B;
   for(const auto& [cell_name, size]:Cells)
   {
     A.addCell(cell_name, size.first);
-  } 
+  }
   for(const auto& [cell_name, size]:Cells)
   {
     int diff_area = fabs(A.getArea() - B.getArea());
@@ -89,12 +135,18 @@ int main(int argc , char *argv[])
       A.deleteCell(cell_name, size.first);
       B.addCell(cell_name, size.second);
     }
-  }  
-  std::cout << "Area A = " << A.getArea() << "\nArea B = " << B.getArea() << "\n";
-  
-  if(fabs(A.getArea() - B.getArea()) - (A.getArea() + B.getArea()) / 10 < 0)  { std::cout <<"YES";  }
-  else  { std::cout<<"NO";  }
+  }
 
+  std::cout << "Area A = " << A.getArea() << "\nArea B = " << B.getArea() << "\n";
+  std::cout << "Cut size = " << calCutSize() << "\n";
+  std::cout << "Cell Gain = " << calCellGain(1) << "\n";
+
+  // TODO 4: Compute Cell Gains and build bucket list
+  
+
+  // Check balance or not
+  // if(fabs(A.getArea() - B.getArea()) - (A.getArea() + B.getArea()) / 10 < 0)  { std::cout <<"YES";  }
+  // else  { std::cout<<"NO";  }
 
   return 0;
 }
