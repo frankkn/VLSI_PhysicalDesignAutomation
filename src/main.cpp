@@ -69,17 +69,21 @@ int calCutSize()
 int calCellGain(int cell_num)
 {
   int gain = 0;
-  bool baseCellinA = A.isIn(cell_num);
   for(const auto& net: CellArray[cell_num])
   {
-    int to = 0, from = 0;
-    for(const auto& cell:NetArray[net])
-    {
-      if(A.isIn(cell))  ++to;
-      else  ++from;
+    int from = 0, to = 0;
+    for(const auto& cell : NetArray[net]){
+      if(A.isIn(cell))
+      {
+        ++from;
+      }
+      else
+      {
+        ++to;
+      }
     }
     if(from == 1) ++gain;
-    else  --gain;
+    if(to == 0) --gain;
   }
   return gain;
 }
@@ -139,10 +143,11 @@ int main(int argc , char *argv[])
 
   std::cout << "Area A = " << A.getArea() << "\nArea B = " << B.getArea() << "\n";
   std::cout << "Cut size = " << calCutSize() << "\n";
-  std::cout << "Cell Gain = " << calCellGain(1) << "\n";
+  for(int i = 1; i <= 10; ++i)
+    std::cout << "Cell Gain " << i << " = "<< calCellGain(i) << "\n";
 
   // TODO 4: Compute Cell Gains and build bucket list
-  
+
 
   // Check balance or not
   // if(fabs(A.getArea() - B.getArea()) - (A.getArea() + B.getArea()) / 10 < 0)  { std::cout <<"YES";  }
