@@ -9,6 +9,7 @@
 #include <cmath>
 #include <map>
 #include <functional>
+#include <chrono>
 
 std::unordered_map<int,std::pair<int,int>> Cells;
 std::unordered_map<int,std::unordered_set<int>> CellArray;
@@ -205,12 +206,6 @@ void updateGain(int base)
 
       MoveBaseToOtherSide(base);
 
-      // After the move, base is in Set B.
-      // for(const auto& cell: NetArray[net])
-      // {
-      //   if(B.isIn(cell))  ++to;
-      //   else ++from;
-      // }
       --from; ++to;
 
       if(from == 0)
@@ -384,10 +379,12 @@ int Area_A = 0, Area_B = 0;
 
 int main(int argc , char *argv[])
 {
+  auto begin = std::chrono::high_resolution_clock::now();
+
   std::ifstream fin_cell(argv[1]);
   std::ifstream fin_nets(argv[2]);
 
-  // TODO 1:Read Cell Area (size in a/b)
+  // Step 1: Read Cell Area (size in Set A/Set B)
   std::string cell_name;
   int size_a, size_b;
   while(fin_cell >> cell_name >> size_a >> size_b)
@@ -400,12 +397,7 @@ int main(int argc , char *argv[])
     GainTable[cell_num] = 0;
   }
 
-  // for(const auto& [x,y]:Cells)
-  // {
-  //   std::cout <<  x << " " << y.first << " " << y.second << "\n";
-  // }
-
-  // TODO 2:Construct NetArray and CellArray
+  // Step 2: Construct NetArray and CellArray
   std::string tmp, net_name;
   while(fin_nets >> tmp >> net_name >> tmp)
   {
@@ -419,7 +411,7 @@ int main(int argc , char *argv[])
     }
   }
 
-  // TODO 3:Init Partition
+  // Step 3: Init Partition
   for(const auto& [cell_name, size]:Cells)
   {
     A.addCell(cell_name, size.first);
@@ -436,7 +428,7 @@ int main(int argc , char *argv[])
     }
   }
 
-  // std::cout << "Size of A = " << A.getCellSet().size() << "\nSize of B = " << B.getCellSet().size() << "\n";
+  // std::cout << "Size of Set A = " << A.getCellSet().size() << "\nSize of Set B = " << B.getCellSet().size() << "\n";
   // std::cout << "Cut size = " << calCutSize() << "\n";
 
   // int Pmax = 1e-6;
@@ -452,7 +444,7 @@ int main(int argc , char *argv[])
   // }
   // std::cout << "Pax = " << Pmax << "\n";
 
-  // TODO 4: Buildup GainTable and Bucketlist
+  // Step 4: Buildup GainTable and Bucketlist
   InitGainTable();
   InitBucketList();
 
@@ -467,6 +459,7 @@ int main(int argc , char *argv[])
   //   std::cout << "\n";
   // }
 
+  // Check GainTable
   // for(const auto& [cell_name, cell_gain]:GainTable)
   // {
   //   std::cout << "cell_name: " << cell_name << "cell_gain: " << cell_gain << "\n";
@@ -476,9 +469,15 @@ int main(int argc , char *argv[])
   //   std::cout << x << " " << y << "\n";
   // }
 
-  //TODO 5: FM process, move one cell from A to B and then move one cell from B to A until no unlocked cells
+  // Step 5: FM process 
+  // move one cell from A to B and then move one cell from B to A until no unlocked cells
   int best_cutsize = fmProcess();
   std::cout << "After FM, size = " << best_cutsize << "\n";
+
+  auto end = std::chrono::high_resolution_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+	std::cout<< "Time measured: "<<  elapsed.count() * 1e-9 << "seconds" << "\n";
+
   WriteResult(argv[3], best_cutsize);
   return 0;
 }
