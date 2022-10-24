@@ -1,20 +1,19 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <unordered_map>
-#include <utility>
-#include <unordered_set>
-#include <tuple>
 #include <algorithm>
 #include <cmath>
-#include <map>
-#include <functional>
 #include <chrono>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 std::unordered_map<int,std::pair<int,int>> Cells;
 std::unordered_map<int,std::unordered_set<int>> CellArray;
 std::unordered_map<int,std::unordered_set<int>> NetArray;
-//std::map<int,std::unordered_set<int>,std::greater<int>> BucketList;
 std::unordered_map<int, bool> LockedCells;
 std::unordered_map<int, int> GainTable;
 std::unordered_set<int> result_A;
@@ -82,7 +81,7 @@ int Cluster::getBaseCell()
     {
       for(auto& cell: cells)
       {
-        if(CanMove(cell) && !LockedCells[cell])
+        if(!LockedCells[cell] && CanMove(cell))
         {
           return cell;
         }
@@ -319,33 +318,49 @@ bool CanMove(int cell_num)
   return diff_area - total_area < 0? true: false;
 }
 
+void UnlockAllCells()
+{
+  for(auto& [cell, state]: LockedCells)
+  {
+    state = false;
+  }
+}
+
+int best_cutsize = 1e+9;
+
 int fmProcess()
 {
   int lock_num = 0;
-  int best_cutsize = 1e+9;
-  std::cout << "B4 FM, cutsize = " << calCutSize() << "\n";
-  std::cout << "Size of Set A = " << A.getSize() << "\n";
-  std::cout << "Size of Set B = " << B.getSize() << "\n";
-  while(lock_num < 500)
+  // int best_cutsize = 1e+9;
+  int partialSum = 0, maxPartialSum = 0;
+
+  while(lock_num < 1000)
   {
     int base = BucketList.getBaseCell();
     if(base != -1)
     {
-      updateGain(base);
-      int tmp = calCutSize();
-      if(best_cutsize > tmp)
+      partialSum += GainTable[base];
+      if(maxPartialSum < partialSum)
       {
-        best_cutsize = tmp;
+        maxPartialSum = partialSum;
+      }
+      updateGain(base);
+      int cur_cutsize = calCutSize();
+      if(cur_cutsize < best_cutsize)
+      {
+        best_cutsize = cur_cutsize;
         result_A = A.getCellSet();
       }
     }
+    else
+    {
+      //UnlockAllCells();
+      break;
+    }
     lock_num++;
   }
-  // std::cout << "Real cut size = " << calCutSize() << "\n";
-  // std::cout << "Size of Set A = " << A.getSize() << "\n";
-  // std::cout << "Size of Set B = " << B.getSize() << "\n";
-  // std::cout << "Final FM's cutsize = " << best_cutsize << "\n";
-  return best_cutsize;
+  // return best_cutsize;
+  return maxPartialSum;
 }
 
 void WriteResult(std::string filename, int best_cutsize)
@@ -470,9 +485,38 @@ int main(int argc , char *argv[])
   // }
 
   // Step 5: FM process 
-  // move one cell from A to B and then move one cell from B to A until no unlocked cells
-  int best_cutsize = fmProcess();
-  std::cout << "After FM, size = " << best_cutsize << "\n";
+  // Move one cell with max gain from A to B 
+
+  std::cout << "Before FM, cut size = " << calCutSize() << "\n";
+  std::cout << "Before FM, Size of Set A = " << A.getSize() << "\n";
+  std::cout << "Before FM, Size of Set B = " << B.getSize() << "\n";
+  std::cout << "----------------------------------------" << "\n";
+
+  // fmProcess();
+
+  // std::cout << "After FM, cut size = " << best_cutsize << "\n";
+  // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
+  // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
+  // std::cout << "----------------------------------------" << "\n";
+  
+  int pass = 0;
+  while(true)
+  {
+    ++pass;
+    int maxPartialSum = fmProcess();
+    if(maxPartialSum <= 0)
+    {
+      std::cout << "FM pass = " << pass << "\n";
+      std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
+      std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
+      std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
+      break;
+    }
+    else
+    {
+      std::cout << "Max partial sum = " << maxPartialSum << "\n";
+    }
+  }
 
   auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
