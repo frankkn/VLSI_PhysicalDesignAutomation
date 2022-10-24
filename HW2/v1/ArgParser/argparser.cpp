@@ -1,3 +1,4 @@
+#pragma once
 #include "../Module/module.cpp"
 #include <string>
 #include <vector>
@@ -12,6 +13,7 @@ class Input;
 class ArgParser
 {
   private:
+    // int setAsize;
     vector<Cell*> cellArray;
     vector<Net*> netArray;
 
@@ -24,6 +26,7 @@ class ArgParser
 class Input
 {
   public:
+    // int setAsize;
     vector<Cell*> cellArray;
     vector<Net*> netArray;
 
@@ -39,7 +42,10 @@ Input* ArgParser::parse(char *argv[])
 
   while(in_cell >> cell_name >> size_a >> size_b)
   {
-    Cell* cell = new Cell(cell_name, size_a, size_b);
+    vector<int> cellArea;
+    cellArea.emplace_back(size_a);
+    cellArea.emplace_back(size_b);
+    Cell* cell = new Cell(cell_name, move(cellArea));
     cellArray.emplace_back(cell);
     cellMap.emplace(cell_name, cell);
   }
@@ -62,7 +68,6 @@ Input* ArgParser::parse(char *argv[])
       }
     }
   }
-  Input* input = new Input(cellArray, netArray);
+  Input* input = new Input(this->cellArray, this->netArray);
   return input;
 }
-
