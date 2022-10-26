@@ -1,0 +1,25 @@
+--How to Compile
+  In this directory, enter the following command:
+
+  $ make
+  It will generate the executable files "main" in "HW2/bin/".
+
+  If you want to remove it, simply enter the following command:
+  $ make clean
+
+--How to Run
+  In this directory, enter the following command:
+  Usage: ../bin/<exe> <net file> <cell file> <output file>
+  e.g.:
+  $ ../bin/main ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.txt
+
+  In "HW2/bin/", enter the following command:
+  Usage: ./<exe> <net file> <cell file> <output file>
+  e.g.:
+  $ ./main ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.out
+
+--How to Verify
+  In this directory, enter the following command:
+  Usage: ../verifier/Verify <net file> <cell file> <output file>
+  e.g.:
+  $ ../verifier/Verify ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.txt
