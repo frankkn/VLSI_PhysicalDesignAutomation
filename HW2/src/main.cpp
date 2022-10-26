@@ -12,6 +12,7 @@
 #define TIME_LIMIT 295
 
 auto begin = std::chrono::high_resolution_clock::now();
+int best_cutsize = 1e+9;
 
 std::unordered_map<int,std::pair<int,int>> Cells;
 std::unordered_map<int,std::unordered_set<int>> CellArray;
@@ -102,6 +103,14 @@ void Cluster::removeCell(int cell_name)
   // --bucket_size;
 }
 
+void Cluster::InitBucketList()
+{
+  for(auto& [cell_name, cell_gain]: GainTable)
+  {
+    GainList[cell_gain].insert(cell_name);
+  }
+}
+
 void calNetGroup()
 {
   for(auto& [net_name, cells]: NetArray)
@@ -156,14 +165,6 @@ void InitGainTable()
         if(netGroupCnt[net].first == 0) --GainTable[cell_name];
       }
     }
-  }
-}
-
-void Cluster::InitBucketList()
-{
-  for(auto& [cell_name, cell_gain]: GainTable)
-  {
-    GainList[cell_gain].insert(cell_name);
   }
 }
 
@@ -329,7 +330,7 @@ void UnlockAllCells()
     state = false;
   }
 }
-int best_cutsize = 1e+9;
+
 int fmProcess(Cluster& BucketList)
 {
   int lock_num = 0;  
@@ -458,22 +459,6 @@ int main(int argc , char *argv[])
     }
   }
 
-  // std::cout << "Size of Set A = " << A.getCellSet().size() << "\nSize of Set B = " << B.getCellSet().size() << "\n";
-  // std::cout << "Cut size = " << calCutSize() << "\n";
-
-  // int Pmax = 1e-6;
-  // int pin;
-  // for(auto& cell: CellArray)
-  // {
-  //   pin = 0;
-  //   for(auto it = cell.second.begin(); it != cell.second.end(); ++it)
-  //   {
-  //     ++pin;
-  //   }
-  //   if(pin > Pmax)  Pmax = pin;
-  // }
-  // std::cout << "Pax = " << Pmax << "\n";
-
   // Step 4: Buildup GainTable and Bucketlist
   InitGainTable();
   Cluster BucketList;
@@ -481,7 +466,6 @@ int main(int argc , char *argv[])
   // Step 5: FM process 
   // Move one cell with max gain from A to B 
   // int best_cutsize = fmProcess(BucketList);
-  
   int pass = 0;
   while(true)
   {
@@ -489,9 +473,7 @@ int main(int argc , char *argv[])
     int maxPartialSum = fmProcess(BucketList);
     if(maxPartialSum <= 0)
     {
-      // std::cout << "FM pass = " << pass << "\n";
-      // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
-      // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
+      std::cout << "FM pass = " << pass << "\n";
       std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
       break;
     }
@@ -500,8 +482,6 @@ int main(int argc , char *argv[])
       std::cout << "Max partial sum = " << maxPartialSum << "\n";
     }
   }
-  std::cout << "Pass = " << pass << "\n";
-  std::cout << "Best cut size = " << best_cutsize << "\n";
 
   auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
