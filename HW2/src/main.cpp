@@ -9,7 +9,9 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
+#define TIME_LIMIT 295
+
+auto begin = std::chrono::high_resolution_clock::now();
 
 std::unordered_map<int,std::pair<int,int>> Cells;
 std::unordered_map<int,std::unordered_set<int>> CellArray;
@@ -42,14 +44,15 @@ class Cluster
     // int bucket_size;
     std::map<int, std::unordered_set<int>, std::greater<int>> GainList;
   public:
-    Cluster() {}
+    Cluster() { InitBucketList(); }
     // int getSize() { return bucket_size; };
     void insertCell(int cell_name);
     void removeCell(int cell_name);
     void moveToOtherSide();
     int getBaseCell();
+    void InitBucketList();
     std::map<int, std::unordered_set<int>, std::greater<int>> getGainList() { return GainList; } ;
-}BucketList;
+};
 
 void Set::addCell(int cell_name, int size)
 {
@@ -156,15 +159,15 @@ void InitGainTable()
   }
 }
 
-void InitBucketList()
+void Cluster::InitBucketList()
 {
   for(auto& [cell_name, cell_gain]: GainTable)
   {
-    BucketList.insertCell(cell_name);
+    GainList[cell_gain].insert(cell_name);
   }
 }
 
-void updateGain(int base)
+void updateGain(Cluster& BucketList, int base)
 {
   LockedCells[base] = true;
   // Base is in Set 0
@@ -326,32 +329,38 @@ void UnlockAllCells()
     state = false;
   }
 }
-
 int best_cutsize = 1e+9;
-
-int fmProcess()
+int fmProcess(Cluster& BucketList)
 {
-  int lock_num = 0;
-  int partialSum = 0, maxPartialSum = 0;
+  int lock_num = 0;  
   int cur_cutsize = calCutSize();
+  //int best_cutsize = 1e+9;
+  int partialSum = 0, maxPartialSum = 0;
   while(lock_num < Cells.size())
   {
+    auto end = std::chrono::high_resolution_clock::now();
+	  auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+	  //std::cout<< "Time measured: "<<  elapsed.count() * 1e-9<< "seconds" << "\n";
+    if(elapsed.count() * 1e-9 > TIME_LIMIT)
+    {
+      return maxPartialSum;
+    }
+
     int base = BucketList.getBaseCell();
     if(base != -1)
     {
       partialSum += GainTable[base];
-      
-      // std::cout << "Base cell's gain : " << GainTable[base] << std::endl;
-      // std::cout << "Cut size by deduction : " << cur_cutsize << std::endl;
-      // std::cout << "Cut size by function : " << calCutSize() << std::endl; 
-      cur_cutsize -= GainTable[base];
-
       if(maxPartialSum < partialSum)
       {
         maxPartialSum = partialSum;
       }
+
+      // std::cout << "Base cell's gain : " << GainTable[base] << std::endl;
+      // std::cout << "Cut size by deduction : " << cur_cutsize << std::endl;
+      // std::cout << "Cut size by function : " << calCutSize() << std::endl; 
+      cur_cutsize -= GainTable[base];
       
-      updateGain(base);
+      updateGain(BucketList, base);
 
       if(cur_cutsize < best_cutsize)
       {
@@ -369,8 +378,8 @@ int fmProcess()
     }
     lock_num++;
   }
-  return best_cutsize;
-  //return maxPartialSum;
+  // return best_cutsize;
+  return maxPartialSum;
 }
 
 void WriteResult(std::string filename, int best_cutsize)
@@ -400,12 +409,8 @@ void WriteResult(std::string filename, int best_cutsize)
   }
 }
 
-int Area_A = 0, Area_B = 0;
-
 int main(int argc , char *argv[])
 {
-  auto begin = std::chrono::high_resolution_clock::now();
-
   std::ifstream fin_cell(argv[1]);
   std::ifstream fin_nets(argv[2]);
 
@@ -414,15 +419,13 @@ int main(int argc , char *argv[])
   int size_a, size_b;
   while(fin_cell >> cell_name >> size_a >> size_b)
   {
-    Area_A += size_a;
-    Area_B += size_b;
     cell_name.erase(0,1);
     int cell_num = stoi(cell_name);
     Cells[cell_num] = std::make_pair(size_a,size_b);
     GainTable[cell_num] = 0;
   }
 
-  // Step 2: ruct NetArray and CellArray
+  // Step 2: Construct NetArray and CellArray
   std::string tmp, net_name;
   while(fin_nets >> tmp >> net_name >> tmp)
   {
@@ -437,6 +440,8 @@ int main(int argc , char *argv[])
   }
 
   // Step 3: Init Partition
+  // First move all the cell into A, 
+  // Then pick one from A to B until meet balance condition 
   for(auto& [cell_name, size]:Cells)
   {
     A.addCell(cell_name, size.first);
@@ -471,64 +476,36 @@ int main(int argc , char *argv[])
 
   // Step 4: Buildup GainTable and Bucketlist
   InitGainTable();
-  InitBucketList();
-
-  // // //Check Bucket list 
-  // for(auto& [cell_gain, cells]:BucketList.getGainList())
-  // {
-  //   std::cout << "cell gain = " << cell_gain;
-  //   for(auto it = cells.begin(); it != cells.end(); ++it)
-  //   {
-  //     std::cout << "cells" << *it << " ";
-  //   }
-  //   std::cout << "\n";
-  // }
-
-  // Check GainTable
-  // for(auto& [cell_name, cell_gain]:GainTable)
-  // {
-  //   std::cout << "cell_name: " << cell_name << "cell_gain: " << cell_gain << "\n";
-  // }
+  Cluster BucketList;
 
   // Step 5: FM process 
   // Move one cell with max gain from A to B 
-
-  // std::cout << "Before FM, cut size = " << calCutSize() << "\n";
-  // std::cout << "Before FM, Size of Set A = " << A.getSize() << "\n";
-  // std::cout << "Before FM, Size of Set B = " << B.getSize() << "\n";
-  // std::cout << "----------------------------------------" << "\n";
-
-  fmProcess();
-
-  // std::cout << "After FM, cut size = " << best_cutsize << "\n";
-  // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
-  // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
-  // std::cout << "----------------------------------------" << "\n";
+  // int best_cutsize = fmProcess(BucketList);
   
-  // int pass = 0;
-  // while(true)
-  // {
-  //   ++pass;
-  //   int maxPartialSum = fmProcess();
-  //   if(maxPartialSum <= 0)
-  //   {
-  //     std::cout << "FM pass = " << pass << "\n";
-  //     // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
-  //     // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
-  //     std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
-  //     break;
-  //   }
-  //   else
-  //   {
-  //     std::cout << "Max partial sum = " << maxPartialSum << "\n";
-  //   }
-  // }
+  int pass = 0;
+  while(true)
+  {
+    ++pass;
+    int maxPartialSum = fmProcess(BucketList);
+    if(maxPartialSum <= 0)
+    {
+      // std::cout << "FM pass = " << pass << "\n";
+      // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
+      // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
+      std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
+      break;
+    }
+    else
+    {
+      std::cout << "Max partial sum = " << maxPartialSum << "\n";
+    }
+  }
+  std::cout << "Pass = " << pass << "\n";
+  std::cout << "Best cut size = " << best_cutsize << "\n";
 
   auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 	std::cout<< "Time measured: "<<  elapsed.count() * 1e-9 << "seconds" << "\n";
-
-  std::cout << best_cutsize << "\n";
   
   WriteResult(argv[3], best_cutsize);
   return 0;
