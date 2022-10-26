@@ -17,6 +17,7 @@ std::unordered_map<int,std::unordered_set<int>> NetArray;
 std::unordered_map<int, bool> LockedCells;
 std::unordered_map<int, int> GainTable;
 std::unordered_set<int> result_A;
+std::unordered_map<int, std::pair<int,int>> netGroupCnt;
 
 bool CanMove(int cell_num);
 
@@ -38,11 +39,11 @@ class Set
 class Cluster
 {
   private:
-    int bucket_size;
+    // int bucket_size;
     std::map<int, std::unordered_set<int>, std::greater<int>> GainList;
   public:
-    Cluster(): bucket_size(0) {}
-    int getSize() { return bucket_size; };
+    Cluster() {}
+    // int getSize() { return bucket_size; };
     void insertCell(int cell_name);
     void removeCell(int cell_name);
     void moveToOtherSide();
@@ -66,7 +67,7 @@ void Cluster::insertCell(int cell_name)
 {
   int cur_gain = GainTable[cell_name];
   GainList[cur_gain].insert(cell_name);
-  ++bucket_size;
+  // ++bucket_size;
 }
 
 int Cluster::getBaseCell()
@@ -95,24 +96,37 @@ void Cluster::removeCell(int cell_name)
 {
   int cur_gain = GainTable[cell_name];
   GainList[cur_gain].erase(cell_name);
-  --bucket_size;
+  // --bucket_size;
+}
+
+void calNetGroup()
+{
+  for(auto& [net_name, cells]: NetArray)
+  {
+    netGroupCnt[net_name].first = netGroupCnt[net_name].second = 0;
+    for(auto& cell: cells)
+    {
+      if(A.isIn(cell))
+      {
+        netGroupCnt[net_name].first++;
+      }
+      else
+      { 
+        netGroupCnt[net_name].second++;
+      }
+    }
+  }
 }
 
 int calCutSize()
 {
+  calNetGroup();
   int cut_cnt = 0;
-  for(const auto& [net_name, cells]:NetArray)
+  for(auto& [net_name, cells]:NetArray)
   {
-    int linkA = 0, linkB = 0;
-    for(const auto& cell: cells)
+    if(netGroupCnt[net_name].first != 0 && netGroupCnt[net_name].second != 0)
     {
-      if(A.isIn(cell))  ++linkA;
-      else  ++linkB;
-      if(linkA != 0 && linkB != 0)
-      {
-        ++cut_cnt;
-        break;
-      }
+      ++cut_cnt;
     }
   }
   return cut_cnt;
@@ -120,69 +134,52 @@ int calCutSize()
 
 void InitGainTable()
 {	
-	for (const auto& [net_name, cells]: NetArray) 
-	{	
-		int from = 0, to = 0; 
-		for(const auto& cell: cells)
-		{	
-      if(A.isIn(cell))  from++;
-			else to++;
-      if(from > 1 && to > 1)  continue;
-		}
-    for(const auto& cell: cells)
-		{	
-			if(from == 1) ++GainTable[cell];
-			if(to == 0) --GainTable[cell];
-		} 
-	}
+  calNetGroup();
+  for(auto& [cell_name, nets]:CellArray)
+  {
+    if(A.isIn(cell_name))
+    {
+      for(auto& net:nets)
+      {
+        if(netGroupCnt[net].first == 1) ++GainTable[cell_name];
+        if(netGroupCnt[net].second == 0) --GainTable[cell_name];
+      }
+    }
+    else 
+    {
+      for(auto& net:nets)
+      {
+        if(netGroupCnt[net].second == 1) ++GainTable[cell_name];
+        if(netGroupCnt[net].first == 0) --GainTable[cell_name];
+      }
+    }
+  }
 }
 
 void InitBucketList()
 {
-  for(const auto& [cell_name, cell_gain]: GainTable)
+  for(auto& [cell_name, cell_gain]: GainTable)
   {
     BucketList.insertCell(cell_name);
   }
 }
 
-void MoveBaseToOtherSide(int base)
-{
-  if(A.isIn(base))
-  {
-    int size_a = Cells[base].first;
-    A.deleteCell(base, size_a);
-    int size_b = Cells[base].second;
-    B.addCell(base, size_b);
-  }
-  else
-  {
-    int size_b = Cells[base].second;
-    B.deleteCell(base, size_b);
-    int size_a = Cells[base].first;
-    A.addCell(base, size_a);
-  }
-  
-}
-
 void updateGain(int base)
 {
   LockedCells[base] = true;
-  int from = 0, to = 0;
+  // Base is in Set 0
   if(A.isIn(base))
   {
-    for(const auto& net: CellArray[base])
+    A.deleteCell(base, Cells[base].first);
+    B.addCell(base, Cells[base].second);
+    for(auto& net: CellArray[base])
     {
-      for(const auto& cell: NetArray[net])
+      // To == 0
+      if(netGroupCnt[net].second == 0)
       {
-        if(A.isIn(cell))  ++from;
-        else ++to;
-      }
-
-      if(to == 0)
-      {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell:NetArray[net])
         {
-          if(!LockedCells[cell] && cell != base)
+          if(cell != base && !LockedCells[cell])
           {
             BucketList.removeCell(cell);
             ++GainTable[cell];
@@ -190,11 +187,12 @@ void updateGain(int base)
           }
         }
       }
-      else if(to == 1)
+      // To == 1
+      else if(netGroupCnt[net].second == 1)
       {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell: NetArray[net])
         {
-          if(B.isIn(cell) && !LockedCells[cell])
+          if(cell != base && !LockedCells[cell] && B.isIn(cell))
           {
             BucketList.removeCell(cell);
             --GainTable[cell];
@@ -203,15 +201,16 @@ void updateGain(int base)
         }
       }
 
-      MoveBaseToOtherSide(base);
+      // From--, To++
+      --netGroupCnt[net].first;
+      ++netGroupCnt[net].second;
 
-      --from; ++to;
-
-      if(from == 0)
+      // From == 0
+      if(netGroupCnt[net].first == 0)
       {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell: NetArray[net])
         {
-          if(!LockedCells[cell] && cell != base)
+          if(cell != base && !LockedCells[cell] && B.isIn(cell))
           {
             BucketList.removeCell(cell);
             --GainTable[cell];
@@ -219,11 +218,12 @@ void updateGain(int base)
           }
         }
       }
-      else if(from == 1)
+      // From == 1
+      else if(netGroupCnt[net].first == 1)
       {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell: NetArray[net])
         {
-          if(A.isIn(cell) && !LockedCells[cell])
+          if(cell != base && !LockedCells[cell] && A.isIn(cell))
           {
             BucketList.removeCell(cell);
             ++GainTable[cell];
@@ -233,21 +233,19 @@ void updateGain(int base)
       }
     }
   }
+  // Base is in Set 1
   else
   {
-    for(const auto& net: CellArray[base])
+    B.deleteCell(base, Cells[base].second);
+    A.addCell(base, Cells[base].first);
+    for(auto& net: CellArray[base])
     {
-      for(const auto& cell: NetArray[net])
+      // To == 0
+      if(netGroupCnt[net].first == 0)
       {
-        if(B.isIn(cell))  ++from;
-        else ++to;
-      }
-
-      if(to == 0)
-      {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell:NetArray[net])
         {
-          if(!LockedCells[cell] && cell != base)
+          if(cell != base && !LockedCells[cell])
           {
             BucketList.removeCell(cell);
             ++GainTable[cell];
@@ -255,11 +253,12 @@ void updateGain(int base)
           }
         }
       }
-      else if(to == 1)
+      // To == 1
+      else if(netGroupCnt[net].first == 1)
       {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell: NetArray[net])
         {
-          if(A.isIn(cell) && !LockedCells[cell])
+          if(cell != base && !LockedCells[cell] && A.isIn(cell))
           {
             BucketList.removeCell(cell);
             --GainTable[cell];
@@ -268,15 +267,16 @@ void updateGain(int base)
         }
       }
 
-      MoveBaseToOtherSide(base);
+      // From--, To++
+      --netGroupCnt[net].second;
+      ++netGroupCnt[net].first;
 
-      --from; ++to;
-
-      if(from == 0)
+      // From == 0
+      if(netGroupCnt[net].second == 0)
       {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell: NetArray[net])
         {
-          if(!LockedCells[cell] && cell != base)
+          if(cell != base && !LockedCells[cell] && A.isIn(cell))
           {
             BucketList.removeCell(cell);
             --GainTable[cell];
@@ -284,11 +284,12 @@ void updateGain(int base)
           }
         }
       }
-      else if(from == 1)
+      // From == 1
+      else if(netGroupCnt[net].second == 1)
       {
-        for(const auto& cell:NetArray[net])
+        for(auto& cell: NetArray[net])
         {
-          if(B.isIn(cell) && !LockedCells[cell])
+          if(cell != base && !LockedCells[cell] && B.isIn(cell))
           {
             BucketList.removeCell(cell);
             ++GainTable[cell];
@@ -313,8 +314,8 @@ bool CanMove(int cell_num)
     tmp_B_area -= Cells[cell_num].second;
     tmp_A_area += Cells[cell_num].first;
   }
-  int diff_area = fabs(tmp_A_area - tmp_B_area);
-  int total_area = (tmp_A_area + tmp_B_area) / 10;
+  long long diff_area = llabs(tmp_A_area - tmp_B_area);
+  long long total_area = (tmp_A_area + tmp_B_area) / 10;
   return diff_area - total_area < 0? true: false;
 }
 
@@ -331,26 +332,35 @@ int best_cutsize = 1e+9;
 int fmProcess()
 {
   int lock_num = 0;
-  // int best_cutsize = 1e+9;
   int partialSum = 0, maxPartialSum = 0;
-
-  while(lock_num < 1000)
+  int cur_cutsize = calCutSize();
+  while(lock_num < Cells.size())
   {
     int base = BucketList.getBaseCell();
     if(base != -1)
     {
       partialSum += GainTable[base];
+      
+      // std::cout << "Base cell's gain : " << GainTable[base] << std::endl;
+      // std::cout << "Cut size by deduction : " << cur_cutsize << std::endl;
+      // std::cout << "Cut size by function : " << calCutSize() << std::endl; 
+      cur_cutsize -= GainTable[base];
+
       if(maxPartialSum < partialSum)
       {
         maxPartialSum = partialSum;
       }
+      
       updateGain(base);
-      int cur_cutsize = calCutSize();
+
       if(cur_cutsize < best_cutsize)
       {
         best_cutsize = cur_cutsize;
         result_A = A.getCellSet();
       }
+      // std::cout << "After, cut size by deduction  : " << cur_cutsize << std::endl;
+      // std::cout << "After, cut size by function : " << calCutSize() << std::endl;
+      // std::cout << "----------------------------------------------" << std::endl;
     }
     else
     {
@@ -359,8 +369,8 @@ int fmProcess()
     }
     lock_num++;
   }
-  // return best_cutsize;
-  return maxPartialSum;
+  return best_cutsize;
+  //return maxPartialSum;
 }
 
 void WriteResult(std::string filename, int best_cutsize)
@@ -369,13 +379,13 @@ void WriteResult(std::string filename, int best_cutsize)
 
   output << "cut_size " << best_cutsize << std::endl;
   output << "A " << result_A.size() <<std::endl;
-  for(const auto &cell : result_A)
+  for( auto &cell : result_A)
   {
     output << "c" << cell << std::endl;
   }
   
   std::unordered_set<int> result_B;
-  for(const auto& [cell_name, nets]:CellArray)
+  for(auto& [cell_name, nets]:CellArray)
   {
     if(!result_A.count(cell_name))
     {
@@ -412,7 +422,7 @@ int main(int argc , char *argv[])
     GainTable[cell_num] = 0;
   }
 
-  // Step 2: Construct NetArray and CellArray
+  // Step 2: ruct NetArray and CellArray
   std::string tmp, net_name;
   while(fin_nets >> tmp >> net_name >> tmp)
   {
@@ -427,14 +437,14 @@ int main(int argc , char *argv[])
   }
 
   // Step 3: Init Partition
-  for(const auto& [cell_name, size]:Cells)
+  for(auto& [cell_name, size]:Cells)
   {
     A.addCell(cell_name, size.first);
   }
-  for(const auto& [cell_name, size]:Cells)
+  for(auto& [cell_name, size]:Cells)
   {
-    int diff_area = fabs(A.getArea() - B.getArea());
-    int total_area = (A.getArea() + B.getArea()) / 10;
+    long long diff_area = llabs(A.getArea() - B.getArea());
+    long long total_area = (A.getArea() + B.getArea()) / 10;
     bool balance = diff_area - total_area < 0? true: false;
     if(!balance)
     {
@@ -448,7 +458,7 @@ int main(int argc , char *argv[])
 
   // int Pmax = 1e-6;
   // int pin;
-  // for(const auto& cell: CellArray)
+  // for(auto& cell: CellArray)
   // {
   //   pin = 0;
   //   for(auto it = cell.second.begin(); it != cell.second.end(); ++it)
@@ -463,8 +473,8 @@ int main(int argc , char *argv[])
   InitGainTable();
   InitBucketList();
 
-  // Check Bucket list 
-  // for(const auto& [cell_gain, cells]:Bucket_A.getGainList())
+  // // //Check Bucket list 
+  // for(auto& [cell_gain, cells]:BucketList.getGainList())
   // {
   //   std::cout << "cell gain = " << cell_gain;
   //   for(auto it = cells.begin(); it != cells.end(); ++it)
@@ -475,53 +485,51 @@ int main(int argc , char *argv[])
   // }
 
   // Check GainTable
-  // for(const auto& [cell_name, cell_gain]:GainTable)
+  // for(auto& [cell_name, cell_gain]:GainTable)
   // {
   //   std::cout << "cell_name: " << cell_name << "cell_gain: " << cell_gain << "\n";
-  // }
-  // for(auto [x, y]: GainTable)
-  // {
-  //   std::cout << x << " " << y << "\n";
   // }
 
   // Step 5: FM process 
   // Move one cell with max gain from A to B 
 
-  std::cout << "Before FM, cut size = " << calCutSize() << "\n";
-  std::cout << "Before FM, Size of Set A = " << A.getSize() << "\n";
-  std::cout << "Before FM, Size of Set B = " << B.getSize() << "\n";
-  std::cout << "----------------------------------------" << "\n";
+  // std::cout << "Before FM, cut size = " << calCutSize() << "\n";
+  // std::cout << "Before FM, Size of Set A = " << A.getSize() << "\n";
+  // std::cout << "Before FM, Size of Set B = " << B.getSize() << "\n";
+  // std::cout << "----------------------------------------" << "\n";
 
-  // fmProcess();
+  fmProcess();
 
   // std::cout << "After FM, cut size = " << best_cutsize << "\n";
   // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
   // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
   // std::cout << "----------------------------------------" << "\n";
   
-  int pass = 0;
-  while(true)
-  {
-    ++pass;
-    int maxPartialSum = fmProcess();
-    if(maxPartialSum <= 0)
-    {
-      std::cout << "FM pass = " << pass << "\n";
-      std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
-      std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
-      std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
-      break;
-    }
-    else
-    {
-      std::cout << "Max partial sum = " << maxPartialSum << "\n";
-    }
-  }
+  // int pass = 0;
+  // while(true)
+  // {
+  //   ++pass;
+  //   int maxPartialSum = fmProcess();
+  //   if(maxPartialSum <= 0)
+  //   {
+  //     std::cout << "FM pass = " << pass << "\n";
+  //     // std::cout << "After FM, Size of Set A = " << result_A.size() << "\n";
+  //     // std::cout << "After FM, Size of Set B = " << Cells.size() - result_A.size() << "\n";
+  //     std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
+  //     break;
+  //   }
+  //   else
+  //   {
+  //     std::cout << "Max partial sum = " << maxPartialSum << "\n";
+  //   }
+  // }
 
   auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 	std::cout<< "Time measured: "<<  elapsed.count() * 1e-9 << "seconds" << "\n";
 
+  std::cout << best_cutsize << "\n";
+  
   WriteResult(argv[3], best_cutsize);
   return 0;
 }
