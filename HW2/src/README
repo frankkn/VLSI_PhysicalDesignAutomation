@@ -11,12 +11,12 @@
   In this directory, enter the following command:
   Usage: ../bin/<exe> <net file> <cell file> <output file>
   e.g.:
-  $ ../bin/main ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.txt
+  $ ../bin/hw2 ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.txt
 
   In "HW2/bin/", enter the following command:
   Usage: ./<exe> <net file> <cell file> <output file>
   e.g.:
-  $ ./main ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.out
+  $ ./hw2 ../testcases/p2-1.nets ../testcases/p2-1.cells ../output/p2-1.out
 
 --How to Verify
   In this directory, enter the following command:
