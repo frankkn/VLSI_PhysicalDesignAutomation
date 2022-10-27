@@ -9,9 +9,8 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#define TIME_LIMIT 295
+#define TIME_LIMIT 300
 
-auto begin = std::chrono::high_resolution_clock::now();
 int best_cutsize = 1e+9;
 
 std::unordered_map<int,std::pair<int,int>> Cells;
@@ -149,6 +148,7 @@ void InitGainTable()
   calNetGroup();
   for(auto& [cell_name, nets]:CellArray)
   {
+    GainTable[cell_name] = 0;
     if(A.isIn(cell_name))
     {
       for(auto& net:nets)
@@ -331,8 +331,9 @@ void UnlockAllCells()
   }
 }
 
-int fmProcess(Cluster& BucketList)
+int fmProcess(Cluster& BucketList, std::chrono::high_resolution_clock::time_point begin, int pass)
 {
+  if(pass != 1) InitGainTable();
   int lock_num = 0;  
   int cur_cutsize = calCutSize();
   //int best_cutsize = 1e+9;
@@ -342,12 +343,13 @@ int fmProcess(Cluster& BucketList)
     auto end = std::chrono::high_resolution_clock::now();
 	  auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 	  //std::cout<< "Time measured: "<<  elapsed.count() * 1e-9<< "seconds" << "\n";
-    if(elapsed.count() * 1e-9 > TIME_LIMIT)
+    if(elapsed.count() * 1e-9 > (TIME_LIMIT - (Cells.size()/100000)*15 ))
     {
       return maxPartialSum;
     }
 
     int base = BucketList.getBaseCell();
+    if(pass != 1 && GainTable[base] <= 0) break;
     if(base != -1)
     {
       partialSum += GainTable[base];
@@ -374,7 +376,7 @@ int fmProcess(Cluster& BucketList)
     }
     else
     {
-      //UnlockAllCells();
+      UnlockAllCells();
       break;
     }
     lock_num++;
@@ -387,31 +389,29 @@ void WriteResult(std::string filename, int best_cutsize)
 {
   std::ofstream output(filename);
 
+  int size_of_set_A = result_A.size();
   output << "cut_size " << best_cutsize << std::endl;
-  output << "A " << result_A.size() <<std::endl;
-  for( auto &cell : result_A)
+  output << "A " << size_of_set_A <<std::endl;
+  for(auto &cell : result_A)
   {
     output << "c" << cell << std::endl;
   }
-  
-  std::unordered_set<int> result_B;
-  for(auto& [cell_name, nets]:CellArray)
+
+  output << "B " << Cells.size() - size_of_set_A << std::endl;
+  for(auto &[cell_name, nets]:CellArray)
   {
     if(!result_A.count(cell_name))
     {
-      result_B.insert(cell_name);
+      output << "c" << cell_name << std::endl;
     }
-  }
-
-  output << "B " << result_B.size() << std::endl;
-  for(auto &cell : result_B)
-  {
-    output << "c" << cell << std::endl;
   }
 }
 
 int main(int argc , char *argv[])
 {
+  std::cin.tie(nullptr);
+  std::ios::sync_with_stdio(false);
+  auto begin = std::chrono::high_resolution_clock::now();
   std::ifstream fin_cell(argv[1]);
   std::ifstream fin_nets(argv[2]);
 
@@ -422,8 +422,8 @@ int main(int argc , char *argv[])
   {
     cell_name.erase(0,1);
     int cell_num = stoi(cell_name);
-    Cells[cell_num] = std::make_pair(size_a,size_b);
-    GainTable[cell_num] = 0;
+    Cells.emplace(cell_num, std::make_pair(size_a,size_b));
+    GainTable.emplace(cell_num, 0);
   }
 
   // Step 2: Construct NetArray and CellArray
@@ -436,7 +436,7 @@ int main(int argc , char *argv[])
       int cell_num = stoi(cell_name.erase(0,1));
       NetArray[net_num].insert(cell_num);
       CellArray[cell_num].insert(net_num);
-      LockedCells[cell_num] = false;
+      LockedCells.emplace(cell_num, false);
     }
   }
 
@@ -470,23 +470,25 @@ int main(int argc , char *argv[])
   while(true)
   {
     ++pass;
-    int maxPartialSum = fmProcess(BucketList);
+    int maxPartialSum = fmProcess(BucketList, begin, pass);
     if(maxPartialSum <= 0)
     {
-      std::cout << "FM pass = " << pass << "\n";
-      std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
+      // std::cout << "Max partial sum (<=0) = " << maxPartialSum << "\n";
+      // std::cout << "FM pass = " << pass << "\n";
+      // std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
       break;
     }
-    else
-    {
-      std::cout << "Max partial sum = " << maxPartialSum << "\n";
-    }
+    // else
+    // {
+    //   std::cout << "Max partial sum = " << maxPartialSum << "\n";
+    // }
   }
 
   auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 	std::cout<< "Time measured: "<<  elapsed.count() * 1e-9 << "seconds" << "\n";
-  
+  std::cout << best_cutsize << "\n";
+
   WriteResult(argv[3], best_cutsize);
   return 0;
 }
