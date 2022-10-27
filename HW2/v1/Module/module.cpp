@@ -25,9 +25,9 @@ class Net
   public:
     string name;
     vector<Cell*> cells; 
-    vector<int> setCellCnt;
+    vector<int> setCnt;
 
-    Net(string name):name(name), setCellCnt({0,0}) {}
+    Net(string name):name(name), setCnt({0,0}) {}
 
 };
 

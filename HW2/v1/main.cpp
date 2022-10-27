@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
   ArgParser AP;
   Input* input = AP.parse(argv);
 
-  FM_partition fmPartition(input);
+  FM FMpartition(input);
   
   return 0;
 }

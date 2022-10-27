@@ -3,7 +3,7 @@
 #include <cmath>
 using namespace std;
 
-class FM_partition
+class FM
 {
   private:
     Input* input;
@@ -11,13 +11,14 @@ class FM_partition
     vector<Set> sets;
     
   public:
-    FM_partition (Input* input):input(input) {}
+    FM (Input* input):input(input) {}
     void InitPartition();
-    void calNetSetCellCnt();
+    void calNetGroupCnt();
     int calCutSize();
+    void InitGain();
 };
 
-void FM_partition::InitPartition()
+void FM::InitPartition()
 {
   for(auto& cell: input->cellArray)
   {
@@ -38,7 +39,7 @@ void FM_partition::InitPartition()
 }
 
 // Calculate # of Nets' cells' in set0 and set1
-void FM_partition::calNetSetCellCnt()
+void FM::calNetGroupCnt()
 {
   for(auto& net:input->netArray)
   {
@@ -49,9 +50,9 @@ void FM_partition::calNetSetCellCnt()
   }
 }
 
-int FM_partition::calCutSize()
+int FM::calCutSize()
 {
-  calNetSetCellCnt();
+  calNetGroupCnt();
   int cut_cnt = 0;
   for(auto net: input->netArray)
   {
@@ -61,5 +62,18 @@ int FM_partition::calCutSize()
     }
   }
   return cut_cnt;
+}
+
+void FM::InitGain()
+{
+  for(auto cell: input->cellArray)
+  {
+    cell->locked = false;
+    cell->gain = 0;
+    for(auto net: cell->nets)
+    {
+      if(net->setCellCnt)
+    }
+  }
 }
 
