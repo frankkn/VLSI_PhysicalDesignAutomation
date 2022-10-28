@@ -338,22 +338,22 @@ int fmProcess(Cluster& BucketList, std::chrono::high_resolution_clock::time_poin
   if(pass != 1) InitGainTable();
   int lock_num = 0;  
   int cur_cutsize = calCutSize();
-  int maxPartialSum = 0;
+  int partialSum = 0;
   while(lock_num < Cells.size())
   {
     auto end = std::chrono::high_resolution_clock::now();
 	  auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 
-    if(elapsed.count() * 1e-9 > (TIME_LIMIT - (Cells.size()/100000)*15 ))
+    if(elapsed.count() * 1e-9 > (TIME_LIMIT - (Cells.size()/100000)*1 ))
     {
-      return maxPartialSum;
+      return partialSum;
     }
 
     int base = BucketList.getBaseCell();
     if(pass != 1 && GainTable[base] <= 0) break;
     if(base != -1)
     {
-      maxPartialSum += GainTable[base];
+      partialSum += GainTable[base];
       cur_cutsize -= GainTable[base];
       
       updateGain(BucketList, base);
@@ -371,7 +371,7 @@ int fmProcess(Cluster& BucketList, std::chrono::high_resolution_clock::time_poin
     }
     lock_num++;
   }
-  return maxPartialSum;
+  return partialSum;
 }
 
 void WriteResult(std::string filename, int best_cutsize)
@@ -399,6 +399,7 @@ void WriteResult(std::string filename, int best_cutsize)
 int main(int argc , char *argv[])
 {
   std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
   std::ios::sync_with_stdio(false);
   auto begin = std::chrono::high_resolution_clock::now();
   std::ifstream fin_cell(argv[1]);
@@ -429,11 +430,15 @@ int main(int argc , char *argv[])
     }
   }
 
+  auto Input_end = std::chrono::high_resolution_clock::now();
+	auto Input_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Input_end - begin);
+	std::cout<< "Input Time = "<<  Input_elapsed.count() * 1e-9 << "seconds" << "\n";
+
   // Step 3: Init Partition
   // First move all the cell into A, 
   // Then pick one from A to B until meet balance condition
 
-  // int cur_seed = 0, best_seed = 0; 
+  // int cur_seed = 0;
   // std::vector<int> random_cells; 
   // for(auto& [cell_name, size]:Cells)
   // {
@@ -509,19 +514,28 @@ int main(int argc , char *argv[])
   while(true)
   {
     ++pass;
-    int maxPartialSum = fmProcess(BucketList, begin, pass);
-    if(maxPartialSum <= 0)
+    int partialSum = fmProcess(BucketList, begin, pass);
+    if(partialSum <= 0)
     {
       // std::cout << "After FM, Size of cut size = " << best_cutsize << "\n";
       break;
     }
   }
 
-  // auto end = std::chrono::high_resolution_clock::now();
-	// auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-	// std::cout<< "Time measured: "<<  elapsed.count() * 1e-9 << "seconds" << "\n";
-  //std::cout << best_cutsize << "\n";
+  auto FM_end = std::chrono::high_resolution_clock::now();
+	auto FM_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(FM_end - Input_end);
+	std::cout << "FM Time = "<<  FM_elapsed.count() * 1e-9 << "seconds" << "\n";
+  std::cout << "Best cut size = " << best_cutsize << "\n";
 
   WriteResult(argv[3], best_cutsize);
+
+  auto Output_end = std::chrono::high_resolution_clock::now();
+	auto Output_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - FM_end);
+	std::cout<< "Output Time = "<<  Output_elapsed.count() * 1e-9 << "seconds" << "\n";
+
+  std::cout << "I/O Time = " << (Input_elapsed + Output_elapsed).count() * 1e-9 << "seconds" << "\n";
+  auto total_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - begin);
+  std::cout << "Total Time = " << total_elapsed.count() * 1e-9 << "seconds" << "\n";
+
   return 0;
 }
