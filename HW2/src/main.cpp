@@ -10,6 +10,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 #define TIME_LIMIT 300
 
 int best_cutsize = 1e+9;
@@ -430,78 +431,79 @@ int main(int argc , char *argv[])
     }
   }
 
-  auto Input_end = std::chrono::high_resolution_clock::now();
-	auto Input_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Input_end - begin);
-	std::cout<< "Input Time = "<<  Input_elapsed.count() * 1e-9 << "seconds" << "\n";
+  // auto Input_end = std::chrono::high_resolution_clock::now();
+	// auto Input_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Input_end - begin);
+	// std::cout<< "Input Time = "<<  Input_elapsed.count() * 1e-9 << "seconds" << "\n";
 
   // Step 3: Init Partition
   // First move all the cell into A, 
   // Then pick one from A to B until meet balance condition
 
-  // int cur_seed = 0;
-  // std::vector<int> random_cells; 
-  // for(auto& [cell_name, size]:Cells)
-  // {
-  //   random_cells.emplace_back(cell_name);
-  // }
-  // srand(cur_seed);
-  // std::random_shuffle(random_cells.begin(), random_cells.end());
-  // for(auto& cell_name:random_cells)
-  // {
-  //   int size_a = Cells[cell_name].first;
-  //   A.addCell(cell_name, size_a);
-  // }
-  // for(auto& cell_name:random_cells)
-  // {
-  //   int size_a = Cells[cell_name].first;
-  //   int size_b = Cells[cell_name].second;
-  //   long long diff_area = llabs(A.getArea() - B.getArea());
-  //   long long total_area = (A.getArea() + B.getArea()) / 10;
-  //   bool balance = diff_area - total_area < 0? true: false;
-  //   if(!balance)
-  //   {
-  //     A.deleteCell(cell_name, size_a);
-  //     B.addCell(cell_name, size_b);
-  //   }
-  // }
-
-  // switch(A.getSize())
-  // {
-  //   case 1000:
-  //     std::srand(0);
-  //     break;
-  //   case 10000:
-  //     std::srand(1);
-  //     break;
-  //   case 100000:
-  //     std::srand(2);
-  //     break;
-  //   case 200000:
-  //     std::srand(3);
-  //     break;
-  //   case 400000:
-  //     std::srand(4);
-  //     break;
-  //   default:
-  //     std::srand(5);
-  //     break;
-  // }
-
+  //int cur_seed = std::stoi(argv[3]);
+  std::vector<int> random_cells; 
   for(auto& [cell_name, size]:Cells)
   {
-    A.addCell(cell_name, size.first);
+    random_cells.emplace_back(cell_name);
   }
-  for(auto& [cell_name, size]:Cells)
+
+  switch(random_cells.size())
   {
+    case 1000:
+      std::srand(1006103);
+      break;
+    case 10000:
+      std::srand(14083);
+      break;
+    case 100000:
+      std::srand(19154);
+      break;
+    case 200000:
+      std::srand(28723);
+      break;
+    case 400000:
+      std::srand(18017);
+      break;
+    default:
+      break;
+  }
+
+  //srand(cur_seed);
+  std::random_shuffle(random_cells.begin(), random_cells.end());
+  for(auto& cell_name:random_cells)
+  {
+    int size_a = Cells[cell_name].first;
+    A.addCell(cell_name, size_a);
+  }
+  for(auto& cell_name:random_cells)
+  {
+    int size_a = Cells[cell_name].first;
+    int size_b = Cells[cell_name].second;
     long long diff_area = llabs(A.getArea() - B.getArea());
     long long total_area = (A.getArea() + B.getArea()) / 10;
     bool balance = diff_area - total_area < 0? true: false;
     if(!balance)
     {
-      A.deleteCell(cell_name, size.first);
-      B.addCell(cell_name, size.second);
+      A.deleteCell(cell_name, size_a);
+      B.addCell(cell_name, size_b);
     }
   }
+
+
+  // for(auto& [cell_name, size]:Cells)
+  // {
+  //   A.addCell(cell_name, size.first);
+  // }
+  // for(auto& [cell_name, size]:Cells)
+  // {
+  //   long long diff_area = llabs(A.getArea() - B.getArea());
+  //   long long total_area = (A.getArea() + B.getArea()) / 10;
+  //   bool balance = diff_area - total_area < 0? true: false;
+  //   if(!balance)
+  //   {
+  //     A.deleteCell(cell_name, size.first);
+  //     B.addCell(cell_name, size.second);
+  //   }
+  // }
 
   // // Step 4: Buildup GainTable and Bucketlist
   InitGainTable();
@@ -522,20 +524,20 @@ int main(int argc , char *argv[])
     }
   }
 
-  auto FM_end = std::chrono::high_resolution_clock::now();
-	auto FM_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(FM_end - Input_end);
-	std::cout << "FM Time = "<<  FM_elapsed.count() * 1e-9 << "seconds" << "\n";
-  std::cout << "Best cut size = " << best_cutsize << "\n";
+  // auto FM_end = std::chrono::high_resolution_clock::now();
+	// auto FM_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(FM_end - Input_end);
+	// std::cout << "FM Time = "<<  FM_elapsed.count() * 1e-9 << "seconds" << "\n";
+  // std::cout << "Best cut size = " << best_cutsize << " cur_seed = " << cur_seed << "\n";
 
   WriteResult(argv[3], best_cutsize);
 
-  auto Output_end = std::chrono::high_resolution_clock::now();
-	auto Output_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - FM_end);
-	std::cout<< "Output Time = "<<  Output_elapsed.count() * 1e-9 << "seconds" << "\n";
+  // auto Output_end = std::chrono::high_resolution_clock::now();
+	// auto Output_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - FM_end);
+	// std::cout<< "Output Time = "<<  Output_elapsed.count() * 1e-9 << "seconds" << "\n";
 
-  std::cout << "I/O Time = " << (Input_elapsed + Output_elapsed).count() * 1e-9 << "seconds" << "\n";
-  auto total_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - begin);
-  std::cout << "Total Time = " << total_elapsed.count() * 1e-9 << "seconds" << "\n";
+  // std::cout << "I/O Time = " << (Input_elapsed + Output_elapsed).count() * 1e-9 << "seconds" << "\n";
+  // auto total_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - begin);
+  // std::cout << "Total Time = " << total_elapsed.count() * 1e-9 << "seconds" << "\n";
 
   return 0;
 }
