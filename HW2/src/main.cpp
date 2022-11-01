@@ -431,9 +431,9 @@ int main(int argc , char *argv[])
     }
   }
 
-  // auto Input_end = std::chrono::high_resolution_clock::now();
-	// auto Input_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Input_end - begin);
-	// std::cout<< "Input Time = "<<  Input_elapsed.count() * 1e-9 << "seconds" << "\n";
+  auto Input_end = std::chrono::high_resolution_clock::now();
+	auto Input_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Input_end - begin);
+	std::cout<< "Input Time = "<<  Input_elapsed.count() * 1e-9 << "seconds" << "\n";
 
   // Step 3: Init Partition
   // First move all the cell into A, 
@@ -457,18 +457,21 @@ int main(int argc , char *argv[])
     case 100000:
       std::srand(19154);
       break;
-    case 200000:
-      std::srand(28723);
-      break;
-    case 400000:
-      std::srand(18017);
-      break;
+    // case 200000:
+    //   std::srand(28723);
+    //   break;
+    // case 400000:
+    //   std::srand(18017);
+    //   break;
     default:
       break;
   }
 
   //srand(cur_seed);
-  std::random_shuffle(random_cells.begin(), random_cells.end());
+  if(random_cells.size() <= 100000)
+  {
+    std::random_shuffle(random_cells.begin(), random_cells.end());
+  }
   for(auto& cell_name:random_cells)
   {
     int size_a = Cells[cell_name].first;
@@ -524,20 +527,20 @@ int main(int argc , char *argv[])
     }
   }
 
-  // auto FM_end = std::chrono::high_resolution_clock::now();
-	// auto FM_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(FM_end - Input_end);
-	// std::cout << "FM Time = "<<  FM_elapsed.count() * 1e-9 << "seconds" << "\n";
-  // std::cout << "Best cut size = " << best_cutsize << " cur_seed = " << cur_seed << "\n";
+  auto FM_end = std::chrono::high_resolution_clock::now();
+	auto FM_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(FM_end - Input_end);
+	std::cout << "FM Time = "<<  FM_elapsed.count() * 1e-9 << "seconds" << "\n";
+  std::cout << "Best cut size = " << best_cutsize << "\n";
 
   WriteResult(argv[3], best_cutsize);
 
-  // auto Output_end = std::chrono::high_resolution_clock::now();
-	// auto Output_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - FM_end);
-	// std::cout<< "Output Time = "<<  Output_elapsed.count() * 1e-9 << "seconds" << "\n";
+  auto Output_end = std::chrono::high_resolution_clock::now();
+	auto Output_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - FM_end);
+	std::cout<< "Output Time = "<<  Output_elapsed.count() * 1e-9 << "seconds" << "\n";
 
-  // std::cout << "I/O Time = " << (Input_elapsed + Output_elapsed).count() * 1e-9 << "seconds" << "\n";
-  // auto total_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - begin);
-  // std::cout << "Total Time = " << total_elapsed.count() * 1e-9 << "seconds" << "\n";
+  std::cout << "I/O Time = " << (Input_elapsed + Output_elapsed).count() * 1e-9 << "seconds" << "\n";
+  auto total_elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(Output_end - begin);
+  std::cout << "Total Time = " << total_elapsed.count() * 1e-9 << "seconds" << "\n";
 
   return 0;
 }
