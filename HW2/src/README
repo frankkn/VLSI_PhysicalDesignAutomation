@@ -11,7 +11,7 @@
   In this directory, enter the following command:
   Usage: ../bin/<exe> <net file> <cell file> <output file>
   e.g.:
-  $ ../bin/hw2 ../testcases/p2-1.cells ../testcases/p2-1.nets ../output/p2-1.txt
+  $ ../bin/hw2 ../testcases/p2-1.cells ../testcases/p2-1.nets ../output/p2-1.out
 
   In "HW2/bin/", enter the following command:
   Usage: ./<exe> <net file> <cell file> <output file>
