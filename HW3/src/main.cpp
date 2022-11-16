@@ -5,6 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <algorithm>
+#include <unordered_map>
 using namespace std;
 
 struct pin
@@ -14,6 +15,7 @@ struct pin
 
   pin(string id, int x_cor, int y_cor):id(id), x_cor(x_cor), y_cor(y_cor) {}
 };
+unordered_map<string, pin*> PinTable;
 
 struct HardBlock
 {
@@ -25,8 +27,8 @@ struct HardBlock
   HardBlock(string name, int width, int height, int center_x = 0, int center_y = 0):
     name(name), width(width), height(height), rotated(false), center_x(center_x), center_y(center_y), center_pin(new pin(name, center_x, center_y)) {}
 };
-
-vector<HardBlock*> HBTable;
+vector<HardBlock*> HBList;
+unordered_map<string, HardBlock*> HBTable;
 
 struct net
 {
@@ -34,8 +36,11 @@ struct net
   vector<pin*> pins;
   vector<HardBlock*> hardblocks;
 
+  net(int degree = 0):degree(degree) {}
+
   int HPWL();
 };
+vector<net*> NetList;
 
 struct TreeNode
 {
@@ -86,13 +91,51 @@ int main(int argc, char *argv[])
       int center_y = downmost_y + height/2;
 
       HardBlock *HB = new HardBlock(name, width, height, center_x, center_y);
-      HBTable.emplace_back(HB);
+      HBList.emplace_back(HB);
+      HBTable[name] = HB;
+      PinTable[name] = HB->center_pin;
     }
   }
   
-  for(auto& HB:HBTable)
+  // Step 1.5: Read pin
+  ifstream fin_pl(argv[3]);
+  string pin_name;
+  int x_cor, y_cor;
+  while(fin_pl >> pin_name >> x_cor >> y_cor)
   {
-    cout << HB->name << "\n";
+    pin *cur_pin = new pin(pin_name, x_cor, y_cor);
+    PinTable[pin_name] = cur_pin;
+  }
+
+  // Step 2: Read nets
+  ifstream fin_nets(argv[2]);
+  string tmp;
+  while(getline(fin_nets, tmp))
+  {
+    if(tmp[3] != 'D') continue;
+    stringstream ss(tmp);
+    string temp, colon;
+    int degree;
+    while(ss >> temp >> colon >> degree)
+    {
+      net *cur_net = new net(degree);
+      NetList.emplace_back(cur_net);
+      for(int i = 0; i < degree; ++i)
+      {
+        string terminal;
+        fin_nets >> terminal;
+        if(terminal[0] == 'p')
+        { 
+          auto fixed_pin = PinTable[terminal];
+          NetList.back()->pins.emplace_back(fixed_pin);
+        }
+        else
+        {
+          auto hb_pin = HBTable[terminal];
+          NetList.back()->hardblocks.emplace_back(hb_pin);
+        }
+      }
+    }
   }
 
   return 0;
