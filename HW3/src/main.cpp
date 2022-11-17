@@ -6,7 +6,12 @@
 #include <tuple>
 #include <algorithm>
 #include <unordered_map>
+#include <cmath>
 using namespace std;
+
+/* 
+./main.out ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.out 0.1
+*/
 
 struct pin
 {
@@ -20,12 +25,13 @@ unordered_map<string, pin*> PinTable;
 struct HardBlock
 {
   string name;
-  int width, height, center_x, center_y;
+  int width, height;
+  int downleft_x, downleft_y; 
   bool rotated;
   pin* center_pin;
 
-  HardBlock(string name, int width, int height, int center_x = 0, int center_y = 0):
-    name(name), width(width), height(height), rotated(false), center_x(center_x), center_y(center_y), center_pin(new pin(name, center_x, center_y)) {}
+  HardBlock(string name, int width, int height, int downleft_x = 0, int downleft_y = 0):
+    name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(new pin(name, center_x, center_y)) {}
 };
 vector<HardBlock*> HBList;
 unordered_map<string, HardBlock*> HBTable;
@@ -44,7 +50,8 @@ vector<net*> NetList;
 
 struct TreeNode
 {
-    int type, width, weight;
+    int type; //0:hb, -1:Vertical, -2:Horizontal
+    int width, weight;
     HardBlock *hardblock;
     TreeNode *lchild, *rchild;
     vector<tuple<int, int, pair<int,int>>> shape;
@@ -52,11 +59,11 @@ struct TreeNode
     TreeNode(int type, HardBlock* hardblock = nullptr):
       type(type), hardblock(hardblock), lchild(nullptr), rchild(nullptr)
     {
-      if(hardblock != nullptr)
-      {
-        shape.emplace_back(make_tuple(hardblock->width, hardblock->height, make_pair(0,0)));
-        shape.emplace_back(make_tuple(hardblock->height, hardblock->width, make_pair(1,1)));
-      }
+      // if(hardblock != nullptr)
+      // {
+      //   shape.emplace_back(make_tuple(hardblock->width, hardblock->height, make_pair(0,0)));
+      //   shape.emplace_back(make_tuple(hardblock->height, hardblock->width, make_pair(1,1)));
+      // }
     }
     void updateShape();
 };
@@ -83,14 +90,14 @@ int main(int argc, char *argv[])
 
       int leftmost_x = min(x0, min(x1, min(x2, x3)));
       int rightmost_x = max(x0, max(x1, max(x2, x3)));
-      int width = leftmost_x - leftmost_x;
+      int width = rightmost_x - leftmost_x;
       int center_x = leftmost_x + width/2;
       int upmost_y = max(y0, max(y1, max(y2, y3)));
       int downmost_y = min(y0, min(y1, min(y2, y3)));
       int height = upmost_y - downmost_y;
       int center_y = downmost_y + height/2;
 
-      HardBlock *HB = new HardBlock(name, width, height, center_x, center_y);
+      HardBlock *HB = new HardBlock(name, width, height, x0, y0);
       HBList.emplace_back(HB);
       HBTable[name] = HB;
       PinTable[name] = HB->center_pin;
@@ -138,5 +145,26 @@ int main(int argc, char *argv[])
     }
   }
 
+  // Step 3: Calculate total area to determine the width and height of floorplan region
+  int total_area = 0;
+  for(const auto& hb: HBList)
+  {
+    int w = hb->width, h = hb->height;
+    total_area += (w * h);
+  }
+  double dead_space_ratio = stod(argv[5]);
+  int region_side_len = sqrt(total_area * (1+dead_space_ratio));
+
+  // Step 4: Init Normalized Polish Expression
+  vector<int> NPE;
+  int cur_width = 0;
+  // NPE.emplace_back(1);
+  // for(int i = 2; i <= HBList.size()*2 - 1; ++i)
+  // {
+  //   if(i%2 == 0) NPE.emplace_back(i/2+1);
+  //   else  NPE.emplace_back(-1); // -1 represents V
+  // }
+  // for(auto& i:NPE)  cout << i << " ";
+  
   return 0;
 }
