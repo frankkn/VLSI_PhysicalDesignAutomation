@@ -22,4 +22,4 @@
   In this directory, enter the following command:
   Usage: ../verifier/Verify <net file> <cell file> <output file>
   e.g.:
-  $ ../verifier/Verify ../testcases/p2-1.cells ../testcases/p2-1.nets ../output/p2-1.txt
+  $ ../verifier/Verify ../testcases/p2-1.cells ../testcases/p2-1.nets ../output/p2-1.out
