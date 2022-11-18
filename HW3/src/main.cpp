@@ -31,7 +31,7 @@ struct HardBlock
   pin* center_pin;
 
   HardBlock(string name, int width, int height, int downleft_x = 0, int downleft_y = 0):
-    name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(new pin(name, center_x, center_y)) {}
+    name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(new pin(name, downleft_x, downleft_y)) {}
 };
 vector<HardBlock*> HBList;
 unordered_map<string, HardBlock*> HBTable;
@@ -166,5 +166,25 @@ int main(int argc, char *argv[])
   // }
   // for(auto& i:NPE)  cout << i << " ";
   
+  int cur_block = 0;
+  NPE.emplace_back(1);
+  for(int i = 1; i < HBList.size(); ++i)
+  {
+    auto curHB = HBList[i];
+    NPE.emplace_back(i+1);
+    if(cur_width + curHB->width > region_side_len)
+    {
+      NPE.emplace_back(-2);
+      cur_width = curHB->width;
+    }
+    else
+    {
+      cur_width += curHB->width;
+      NPE.emplace_back(-1);
+    }
+  }
+
+  for(auto& i:NPE)  cout << i << " ";
+
   return 0;
 }
