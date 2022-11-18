@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <cmath>
+#include <stack>
 using namespace std;
 
 /* 
@@ -52,28 +53,64 @@ struct TreeNode
 {
     int type; //0:hb, -1:Vertical, -2:Horizontal
     int width, weight;
-    HardBlock *hardblock;
+    HardBlock* hardblock;
     TreeNode *lchild, *rchild;
-    vector<tuple<int, int, pair<int,int>>> shape;
+    vector<tuple<int, int, pair<int,int>>> shape; // For VHnode (cut node)
     
     TreeNode(int type, HardBlock* hardblock = nullptr):
       type(type), hardblock(hardblock), lchild(nullptr), rchild(nullptr)
     {
-      // if(hardblock != nullptr)
-      // {
-      //   shape.emplace_back(make_tuple(hardblock->width, hardblock->height, make_pair(0,0)));
-      //   shape.emplace_back(make_tuple(hardblock->height, hardblock->width, make_pair(1,1)));
-      // }
+      if(type == 0) // leaf block shape
+      {
+        shape.emplace_back(make_tuple(hardblock->width, hardblock->height, (0,0)));
+        shape.emplace_back(make_tuple(hardblock->height, hardblock->width, (0,0)));
+      }
     }
     void updateShape();
 };
+
+void TreeNode::updateShape()
+{
+
+}
+
+TreeNode* ConstructTree(vector<int>& NPE)
+{
+  stack<TreeNode*> st;
+  for(auto& element:NPE)
+  {
+    if(element >= 0)
+    {
+      string hbNode_name = "sb"+element;
+      HardBlock* hb = HBTable[hbNode_name];
+      TreeNode* hbNode = new TreeNode(0, hb);
+      st.emplace(hbNode);
+    }
+    else
+    {
+      TreeNode* VHnode = new TreeNode(element);
+      TreeNode* Rnode = st.top(); st.pop();
+      VHnode->rchild = Rnode;
+      TreeNode* Lnode = st.top(); st.pop();
+      VHnode->lchild = Lnode;
+      st.emplace(VHnode);
+      VHnode->updateShape();
+    }
+  }
+  return st.top(); // root
+}
+
+// int calHPWL()
+// {
+
+// }
 
 int main(int argc, char *argv[])
 {
   cin.tie(nullptr);
   ios::sync_with_stdio(false);
 
-  // Step 1: Read hard blocks
+  // Step 1-1: Read hard blocks
   ifstream fin_hardblocks(argv[1]);
   string s;
   while(getline(fin_hardblocks, s))
@@ -104,7 +141,7 @@ int main(int argc, char *argv[])
     }
   }
   
-  // Step 1.5: Read pin
+  // Step 1-2: Read pin
   ifstream fin_pl(argv[3]);
   string pin_name;
   int x_cor, y_cor;
@@ -114,7 +151,7 @@ int main(int argc, char *argv[])
     PinTable[pin_name] = cur_pin;
   }
 
-  // Step 2: Read nets
+  // Step 1-3: Read nets
   ifstream fin_nets(argv[2]);
   string tmp;
   while(getline(fin_nets, tmp))
@@ -145,7 +182,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  // Step 3: Calculate total area to determine the width and height of floorplan region
+  // Step 2-1: Calculate total area to determine the width and height of floorplan region
   int total_area = 0;
   for(const auto& hb: HBList)
   {
@@ -155,17 +192,9 @@ int main(int argc, char *argv[])
   double dead_space_ratio = stod(argv[5]);
   int region_side_len = sqrt(total_area * (1+dead_space_ratio));
 
-  // Step 4: Init Normalized Polish Expression
+  // Step 2-2: Init Normalized Polish Expression
   vector<int> NPE;
   int cur_width = 0;
-  // NPE.emplace_back(1);
-  // for(int i = 2; i <= HBList.size()*2 - 1; ++i)
-  // {
-  //   if(i%2 == 0) NPE.emplace_back(i/2+1);
-  //   else  NPE.emplace_back(-1); // -1 represents V
-  // }
-  // for(auto& i:NPE)  cout << i << " ";
-  
   NPE.emplace_back(0);
   for(int i = 1; i < HBList.size(); ++i)
   {
@@ -182,6 +211,12 @@ int main(int argc, char *argv[])
       NPE.emplace_back(-1);
     }
   }
+
+  // Step 3: Simulated Annealing Floorplanning
+  vector<int> BestNPE = NPE;
+  double T0 = 100;
+  int M = 0, MT = 0, uphill = 0;
+  int k = 5, N = k * HBList.size();
 
   return 0;
 }
