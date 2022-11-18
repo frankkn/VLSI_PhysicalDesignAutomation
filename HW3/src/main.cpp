@@ -166,12 +166,11 @@ int main(int argc, char *argv[])
   // }
   // for(auto& i:NPE)  cout << i << " ";
   
-  int cur_block = 0;
-  NPE.emplace_back(1);
+  NPE.emplace_back(0);
   for(int i = 1; i < HBList.size(); ++i)
   {
     auto curHB = HBList[i];
-    NPE.emplace_back(i+1);
+    NPE.emplace_back(i);
     if(cur_width + curHB->width > region_side_len)
     {
       NPE.emplace_back(-2);
@@ -183,8 +182,6 @@ int main(int argc, char *argv[])
       NPE.emplace_back(-1);
     }
   }
-
-  for(auto& i:NPE)  cout << i << " ";
 
   return 0;
 }
