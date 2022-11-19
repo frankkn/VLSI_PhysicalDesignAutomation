@@ -71,7 +71,53 @@ struct TreeNode
 
 void TreeNode::updateShape()
 {
-
+  shape.clear();
+  if(type == -1)
+  {
+    sort(lchild->shape.begin(), lchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<1>(a) > get<1>(b); });
+    sort(rchild->shape.begin(), rchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<1>(a) > get<1>(b); });
+    int i = 0, j = 0;
+    while(i < lchild->shape.size() && j < rchild->shape.size())
+    {
+      auto cur_shape = make_tuple(get<0>(lchild->shape[i])+get<0>(rchild->shape[j]),max(get<1>(lchild->shape[i]),get<1>(rchild->shape[j])),(i,j));
+      shape.emplace_back(cur_shape);
+      if(get<1>(lchild->shape[i]) > get<1>(rchild->shape[j]))
+      {
+        ++i;
+      }
+      else if(get<1>(lchild->shape[i]) < get<1>(rchild->shape[j]))
+      {
+        ++j;
+      }
+      else
+      {
+        ++i;++j;
+      }
+    }
+  }
+  else
+  {
+    sort(lchild->shape.begin(), lchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<0>(a) > get<0>(b); });
+    sort(rchild->shape.begin(), rchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<0>(a) > get<0>(b); });
+    int i = 0, j = 0;
+    while(i < lchild->shape.size() && j < rchild->shape.size())
+    {
+      auto cur_shape = make_tuple(max(get<0>(lchild->shape[i]),get<0>(rchild->shape[j])),get<1>(lchild->shape[i])+get<1>(rchild->shape[j]),(i,j));
+      shape.emplace_back(cur_shape);
+      if(get<0>(lchild->shape[i]) > get<0>(rchild->shape[j]))
+      {
+        ++i;
+      }
+      else if(get<0>(lchild->shape[i]) < get<0>(rchild->shape[j]))
+      {
+        ++j;
+      }
+      else
+      {
+        ++i;++j;
+      }
+    }
+  }
 }
 
 TreeNode* ConstructTree(vector<int>& NPE)
@@ -194,7 +240,7 @@ int main(int argc, char *argv[])
 
   // Step 2-2: Init Normalized Polish Expression
   vector<int> NPE;
-  int cur_width = 0;
+  int cur_width = HBList[0]->width;
   NPE.emplace_back(0);
   for(int i = 1; i < HBList.size(); ++i)
   {
