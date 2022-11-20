@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <cmath>
 #include <stack>
+#include <climits>
+#include <stdlib.h>
 using namespace std;
 
 /* 
@@ -45,9 +47,30 @@ struct net
 
   net(int degree = 0):degree(degree) {}
 
-  int HPWL();
+  int calHPWL();
 };
 vector<net*> NetList;
+
+int net::calHPWL()
+{
+  int min_x = INT_MAX, max_x = INT_MIN;
+  int min_y = INT_MAX, max_y = INT_MIN;
+  for(const auto& pin: pins)
+  {
+    if(pin->x_cor < min_x)  min_x = pin->x_cor;
+    if(pin->x_cor > max_x)  max_x = pin->x_cor;
+    if(pin->y_cor < min_y)  min_y = pin->y_cor;
+    if(pin->y_cor > max_y)  max_y = pin->y_cor;
+  }
+  for(const auto& hb: hardblocks)
+  {
+    if(hb->center_pin->x_cor < min_x) min_x = hb->center_pin->x_cor;
+    if(hb->center_pin->x_cor > max_x) max_x = hb->center_pin->x_cor;
+    if(hb->center_pin->y_cor < min_y) min_y = hb->center_pin->y_cor;
+    if(hb->center_pin->y_cor > max_y) max_y = hb->center_pin->y_cor;
+  }
+  return max_x - min_x + max_y - min_y;
+}
 
 struct TreeNode
 {
@@ -60,18 +83,19 @@ struct TreeNode
     TreeNode(int type, HardBlock* hardblock = nullptr):
       type(type), hardblock(hardblock), lchild(nullptr), rchild(nullptr)
     {
-      if(type == 0) // leaf block shape
-      {
-        shape.emplace_back(make_tuple(hardblock->width, hardblock->height, (0,0)));
-        shape.emplace_back(make_tuple(hardblock->height, hardblock->width, (0,0)));
-      }
+      // if(type == 0) // leaf block shape
+      // {
+      //   shape.emplace_back(make_tuple(hardblock->width, hardblock->height, (0,0)));
+      //   shape.emplace_back(make_tuple(hardblock->height, hardblock->width, (0,0)));
+      // }
     }
     void updateShape();
 };
 
+/*
 void TreeNode::updateShape()
 {
-  shape.clear();
+  decltype(shape)().swap(shape);
   if(type == -1)
   {
     sort(lchild->shape.begin(), lchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<1>(a) > get<1>(b); });
@@ -119,7 +143,8 @@ void TreeNode::updateShape()
     }
   }
 }
-
+*/
+/*
 TreeNode* ConstructTree(vector<int>& NPE)
 {
   stack<TreeNode*> st;
@@ -145,6 +170,58 @@ TreeNode* ConstructTree(vector<int>& NPE)
   }
   return st.top(); // root
 }
+*/
+
+// template<class T>
+// void SWAP(T& a, T& b) // "perfect swap" (almost)
+// {
+//   T tmp {move(a)}; // move from a
+//   a = move(b); // move from b
+//   b = move(tmp); // move from tmp
+// }
+
+/*
+vector<int>& selectMove(vector<int>& curNPE, int M)
+{
+  vector<int> LeafPos;
+  switch(M)
+  {
+    case 0:
+      for(int i = 0; i < curNPE.size(); ++i)
+      {
+        if(curNPE[i] >= 0)
+        {
+          LeafPos.emplace_back(i);
+        }
+      }
+      int n = LeafPos.size();
+      int firstIdx = rand() % n, secondIdx = rand() % n;
+      while(firstIdx == secondIdx)  firstIdx = rand() % n;
+      SWAP(curNPE[firstIdx], curNPE[secondIdx]);
+      break;
+    case 1:
+
+      break;
+    case 2:  
+
+      break;
+  }
+  return curNPE;
+}
+*/
+
+// vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
+// {
+//   vector<int> BestNPE {}, curNPE = NPE;
+//   double T0 = 100;
+//   int MT = 0, uphill = 0, reject = 0;
+//   int N = k * HBList.size();
+//   while(reject/MT <= 0.95 && T0 >= epsilon)
+//   {
+//     int M = rand() % 3;
+//     vector<int> curNPE = selectMove(curNPE, M);
+//   }
+// }
 
 // int calHPWL()
 // {
@@ -239,30 +316,54 @@ int main(int argc, char *argv[])
   int region_side_len = sqrt(total_area * (1+dead_space_ratio));
 
   // Step 2-2: Init Normalized Polish Expression
-  vector<int> NPE;
+  vector<int> NPE, row;
+  deque<vector<int>> rows;
   int cur_width = HBList[0]->width;
-  NPE.emplace_back(0);
+  row.emplace_back(0);
+  //int placedBlock = 1;
   for(int i = 1; i < HBList.size(); ++i)
   {
     auto curHB = HBList[i];
-    NPE.emplace_back(i);
-    if(cur_width + curHB->width > region_side_len)
+    if(cur_width + curHB->width <= region_side_len)
     {
-      NPE.emplace_back(-2);
-      cur_width = curHB->width;
+      row.emplace_back(i);
+      cur_width += curHB->width;
+      row.emplace_back(-1);
     }
     else
     {
-      cur_width += curHB->width;
-      NPE.emplace_back(-1);
+      rows.emplace_back(row);
+      decltype(row)().swap(row);
+
+      row.emplace_back(i);
+      cur_width = curHB->width;
     }
   }
+  rows.emplace_back(row);
+
+  for(auto& row_i: rows[0])
+  {
+    NPE.emplace_back(row_i);
+  }
+  rows.pop_front();
+
+  for(auto& row:rows)
+  {
+    for(auto& row_i:row)
+    {
+      NPE.emplace_back(row_i);
+    }
+    NPE.emplace_back(-2);
+  }
+
+  cout << NPE.size() << "!\n";
+  for(auto NPE_i: NPE)  cout << NPE_i << " ";
 
   // Step 3: Simulated Annealing Floorplanning
-  vector<int> BestNPE = NPE;
-  double T0 = 100;
-  int M = 0, MT = 0, uphill = 0;
-  int k = 5, N = k * HBList.size();
+  int epsilon = 0.5; // End Temperature
+  int ratio = 0.95; // Decreasing ratio for temperature
+  int k = 5; 
+  // SAfloorplanning(epsilon, ratio, k, NPE);
 
   return 0;
 }
