@@ -10,6 +10,7 @@
 #include <stack>
 #include <climits>
 #include <stdlib.h>
+#include <time.h>
 using namespace std;
 
 /* 
@@ -170,7 +171,6 @@ TreeNode* ConstructTree(vector<int>& NPE)
   return st.top(); // root
 }
 
-
 template<class T>
 void SWAP(T& a, T& b) // "perfect swap" (almost)
 {
@@ -179,43 +179,133 @@ void SWAP(T& a, T& b) // "perfect swap" (almost)
   b = move(tmp); // move from tmp
 }
 
-/*
+void Complement(vector<int>& curNPE, int startIdx)
+{
+  for(int i = startIdx; i < curNPE.size(); ++i)
+  {
+    if(curNPE[i] == -1) curNPE[i] = -2;
+    else if(curNPE[i] == -2)  curNPE[i] = -1;
+    else break;
+  }
+}
+
+bool isSkewed(vector<int>& curNPE, int i)
+{
+  // SWAP(curNPE[i], curNPE[i+1]);
+  // if(curNPE[i-1] == curNPE[i])  return false;
+  // else if(curNPE[i] == curNPE[i+1]) return false;
+  // return true;
+
+  if(i-1 >= 0 && curNPE[i-1] == curNPE[i+1])
+  {
+    return false;
+  }
+  else if(i+2 < curNPE.size() && curNPE[i] == curNPE[i+2])
+  {
+    return false;
+  }
+  return true;
+}
+
+bool isBallot(vector<int>& curNPE, int i)
+{
+  // SWAP(curNPE[i], curNPE[i+1]);
+  // int N = 0;
+  // for(int k = 0; k <= i+1; ++k)
+  // {
+  //   if(curNPE[i] == -1 || curNPE[i] == -2)  ++N;
+  //   if(2 * N < i) return false;
+  // }
+  // return true;
+
+  // operand + operator
+  if(curNPE[i] >= 0)
+  {
+    int N = 0;
+    for(int k = 0; k <= i+1; ++k)
+    {
+      if(curNPE[i] == -1 || curNPE[i] == -2)  ++N;
+      if(2 * N < i) return false;
+    }
+  }
+  return true;
+}
+
 vector<int>& selectMove(vector<int>& curNPE, int M)
 {
-  vector<int> SwapPos;
+  unsigned seed = (unsigned)time(NULL);
+  srand(seed);
   switch(M)
   {
     case 0:
+    {
+      vector<int> SwapPos;
       for(int i = 0; i < curNPE.size(); ++i)
       {
-        if(curNPE[i] >= 0)
+        if(curNPE[i] >= 0 && SwapPos.size() < HBList.size()-1)
         {
           SwapPos.emplace_back(i);
         }
       }
       int n = SwapPos.size();
-      int firstIdx = rand() % n, secondIdx = rand() % n;
-      while(firstIdx == secondIdx)  firstIdx = rand() % n;
-      SWAP(curNPE[firstIdx], curNPE[secondIdx]);
+    
+      int r = rand() % n;
+      int pos1 = SwapPos[r];
+      int pos2 = pos1;
+      while(curNPE[++pos2] < 0);
+      // cout << "pos1 = " << pos1 << " Block num = " << curNPE[pos1] << endl;
+      // cout << "pos2 = " << pos2 << " Block num = " << curNPE[pos2] << endl;
+      SWAP(curNPE[pos1], curNPE[pos2]);
       break;
+    }
     case 1:
+    {
+      vector<int> InverseStartPos;
       for(int i = 0; i < curNPE.size()-1; ++i)
       {
         if(curNPE[i] >= 0 && curNPE[i+1] < 0)
         {
-          SwapPos.emplace_back(i+1);
+          InverseStartPos.emplace_back(i+1);
+        }
+      }
+      int n = InverseStartPos.size();
+      int r = rand() % n;
+      int startIdx = InverseStartPos[r];
+      // cout << "StartIdx of curNPE = " << startIdx << endl;
+      Complement(curNPE, startIdx);
+      break;
+    }
+    case 2:  
+      vector<int> SwapPos;
+      for(int i = 0; i < curNPE.size()-1; ++i)
+      {
+        if(curNPE[i] >= 0 && curNPE[i+1] < 0)
+        {
+          if(isSkewed(curNPE, i) && isBallot(curNPE, i))
+          {
+            SwapPos.emplace_back(i);
+          }
+        }
+        else if(curNPE[i] < 0 && curNPE[i+1] >= 0)
+        {
+          if(isSkewed(curNPE, i))
+          {
+            SwapPos.emplace_back(i);
+          }
         }
       }
       int n = SwapPos.size();
-
-
-      break;
-    case 2:  
-
+      if(n != 0)
+      {
+        int r = rand() % n;
+        int SwapIdx = SwapPos[r];
+        // cout << "SwapIdx = " << SwapIdx << endl;
+        SWAP(curNPE[SwapIdx], curNPE[SwapIdx+1]);
+      }
       break;
   }
   return curNPE;
-}*/
+}
 
 /*
 vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
@@ -392,6 +482,13 @@ int main(int argc, char *argv[])
 
   PrintInit(NPE); 
 
+  vector<int> curNPE = NPE;
+  selectMove(curNPE, 2);
+
+  cout << "-----------------------------------------------------" << endl;
+
+  PrintInit(curNPE);
+  
   // Step 3: Simulated Annealing Floorplanning
   int epsilon = 0.5; // End Temperature
   int ratio = 0.95; // Decreasing ratio for temperature
