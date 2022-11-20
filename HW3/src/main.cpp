@@ -92,11 +92,6 @@ struct TreeNode
     void updateShape();
 };
 
-bool check_2(const tuple<int,int,pair<int,int>>& a, const tuple<int,int,pair<int,int>>& b)
-{
-  return (get<0>(a) < get<0>(b));
-}
-
 void TreeNode::updateShape()
 {
   decltype(shape)().swap(shape);
@@ -184,54 +179,87 @@ void SWAP(T& a, T& b) // "perfect swap" (almost)
   b = move(tmp); // move from tmp
 }
 
+/*
+vector<int>& selectMove(vector<int>& curNPE, int M)
+{
+  vector<int> SwapPos;
+  switch(M)
+  {
+    case 0:
+      for(int i = 0; i < curNPE.size(); ++i)
+      {
+        if(curNPE[i] >= 0)
+        {
+          SwapPos.emplace_back(i);
+        }
+      }
+      int n = SwapPos.size();
+      int firstIdx = rand() % n, secondIdx = rand() % n;
+      while(firstIdx == secondIdx)  firstIdx = rand() % n;
+      SWAP(curNPE[firstIdx], curNPE[secondIdx]);
+      break;
+    case 1:
+      for(int i = 0; i < curNPE.size()-1; ++i)
+      {
+        if(curNPE[i] >= 0 && curNPE[i+1] < 0)
+        {
+          SwapPos.emplace_back(i+1);
+        }
+      }
+      int n = SwapPos.size();
 
-// vector<int>& selectMove(vector<int>& curNPE, int M)
-// {
-//   vector<int> LeafPos;
-//   switch(M)
-//   {
-//     case 0:
-//       for(int i = 0; i < curNPE.size(); ++i)
-//       {
-//         if(curNPE[i] >= 0)
-//         {
-//           LeafPos.emplace_back(i);
-//         }
-//       }
-//       int n = LeafPos.size();
-//       int firstIdx = rand() % n, secondIdx = rand() % n;
-//       while(firstIdx == secondIdx)  firstIdx = rand() % n;
-//       SWAP(curNPE[firstIdx], curNPE[secondIdx]);
-//       break;
-//     case 1:
 
-//       break;
-//     case 2:  
+      break;
+    case 2:  
 
-//       break;
-//   }
-//   return curNPE;
-// }
+      break;
+  }
+  return curNPE;
+}*/
 
-
+/*
 vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
 {
   vector<int> BestNPE {}, curNPE = NPE;
   double T0 = 100;
   int MT = 0, uphill = 0, reject = 0;
   int N = k * HBList.size();
-  // while(reject/MT <= 0.95 && T0 >= epsilon)
-  // {
-  //   int M = rand() % 3;
-  //   vector<int> curNPE = selectMove(curNPE, M);
-  // }
+  while(reject/MT <= 0.95 && T0 >= epsilon)
+  {
+    int M = rand() % 3;
+    vector<int> curNPE = selectMove(curNPE, M);
+  }
   return {};
-}
+}*/
 
 // int calHPWL()
 // {
 
 // }
+
+void PrintInit(vector<int>& NPE)
+{
+  vector<vector<int>> rows;
+  vector<int> row;
+  for(auto NPE_i: NPE)
+  {
+    row.emplace_back(NPE_i);
+    if(NPE_i == -2)
+    { 
+      rows.emplace_back(row);
+      row.clear();
+    }
+  }
+  reverse(rows.begin(), rows.end());
+  for(auto row: rows)
+  {
+    for(auto row_i: row)
+    {
+      cout << row_i << " ";
+      if(row_i == -2) cout << "\n";
+    }
+  }
+}
 
 int main(int argc, char *argv[])
 {
@@ -351,6 +379,7 @@ int main(int argc, char *argv[])
     NPE.emplace_back(row_i);
   }
   rows.pop_front();
+  NPE.emplace_back(-2);
 
   for(auto& row:rows)
   {
@@ -361,8 +390,7 @@ int main(int argc, char *argv[])
     NPE.emplace_back(-2);
   }
 
-  cout << NPE.size() << "!\n";
-  for(auto NPE_i: NPE)  cout << NPE_i << " ";
+  PrintInit(NPE); 
 
   // Step 3: Simulated Annealing Floorplanning
   int epsilon = 0.5; // End Temperature
