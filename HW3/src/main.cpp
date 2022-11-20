@@ -78,32 +78,36 @@ struct TreeNode
     int width, weight;
     HardBlock* hardblock;
     TreeNode *lchild, *rchild;
-    vector<tuple<int, int, pair<int,int>>> shape; // For VHnode (cut node)
+    vector<tuple<int,int,pair<int,int>>> shape; // For VHnode (cut node)
     
-    TreeNode(int type, HardBlock* hardblock = nullptr):
+    TreeNode(int type = 0, HardBlock* hardblock = nullptr):
       type(type), hardblock(hardblock), lchild(nullptr), rchild(nullptr)
     {
-      // if(type == 0) // leaf block shape
-      // {
-      //   shape.emplace_back(make_tuple(hardblock->width, hardblock->height, (0,0)));
-      //   shape.emplace_back(make_tuple(hardblock->height, hardblock->width, (0,0)));
-      // }
+      if(type == 0) // leaf block shape
+      {
+        shape.emplace_back(make_tuple(hardblock->width, hardblock->height, make_pair(0,0)));
+        shape.emplace_back(make_tuple(hardblock->height, hardblock->width, make_pair(0,0)));
+      }
     }
     void updateShape();
 };
 
-/*
+bool check_2(const tuple<int,int,pair<int,int>>& a, const tuple<int,int,pair<int,int>>& b)
+{
+  return (get<0>(a) < get<0>(b));
+}
+
 void TreeNode::updateShape()
 {
   decltype(shape)().swap(shape);
   if(type == -1)
   {
-    sort(lchild->shape.begin(), lchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<1>(a) > get<1>(b); });
-    sort(rchild->shape.begin(), rchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<1>(a) > get<1>(b); });
+    sort(lchild->shape.begin(), lchild->shape.end(), [&](auto& a, auto& b) {return get<1>(a) > get<1>(b);});
+    sort(rchild->shape.begin(), rchild->shape.end(), [&](auto& a, auto& b) {return get<1>(a) > get<1>(b);});
     int i = 0, j = 0;
     while(i < lchild->shape.size() && j < rchild->shape.size())
     {
-      auto cur_shape = make_tuple(get<0>(lchild->shape[i])+get<0>(rchild->shape[j]),max(get<1>(lchild->shape[i]),get<1>(rchild->shape[j])),(i,j));
+      auto cur_shape = make_tuple(get<0>(lchild->shape[i])+get<0>(rchild->shape[j]), max(get<1>(lchild->shape[i]), get<1>(rchild->shape[j])),make_pair(i,j));
       shape.emplace_back(cur_shape);
       if(get<1>(lchild->shape[i]) > get<1>(rchild->shape[j]))
       {
@@ -121,12 +125,12 @@ void TreeNode::updateShape()
   }
   else
   {
-    sort(lchild->shape.begin(), lchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<0>(a) > get<0>(b); });
-    sort(rchild->shape.begin(), rchild->shape.end(), [&](tuple<int,int,pair<int,int>>& a, tuple<int,int,pair<int,int>>& b){ return get<0>(a) > get<0>(b); });
+    sort(lchild->shape.begin(), lchild->shape.end(), [&](auto& a, auto& b) {return get<0>(a) > get<0>(b);});
+    sort(rchild->shape.begin(), rchild->shape.end(), [&](auto& a, auto& b) {return get<0>(a) > get<0>(b);});
     int i = 0, j = 0;
     while(i < lchild->shape.size() && j < rchild->shape.size())
     {
-      auto cur_shape = make_tuple(max(get<0>(lchild->shape[i]),get<0>(rchild->shape[j])),get<1>(lchild->shape[i])+get<1>(rchild->shape[j]),(i,j));
+      auto cur_shape = make_tuple(max(get<0>(lchild->shape[i]),get<0>(rchild->shape[j])), get<1>(lchild->shape[i])+get<1>(rchild->shape[j]), make_pair(i,j));
       shape.emplace_back(cur_shape);
       if(get<0>(lchild->shape[i]) > get<0>(rchild->shape[j]))
       {
@@ -143,8 +147,8 @@ void TreeNode::updateShape()
     }
   }
 }
-*/
-/*
+
+
 TreeNode* ConstructTree(vector<int>& NPE)
 {
   stack<TreeNode*> st;
@@ -170,58 +174,59 @@ TreeNode* ConstructTree(vector<int>& NPE)
   }
   return st.top(); // root
 }
-*/
 
-// template<class T>
-// void SWAP(T& a, T& b) // "perfect swap" (almost)
-// {
-//   T tmp {move(a)}; // move from a
-//   a = move(b); // move from b
-//   b = move(tmp); // move from tmp
-// }
 
-/*
-vector<int>& selectMove(vector<int>& curNPE, int M)
+template<class T>
+void SWAP(T& a, T& b) // "perfect swap" (almost)
 {
-  vector<int> LeafPos;
-  switch(M)
-  {
-    case 0:
-      for(int i = 0; i < curNPE.size(); ++i)
-      {
-        if(curNPE[i] >= 0)
-        {
-          LeafPos.emplace_back(i);
-        }
-      }
-      int n = LeafPos.size();
-      int firstIdx = rand() % n, secondIdx = rand() % n;
-      while(firstIdx == secondIdx)  firstIdx = rand() % n;
-      SWAP(curNPE[firstIdx], curNPE[secondIdx]);
-      break;
-    case 1:
-
-      break;
-    case 2:  
-
-      break;
-  }
-  return curNPE;
+  T tmp {move(a)}; // move from a
+  a = move(b); // move from b
+  b = move(tmp); // move from tmp
 }
-*/
 
-// vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
+
+// vector<int>& selectMove(vector<int>& curNPE, int M)
 // {
-//   vector<int> BestNPE {}, curNPE = NPE;
-//   double T0 = 100;
-//   int MT = 0, uphill = 0, reject = 0;
-//   int N = k * HBList.size();
-//   while(reject/MT <= 0.95 && T0 >= epsilon)
+//   vector<int> LeafPos;
+//   switch(M)
 //   {
-//     int M = rand() % 3;
-//     vector<int> curNPE = selectMove(curNPE, M);
+//     case 0:
+//       for(int i = 0; i < curNPE.size(); ++i)
+//       {
+//         if(curNPE[i] >= 0)
+//         {
+//           LeafPos.emplace_back(i);
+//         }
+//       }
+//       int n = LeafPos.size();
+//       int firstIdx = rand() % n, secondIdx = rand() % n;
+//       while(firstIdx == secondIdx)  firstIdx = rand() % n;
+//       SWAP(curNPE[firstIdx], curNPE[secondIdx]);
+//       break;
+//     case 1:
+
+//       break;
+//     case 2:  
+
+//       break;
 //   }
+//   return curNPE;
 // }
+
+
+vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
+{
+  vector<int> BestNPE {}, curNPE = NPE;
+  double T0 = 100;
+  int MT = 0, uphill = 0, reject = 0;
+  int N = k * HBList.size();
+  // while(reject/MT <= 0.95 && T0 >= epsilon)
+  // {
+  //   int M = rand() % 3;
+  //   vector<int> curNPE = selectMove(curNPE, M);
+  // }
+  return {};
+}
 
 // int calHPWL()
 // {

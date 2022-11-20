@@ -3,6 +3,8 @@
     "xiosbase": "cpp",
     "xstring": "cpp",
     "vector": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "tuple": "cpp",
+    "utility": "cpp"
   }
 }
