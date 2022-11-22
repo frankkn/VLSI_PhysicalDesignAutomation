@@ -33,12 +33,22 @@ struct HardBlock
   int downleft_x, downleft_y; 
   bool rotated;
   pin* center_pin;
+  void update(int& new_width, int& new_height, int& new_x, int& new_y);
 
   HardBlock(string name, int width, int height, int downleft_x = 0, int downleft_y = 0):
     name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(new pin(name, downleft_x, downleft_y)) {}
 };
 vector<HardBlock*> HBList;
 unordered_map<string, HardBlock*> HBTable;
+
+void HardBlock::update(int& new_width, int& new_height, int& new_x, int& new_y)
+{
+  downleft_x = new_x;
+  downleft_y = new_y;
+  rotated = width == new_width? rotated:!rotated;
+  center_pin->x_cor = new_x + new_width/2;
+  center_pin->y_cor = new_y + new_height/2;
+}
 
 struct net
 {
@@ -144,42 +154,87 @@ void TreeNode::updateShape()
   }
 }
 
+class SA
+{ 
+  private:
+    double region_side_len;
+    void CalSideLen(double& dead_space_ratio);
+    template<class T> void SWAP(T& a, T& b); // "perfect swap" (almost)
+    void InitNPE(vector<int>& NPE);
+    void Complement(vector<int>& curNPE, int startIdx);
+    bool isSkewed(vector<int>& curNPE, int i);
+    bool isBallot(vector<int>& curNPE, int i);
+    vector<int>& selectMove(vector<int>& curNPE, int M);
+    TreeNode* ConstructTree(vector<int>& NPE);
+  public:
+    SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
+    void Run();
+};
 
-TreeNode* ConstructTree(vector<int>& NPE)
+void SA::CalSideLen(double& dead_space_ratio)
 {
-  stack<TreeNode*> st;
-  for(auto& element:NPE)
+  double total_area = 0;
+  for(const auto& hb: HBList)
   {
-    if(element >= 0)
-    {
-      string hbNode_name = "sb"+element;
-      HardBlock* hb = HBTable[hbNode_name];
-      TreeNode* hbNode = new TreeNode(0, hb);
-      st.emplace(hbNode);
-    }
-    else
-    {
-      TreeNode* VHnode = new TreeNode(element);
-      TreeNode* Rnode = st.top(); st.pop();
-      VHnode->rchild = Rnode;
-      TreeNode* Lnode = st.top(); st.pop();
-      VHnode->lchild = Lnode;
-      st.emplace(VHnode);
-      VHnode->updateShape();
-    }
+    int w = hb->width, h = hb->height;
+    total_area += (w * h);
   }
-  return st.top(); // root
+  region_side_len = sqrt(total_area * (1+dead_space_ratio));
 }
 
 template<class T>
-void SWAP(T& a, T& b) // "perfect swap" (almost)
+void SA::SWAP(T& a, T& b) // "perfect swap" (almost)
 {
   T tmp {move(a)}; // move from a
   a = move(b); // move from b
   b = move(tmp); // move from tmp
 }
 
-void Complement(vector<int>& curNPE, int startIdx)
+void SA::InitNPE(vector<int>& NPE)
+{
+  vector<int> row;
+  deque<vector<int>> rows;
+  int cur_width = HBList[0]->width;
+  row.emplace_back(0);
+  int placedBlock = 1;
+  for(int i = 1; i < HBList.size(); ++i)
+  {
+    auto curHB = HBList[i];
+    if(cur_width + curHB->width <= region_side_len)
+    {
+      row.emplace_back(i);
+      cur_width += curHB->width;
+      row.emplace_back(-1);
+    }
+    else
+    {
+      rows.emplace_back(row);
+      decltype(row)().swap(row);
+
+      row.emplace_back(i);
+      cur_width = curHB->width;
+    }
+  }
+  rows.emplace_back(row);
+
+  for(auto& row_i: rows[0])
+  {
+    NPE.emplace_back(row_i);
+  }
+  rows.pop_front();
+  //NPE.emplace_back(-2);
+
+  for(auto& row:rows)
+  {
+    for(auto& row_i:row)
+    {
+      NPE.emplace_back(row_i);
+    }
+    NPE.emplace_back(-2);
+  }
+}
+
+void SA::Complement(vector<int>& curNPE, int startIdx)
 {
   for(int i = startIdx; i < curNPE.size(); ++i)
   {
@@ -189,7 +244,7 @@ void Complement(vector<int>& curNPE, int startIdx)
   }
 }
 
-bool isSkewed(vector<int>& curNPE, int i)
+bool SA::isSkewed(vector<int>& curNPE, int i)
 {
   // SWAP(curNPE[i], curNPE[i+1]);
   // if(curNPE[i-1] == curNPE[i])  return false;
@@ -207,7 +262,7 @@ bool isSkewed(vector<int>& curNPE, int i)
   return true;
 }
 
-bool isBallot(vector<int>& curNPE, int i)
+bool SA::isBallot(vector<int>& curNPE, int i)
 {
   // SWAP(curNPE[i], curNPE[i+1]);
   // int N = 0;
@@ -231,7 +286,7 @@ bool isBallot(vector<int>& curNPE, int i)
   return true;
 }
 
-vector<int>& selectMove(vector<int>& curNPE, int M)
+vector<int>& SA::selectMove(vector<int>& curNPE, int M)
 {
   unsigned seed = (unsigned)time(NULL);
   srand(seed);
@@ -307,25 +362,31 @@ vector<int>& selectMove(vector<int>& curNPE, int M)
   return curNPE;
 }
 
-/*
-vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
+TreeNode* SA::ConstructTree(vector<int>& NPE)
 {
-  vector<int> BestNPE {}, curNPE = NPE;
-  double T0 = 100;
-  int MT = 0, uphill = 0, reject = 0;
-  int N = k * HBList.size();
-  while(reject/MT <= 0.95 && T0 >= epsilon)
+  stack<TreeNode*> st;
+  for(auto& element:NPE)
   {
-    int M = rand() % 3;
-    vector<int> curNPE = selectMove(curNPE, M);
+    if(element >= 0)
+    {
+      string hbNode_name = "sb"+element;
+      HardBlock* hb = HBTable[hbNode_name];
+      TreeNode* hbNode = new TreeNode(0, hb);
+      st.emplace(hbNode);
+    }
+    else
+    {
+      TreeNode* VHnode = new TreeNode(element);
+      TreeNode* Rnode = st.top(); st.pop();
+      VHnode->rchild = Rnode;
+      TreeNode* Lnode = st.top(); st.pop();
+      VHnode->lchild = Lnode;
+      st.emplace(VHnode);
+      VHnode->updateShape();
+    }
   }
-  return {};
-}*/
-
-// int calHPWL()
-// {
-
-// }
+  return st.top(); // root
+}
 
 // First row and second row will be concatenated.
 // Second row will start with two continuous hardblocks(>= 0).
@@ -430,72 +491,10 @@ int main(int argc, char *argv[])
     }
   }
 
-  // Step 2-1: Calculate total area to determine the width and height of floorplan region
-  int total_area = 0;
-  for(const auto& hb: HBList)
-  {
-    int w = hb->width, h = hb->height;
-    total_area += (w * h);
-  }
-  double dead_space_ratio = stod(argv[5]);
-  int region_side_len = sqrt(total_area * (1+dead_space_ratio));
+  SA sa(stod(argv[5]));
 
-  // Step 2-2: Init Normalized Polish Expression
-  vector<int> NPE, row;
-  deque<vector<int>> rows;
-  int cur_width = HBList[0]->width;
-  row.emplace_back(0);
-  int placedBlock = 1;
-  for(int i = 1; i < HBList.size(); ++i)
-  {
-    auto curHB = HBList[i];
-    if(cur_width + curHB->width <= region_side_len)
-    {
-      row.emplace_back(i);
-      cur_width += curHB->width;
-      row.emplace_back(-1);
-    }
-    else
-    {
-      rows.emplace_back(row);
-      decltype(row)().swap(row);
-
-      row.emplace_back(i);
-      cur_width = curHB->width;
-    }
-  }
-  rows.emplace_back(row);
-
-  for(auto& row_i: rows[0])
-  {
-    NPE.emplace_back(row_i);
-  }
-  rows.pop_front();
-  //NPE.emplace_back(-2);
-
-  for(auto& row:rows)
-  {
-    for(auto& row_i:row)
-    {
-      NPE.emplace_back(row_i);
-    }
-    NPE.emplace_back(-2);
-  }
-
-  PrintInit(NPE); 
-
-  vector<int> curNPE = NPE;
-  selectMove(curNPE, 2);
-
-  cout << "-----------------------------------------------------" << endl;
-
-  PrintInit(curNPE);
-  
-  // Step 3: Simulated Annealing Floorplanning
-  int epsilon = 0.5; // End Temperature
-  int ratio = 0.95; // Decreasing ratio for temperature
-  int k = 5; 
-  // SAfloorplanning(epsilon, ratio, k, NPE);
+  //sa.Run();
+  //WriteResult(argv[4], HBList);
 
   return 0;
 }
