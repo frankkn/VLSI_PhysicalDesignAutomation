@@ -327,6 +327,8 @@ vector<int> SAfloorplanning(int epsilon, int ratio, int k, vector<int>& NPE)
 
 // }
 
+// First row and second row will be concatenated.
+// Second row will start with two continuous hardblocks(>= 0).
 void PrintInit(vector<int>& NPE)
 {
   vector<vector<int>> rows;
@@ -443,7 +445,7 @@ int main(int argc, char *argv[])
   deque<vector<int>> rows;
   int cur_width = HBList[0]->width;
   row.emplace_back(0);
-  //int placedBlock = 1;
+  int placedBlock = 1;
   for(int i = 1; i < HBList.size(); ++i)
   {
     auto curHB = HBList[i];
@@ -469,7 +471,7 @@ int main(int argc, char *argv[])
     NPE.emplace_back(row_i);
   }
   rows.pop_front();
-  NPE.emplace_back(-2);
+  //NPE.emplace_back(-2);
 
   for(auto& row:rows)
   {
