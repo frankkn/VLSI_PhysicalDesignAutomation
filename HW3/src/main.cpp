@@ -14,8 +14,10 @@
 using namespace std;
 
 /* 
-./main.out ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.out 0.1
+./main.out ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
+./verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
 */
+
 
 struct pin
 {
@@ -164,9 +166,10 @@ class SA
     void Complement(vector<int>& curNPE, int startIdx);
     bool isSkewed(vector<int>& curNPE, int i);
     bool isBallot(vector<int>& curNPE, int i);
-    vector<int>& selectMove(vector<int>& curNPE, int M);
+    vector<int>& SelectMove(vector<int>& curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
+    int CalCost(vector<int>& NPE);
   public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
     void Run();
@@ -287,7 +290,7 @@ bool SA::isBallot(vector<int>& curNPE, int i)
   return true;
 }
 
-vector<int>& SA::selectMove(vector<int>& curNPE, int M)
+vector<int>& SA::SelectMove(vector<int>& curNPE, int M)
 {
   unsigned seed = (unsigned)time(NULL);
   srand(seed);
@@ -403,6 +406,37 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
     new_y += node->type == -1? 0: get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
     PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, new_x, new_y);
   }
+}
+
+int SA::CalCost(vector<int>& NPE)
+{
+  TreeNode* root = ConstructTree(NPE);
+  int best_area = INT_MAX, cur_area = 0, shapeIdx = -1;
+  for(int i = 0; i < root->shape.size(); ++i)
+  {
+    auto info = root->shape[i];
+    int cur_width = get<0>(info), cur_height = get<1>(info);
+    if(!(cur_width <= region_side_len && cur_height <= region_side_len))
+    {
+      continue;
+    }
+    else
+    {
+      cur_area = cur_width * cur_height;
+    }
+    if(cur_area < best_area)
+    {
+      best_area = cur_area;
+      shapeIdx = i;
+    }
+  }
+  PlaceBlock(root, shapeIdx, 0, 0);
+  int HPWL = 0;
+  for(auto& net: NetList)
+  {
+    HPWL += net->calHPWL();
+  }
+  return HPWL;
 }
 
 // First row and second row will be concatenated.
