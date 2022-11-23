@@ -33,7 +33,7 @@ struct HardBlock
   int downleft_x, downleft_y; 
   bool rotated;
   pin* center_pin;
-  void update(int& new_width, int& new_height, int& new_x, int& new_y);
+  void updateInfo(int& new_width, int& new_height, int& new_x, int& new_y);
 
   HardBlock(string name, int width, int height, int downleft_x = 0, int downleft_y = 0):
     name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(new pin(name, downleft_x, downleft_y)) {}
@@ -41,7 +41,7 @@ struct HardBlock
 vector<HardBlock*> HBList;
 unordered_map<string, HardBlock*> HBTable;
 
-void HardBlock::update(int& new_width, int& new_height, int& new_x, int& new_y)
+void HardBlock::updateInfo(int& new_width, int& new_height, int& new_x, int& new_y)
 {
   downleft_x = new_x;
   downleft_y = new_y;
@@ -166,6 +166,7 @@ class SA
     bool isBallot(vector<int>& curNPE, int i);
     vector<int>& selectMove(vector<int>& curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
+    void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
   public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
     void Run();
@@ -386,6 +387,22 @@ TreeNode* SA::ConstructTree(vector<int>& NPE)
     }
   }
   return st.top(); // root
+}
+
+void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
+{
+  if(node->type == 0)
+  {
+    node->hardblock->updateInfo(get<0>(node->shape[shapeIdx]), get<1>(node->shape[shapeIdx]), x, y);
+  }
+  else
+  {
+    PlaceBlock(node->lchild, get<2>(node->shape[shapeIdx]).first, x, y);
+    int new_x = 0, new_y = 0;
+    new_x += node->type == -1? get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]): 0;
+    new_y += node->type == -1? 0: get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, new_x, new_y);
+  }
 }
 
 // First row and second row will be concatenated.
