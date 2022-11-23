@@ -14,8 +14,9 @@
 using namespace std;
 
 /* 
+g++ -std=c++17 -o main.out main.cpp
 ./main.out ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
-./verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
+../verifier/verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
 */
 
 
@@ -99,7 +100,7 @@ struct TreeNode
       if(type == 0) // leaf block shape
       {
         shape.emplace_back(make_tuple(hardblock->width, hardblock->height, make_pair(0,0)));
-        shape.emplace_back(make_tuple(hardblock->height, hardblock->width, make_pair(0,0)));
+        shape.emplace_back(make_tuple(hardblock->height, hardblock->width, make_pair(1,1)));
       }
     }
     void updateShape();
@@ -158,20 +159,23 @@ void TreeNode::updateShape()
 
 class SA
 { 
-  private:
+  public:
+  //private:
     double region_side_len;
     void CalSideLen(double& dead_space_ratio);
     template<class T> void SWAP(T& a, T& b); // "perfect swap" (almost)
-    void InitNPE(vector<int>& NPE);
+    // void InitNPE(vector<int>& NPE);
     void Complement(vector<int>& curNPE, int startIdx);
     bool isSkewed(vector<int>& curNPE, int i);
     bool isBallot(vector<int>& curNPE, int i);
     vector<int>& SelectMove(vector<int>& curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
-    int CalCost(vector<int>& NPE);
-  public:
+    // int CalCost(vector<int>& NPE);
+  //public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
+    int CalCost(vector<int>& NPE);
+    void InitNPE(vector<int>& NPE);
     void Run();
 };
 
@@ -368,28 +372,28 @@ vector<int>& SA::SelectMove(vector<int>& curNPE, int M)
 
 TreeNode* SA::ConstructTree(vector<int>& NPE)
 {
-  stack<TreeNode*> st;
-  for(auto& element:NPE)
+  vector<TreeNode*> st;
+  for(auto element:NPE)
   {
     if(element >= 0)
     {
-      string hbNode_name = "sb"+element;
+      string hbNode_name = "sb"+ to_string(element);
       HardBlock* hb = HBTable[hbNode_name];
       TreeNode* hbNode = new TreeNode(0, hb);
-      st.emplace(hbNode);
+      st.emplace_back(hbNode);
     }
     else
     {
       TreeNode* VHnode = new TreeNode(element);
-      TreeNode* Rnode = st.top(); st.pop();
+      TreeNode* Rnode = st.back(); st.pop_back();
       VHnode->rchild = Rnode;
-      TreeNode* Lnode = st.top(); st.pop();
+      TreeNode* Lnode = st.back(); st.pop_back();
       VHnode->lchild = Lnode;
-      st.emplace(VHnode);
+      st.emplace_back(VHnode);
       VHnode->updateShape();
     }
   }
-  return st.top(); // root
+  return st.back(); // root
 }
 
 void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
@@ -401,10 +405,16 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
   else
   {
     PlaceBlock(node->lchild, get<2>(node->shape[shapeIdx]).first, x, y);
-    int new_x = 0, new_y = 0;
-    new_x += node->type == -1? get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]): 0;
-    new_y += node->type == -1? 0: get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
-    PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, new_x, new_y);
+    int displacementX = 0, displacementY = 0;
+    if(node->type == -1)
+    {
+      displacementX = get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    }
+    else
+    {
+      displacementY = get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    }
+    PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, x+displacementX, y+displacementY);
   }
 }
 
@@ -462,6 +472,18 @@ void PrintInit(vector<int>& NPE)
       cout << row_i << " ";
       if(row_i == -2) cout << "\n";
     }
+  }
+}
+
+void WriteResult(string filename, int WL)
+{
+  ofstream output(filename);
+
+  output << "Wirelength " << WL << "\n";
+  output << "Blocks" << "\n";
+  for(auto& [hb_name, hb_ptr]:HBTable)
+  {
+    output << hb_name << " " << hb_ptr->downleft_x << " " << hb_ptr->downleft_y << " " << hb_ptr->rotated << "\n"; 
   }
 }
 
@@ -543,9 +565,16 @@ int main(int argc, char *argv[])
   }
 
   SA sa(stod(argv[5]));
+  vector<int> init_npe;
+  sa.InitNPE(init_npe);
+  
+  sa.ConstructTree(init_npe);
+  sa.CalCost(init_npe);
 
   //sa.Run();
-  //WriteResult(argv[4], HBList);
+  
+  int WL = sa.CalCost(init_npe);
+  WriteResult(argv[4], WL);
 
   return 0;
 }
