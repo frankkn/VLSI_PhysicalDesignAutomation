@@ -1,25 +1,25 @@
---How to Compile
-  In this directory, enter the following command:
+--How to Compile  
+  In this directory, enter the following command:  
 
-  $ make
-  It will generate the executable files "hw3" in "HW3/bin/".
+  $ make  
+  It will generate the executable files "hw3" in "HW3/bin/".  
 
-  If you want to remove it, simply enter the following command:
-  $ make clean
+  If you want to remove it, simply enter the following command:  
+  $ make clean  
 
---How to Run
-  In this directory, enter the following command:
-  Usage: ../bin/<exe> <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>
-  e.g.:
-  ../bin/hw3 ../testcase/n100.hardblocks ../testcase/n100.nets ../testcase/n100.pl ../output/n100.floorplan 0.1
+--How to Run  
+  In this directory, enter the following command:  
+  Usage: ../bin/<exe> <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>  
+  e.g.:  
+  ../bin/hw3 ../testcase/n100.hardblocks ../testcase/n100.nets ../testcase/n100.pl ../output/n100.floorplan 0.1  
 
-  In "HW3/bin/", enter the following command:
-  Usage: ./<exe> <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>
-  e.g.:
-  $ ./hw3 ../testcase/n100.hardblocks ../testcase/n100.nets ../testcase/n100.pl ../output/n100.floorplan 0.1
+  In "HW3/bin/", enter the following command:  
+  Usage: ./<exe> <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>  
+  e.g.:  
+  $ ./hw3 ../testcase/n100.hardblocks ../testcase/n100.nets ../testcase/n100.pl ../output/n100.floorplan 0.1  
 
---How to Verify
-  In this directory, enter the following command:
-  Usage: ../verifier/Verify <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>
-  e.g.:
-  $ ../verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
+--How to Verify  
+  In this directory, enter the following command:  
+  Usage: ../verifier/Verify <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>  
+  e.g.:  
+  $ ../verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1  
