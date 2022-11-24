@@ -164,18 +164,17 @@ class SA
     double region_side_len;
     void CalSideLen(double& dead_space_ratio);
     template<class T> void SWAP(T& a, T& b); // "perfect swap" (almost)
-    // void InitNPE(vector<int>& NPE);
+    void InitNPE(vector<int>& NPE);
     void Complement(vector<int>& curNPE, int startIdx);
     bool isSkewed(vector<int>& curNPE, int i);
     bool isBallot(vector<int>& curNPE, int i);
     vector<int>& SelectMove(vector<int>& curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
-    // int CalCost(vector<int>& NPE);
+    int CalCost(vector<int>& NPE); // focus on WL only
+    
   //public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
-    int CalCost(vector<int>& NPE);
-    void InitNPE(vector<int>& NPE);
     void Run();
 };
 
@@ -405,15 +404,8 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
   else
   {
     PlaceBlock(node->lchild, get<2>(node->shape[shapeIdx]).first, x, y);
-    int displacementX = 0, displacementY = 0;
-    if(node->type == -1)
-    {
-      displacementX = get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
-    }
-    else
-    {
-      displacementY = get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
-    }
+    int displacementX = node->type == -1? get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
+    int displacementY = node->type == -2? get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
     PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, x+displacementX, y+displacementY);
   }
 }
@@ -421,22 +413,33 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
 int SA::CalCost(vector<int>& NPE)
 {
   TreeNode* root = ConstructTree(NPE);
-  int best_area = INT_MAX, cur_area = 0, shapeIdx = -1;
+  int min_out_area = INT_MAX, out_of_range_area = 0, shapeIdx = -1;
   for(int i = 0; i < root->shape.size(); ++i)
   {
     auto info = root->shape[i];
     int cur_width = get<0>(info), cur_height = get<1>(info);
-    if(!(cur_width <= region_side_len && cur_height <= region_side_len))
+    if(cur_width > region_side_len && cur_height > region_side_len)
     {
-      continue;
+      out_of_range_area = cur_width * cur_height - pow(region_side_len,2);
+    }
+    else if(cur_height > region_side_len)
+    {
+      out_of_range_area = cur_width * (cur_height - region_side_len);
+    }
+    else if(cur_width > region_side_len)
+    {
+      out_of_range_area= cur_height * (cur_width - region_side_len);
     }
     else
     {
-      cur_area = cur_width * cur_height;
+      out_of_range_area = 0;
     }
-    if(cur_area < best_area)
+    
+    // Pick 1st shape which is within the region due to time-saving.
+    // But it might not be the min-area-shape of all the qualified shape(i.e., Inside the region). 
+    if(out_of_range_area < min_out_area)
     {
-      best_area = cur_area;
+      min_out_area = out_of_range_area;
       shapeIdx = i;
     }
   }
@@ -565,15 +568,10 @@ int main(int argc, char *argv[])
   }
 
   SA sa(stod(argv[5]));
-  vector<int> init_npe;
-  sa.InitNPE(init_npe);
+  vector<int> initNPE;
+  sa.InitNPE(initNPE);
   
-  sa.ConstructTree(init_npe);
-  sa.CalCost(init_npe);
-
-  //sa.Run();
-  
-  int WL = sa.CalCost(init_npe);
+  int WL = sa.CalCost(initNPE);
   WriteResult(argv[4], WL);
 
   return 0;
