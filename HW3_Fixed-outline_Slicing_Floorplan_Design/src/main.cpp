@@ -11,6 +11,7 @@
 #include <climits>
 #include <stdlib.h>
 #include <time.h>
+#include <random>
 using namespace std;
 
 /* 
@@ -168,11 +169,11 @@ class SA
     void Complement(vector<int>& curNPE, int startIdx);
     bool isSkewed(vector<int>& curNPE, int i);
     bool isBallot(vector<int>& curNPE, int i);
-    vector<int>& SelectMove(vector<int>& curNPE, int M);
+    vector<int>& Perturb(vector<int>& curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
     int CalCost(vector<int>& NPE); // focus on WL only
-    
+    vector<int> SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE);
   //public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
     void Run();
@@ -293,10 +294,8 @@ bool SA::isBallot(vector<int>& curNPE, int i)
   return true;
 }
 
-vector<int>& SA::SelectMove(vector<int>& curNPE, int M)
+vector<int>& SA::Perturb(vector<int>& curNPE, int M)
 {
-  unsigned seed = (unsigned)time(NULL);
-  srand(seed);
   switch(M)
   {
     case 0:
@@ -434,7 +433,7 @@ int SA::CalCost(vector<int>& NPE)
     {
       out_of_range_area = 0;
     }
-    
+
     // Pick 1st shape which is within the region due to time-saving.
     // But it might not be the min-area-shape of all the qualified shape(i.e., Inside the region). 
     if(out_of_range_area < min_out_area)
@@ -450,6 +449,56 @@ int SA::CalCost(vector<int>& NPE)
     HPWL += net->calHPWL();
   }
   return HPWL;
+}
+
+vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE)
+{
+  vector<int> BestNPE = initNPE, curNPE = initNPE;
+  int MT, uphill, reject;
+  int N = k * HBList.size();
+  double T0 = 100;
+  int best_cost = CalCost(curNPE);
+  int cur_cost = best_cost;
+  mt19937 random_number_generator(random_device{}());
+  uniform_real_distribution<> rand_prob(0, 1);
+  do
+  {
+    MT = uphill = reject = 0;
+    do
+    {
+      int M = rand() % 3;
+      vector<int> tryNPE = Perturb(curNPE ,M);
+      MT += 1;
+      int try_cost = CalCost(tryNPE);
+      int delta_cost = try_cost - cur_cost;
+      if(delta_cost <= 0 || rand_prob(random_number_generator) < exp(-1 * delta_cost / T0))
+      {
+        if(delta_cost > 0)
+        {
+          uphill += 1;
+        }
+        curNPE = tryNPE;
+        cur_cost = try_cost; 
+        if(cur_cost < best_cost)
+        {
+          BestNPE = curNPE;
+        }
+      }
+      else
+      {
+        reject += 1;
+      }
+      
+    }while(uphill > N || MT > 2*N);
+    T0 = r * T0;  
+  }while(reject/MT > 0.95 || T0 < epsilon);
+  return BestNPE;
+}
+
+void SA::Run()
+{
+  unsigned seed = (unsigned)time(NULL);
+  srand(seed);
 }
 
 // First row and second row will be concatenated.
