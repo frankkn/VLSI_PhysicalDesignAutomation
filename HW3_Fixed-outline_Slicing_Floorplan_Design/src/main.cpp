@@ -460,13 +460,14 @@ vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& in
   int best_cost = CalCost(curNPE);
   int cur_cost = best_cost;
   mt19937 random_number_generator(random_device{}());
+  uniform_int_distribution<> rand_move(1, 3);
   uniform_real_distribution<> rand_prob(0, 1);
   do
   {
     MT = uphill = reject = 0;
     do
     {
-      int M = rand() % 3;
+      int M = rand_move(random_number_generator);
       vector<int> tryNPE = Perturb(curNPE ,M);
       MT += 1;
       int try_cost = CalCost(tryNPE);
@@ -488,7 +489,6 @@ vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& in
       {
         reject += 1;
       }
-      
     }while(uphill > N || MT > 2*N);
     T0 = r * T0;  
   }while(reject/MT > 0.95 || T0 < epsilon);
