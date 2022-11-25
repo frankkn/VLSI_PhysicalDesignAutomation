@@ -47,9 +47,10 @@ unordered_map<string, HardBlock*> HBTable;
 
 void HardBlock::updateInfo(int& new_width, int& new_height, int& new_x, int& new_y)
 {
+
   downleft_x = new_x;
   downleft_y = new_y;
-  rotated = width == new_width? rotated:!rotated;
+  rotated = !(width == new_width && height == new_height);
   center_pin->x_cor = new_x + new_width/2;
   center_pin->y_cor = new_y + new_height/2;
 }
@@ -84,7 +85,7 @@ int net::calHPWL()
     if(hb->center_pin->y_cor < min_y) min_y = hb->center_pin->y_cor;
     if(hb->center_pin->y_cor > max_y) max_y = hb->center_pin->y_cor;
   }
-  return max_x - min_x + max_y - min_y;
+  return (max_x - min_x) + (max_y - min_y);
 }
 
 struct TreeNode
@@ -173,10 +174,10 @@ class SA
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
     int CalCost(vector<int>& NPE); // focus on WL only
-    vector<int> SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE);
+    int SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE);
   //public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
-    void Run();
+    int Run();
 };
 
 void SA::CalSideLen(double& dead_space_ratio)
@@ -412,7 +413,7 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
 int SA::CalCost(vector<int>& NPE)
 {
   TreeNode* root = ConstructTree(NPE);
-  int min_out_area = INT_MAX, out_of_range_area = 0, shapeIdx = -1;
+  int min_out_area = INT_MAX, out_of_range_area = 0, shapeIdx = 0;
   for(int i = 0; i < root->shape.size(); ++i)
   {
     auto info = root->shape[i];
@@ -435,7 +436,7 @@ int SA::CalCost(vector<int>& NPE)
     }
 
     // Pick 1st shape which is within the region due to time-saving.
-    // But it might not be the min-area-shape of all the qualified shape(i.e., Inside the region). 
+    // But it might not be the min-area-shape of all the qualified shape. 
     if(out_of_range_area < min_out_area)
     {
       min_out_area = out_of_range_area;
@@ -451,28 +452,30 @@ int SA::CalCost(vector<int>& NPE)
   return HPWL;
 }
 
-vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE)
+int SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE)
 {
   vector<int> BestNPE = initNPE, curNPE = initNPE;
-  int MT, uphill, reject;
+  int MT, uphill, reject; MT = uphill = reject = 0;
   int N = k * HBList.size();
   double T0 = 100;
-  int best_cost = CalCost(curNPE);
-  int cur_cost = best_cost;
-  mt19937 random_number_generator(random_device{}());
-  uniform_int_distribution<> rand_move(1, 3);
-  uniform_real_distribution<> rand_prob(0, 1);
+  int cur_cost = CalCost(curNPE);
+  int best_cost = cur_cost;
+  // mt19937 random_number_generator(random_device{}());
+  // uniform_int_distribution<> rand_move(1, 3);
+  // uniform_real_distribution<> rand_prob(0, 1);
   do
   {
     MT = uphill = reject = 0;
     do
     {
-      int M = rand_move(random_number_generator);
-      vector<int> tryNPE = Perturb(curNPE ,M);
+      // int M = rand_move(random_number_generator);
+      int M = rand() % 3;
+      // int M = 0;
+      vector<int> tryNPE = Perturb(curNPE, M);
       MT += 1;
       int try_cost = CalCost(tryNPE);
       int delta_cost = try_cost - cur_cost;
-      if(delta_cost <= 0 || rand_prob(random_number_generator) < exp(-1 * delta_cost / T0))
+      if(delta_cost < 0 || (double)rand()/RAND_MAX < exp(-1*delta_cost/T0))
       {
         if(delta_cost > 0)
         {
@@ -492,13 +495,17 @@ vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& in
     }while(uphill > N || MT > 2*N);
     T0 = r * T0;  
   }while(reject/MT > 0.95 || T0 < epsilon);
-  return BestNPE;
+  return best_cost;
 }
 
-void SA::Run()
+int SA::Run()
 {
-  unsigned seed = (unsigned)time(NULL);
+  unsigned seed = 2;
   srand(seed);
+
+  vector<int> initNPE {};
+  InitNPE(initNPE);
+  return SAfloorplanning(90, 0.95, 5, initNPE);
 }
 
 // First row and second row will be concatenated.
@@ -533,9 +540,9 @@ void WriteResult(string filename, int WL)
 
   output << "Wirelength " << WL << "\n";
   output << "Blocks" << "\n";
-  for(auto& [hb_name, hb_ptr]:HBTable)
+  for(auto& hb:HBList)
   {
-    output << hb_name << " " << hb_ptr->downleft_x << " " << hb_ptr->downleft_y << " " << hb_ptr->rotated << "\n"; 
+    output << hb->name << " " << hb->downleft_x << " " << hb->downleft_y << " " << hb->rotated << "\n"; 
   }
 }
 
@@ -617,11 +624,8 @@ int main(int argc, char *argv[])
   }
 
   SA sa(stod(argv[5]));
-  vector<int> initNPE;
-  sa.InitNPE(initNPE);
-  
-  int WL = sa.CalCost(initNPE);
-  WriteResult(argv[4], WL);
+  int finalWL = sa.Run();
+  WriteResult(argv[4], finalWL);
 
   return 0;
 }
