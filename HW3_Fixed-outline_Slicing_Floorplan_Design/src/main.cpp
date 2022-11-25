@@ -39,8 +39,8 @@ struct HardBlock
   pin* center_pin;
   void updateInfo(int& new_width, int& new_height, int& new_x, int& new_y);
 
-  HardBlock(string name, int width, int height, int downleft_x = 0, int downleft_y = 0):
-    name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(new pin(name, downleft_x, downleft_y)) {}
+  HardBlock(string name, int width, int height, pin* center_pin, int downleft_x = 0, int downleft_y = 0):
+    name(name), width(width), height(height), rotated(false), downleft_x(downleft_x), downleft_y(downleft_y), center_pin(center_pin) {}
 };
 vector<HardBlock*> HBList;
 unordered_map<string, HardBlock*> HBTable;
@@ -434,7 +434,6 @@ int SA::CalCost(vector<int>& NPE)
     {
       out_of_range_area = 0;
     }
-
     // Pick 1st shape which is within the region due to time-saving.
     // But it might not be the min-area-shape of all the qualified shape. 
     if(out_of_range_area < min_out_area)
@@ -486,6 +485,7 @@ int SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE)
         if(cur_cost < best_cost)
         {
           BestNPE = curNPE;
+          best_cost = cur_cost;
         }
       }
       else
@@ -500,12 +500,12 @@ int SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE)
 
 int SA::Run()
 {
-  unsigned seed = 2;
+  unsigned seed = 3;
   srand(seed);
 
   vector<int> initNPE {};
   InitNPE(initNPE);
-  return SAfloorplanning(90, 0.95, 5, initNPE);
+  return SAfloorplanning(0.1, 0.95, 5, initNPE);
 }
 
 // First row and second row will be concatenated.
@@ -575,7 +575,9 @@ int main(int argc, char *argv[])
       int height = upmost_y - downmost_y;
       int center_y = downmost_y + height/2;
 
-      HardBlock *HB = new HardBlock(name, width, height, x0, y0);
+
+      pin* center_pin = new pin(name, center_x, center_y);
+      HardBlock *HB = new HardBlock(name, width, height, center_pin, x0, y0);
       HBList.emplace_back(HB);
       HBTable[name] = HB;
       PinTable[name] = HB->center_pin;
