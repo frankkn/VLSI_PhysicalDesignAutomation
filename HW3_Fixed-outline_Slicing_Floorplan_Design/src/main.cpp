@@ -47,10 +47,9 @@ unordered_map<string, HardBlock*> HBTable;
 
 void HardBlock::updateInfo(int& new_width, int& new_height, int& new_x, int& new_y)
 {
-
   downleft_x = new_x;
   downleft_y = new_y;
-  rotated = !(width == new_width && height == new_height);
+  if(width == new_width && height == new_height)  rotated = !rotated;
   center_pin->x_cor = new_x + new_width/2;
   center_pin->y_cor = new_y + new_height/2;
 }
@@ -63,11 +62,11 @@ struct net
 
   net(int degree = 0):degree(degree) {}
 
-  int calHPWL();
+  int CalHPWL();
 };
 vector<net*> NetList;
 
-int net::calHPWL()
+int net::CalHPWL()
 {
   int min_x = INT_MAX, max_x = INT_MIN;
   int min_y = INT_MAX, max_y = INT_MIN;
@@ -170,11 +169,12 @@ class SA
     void Complement(vector<int>& curNPE, int startIdx);
     bool isSkewed(vector<int>& curNPE, int i);
     bool isBallot(vector<int>& curNPE, int i);
-    vector<int>& Perturb(vector<int>& curNPE, int M);
+    vector<int> Perturb(vector<int> curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
-    int CalCost(vector<int>& NPE); // focus on WL only
-    int SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE);
+    int CalTotalHPWL();
+    int CalCost(vector<int>& NPE, bool focusWL);
+    vector<int> SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE, bool const &focusWL);
   //public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
     int Run();
@@ -295,7 +295,7 @@ bool SA::isBallot(vector<int>& curNPE, int i)
   return true;
 }
 
-vector<int>& SA::Perturb(vector<int>& curNPE, int M)
+vector<int> SA::Perturb(vector<int> curNPE, int M)
 {
   switch(M)
   {
@@ -404,13 +404,32 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
   else
   {
     PlaceBlock(node->lchild, get<2>(node->shape[shapeIdx]).first, x, y);
-    int displacementX = node->type == -1? get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
-    int displacementY = node->type == -2? get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
+    //int displacementX = node->type == -1? get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
+    //int displacementY = node->type == -2? get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
+    int displacementX = 0, displacementY = 0;
+    if(node->type == -1)
+    {
+      displacementX = get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    }
+    else
+    {
+      displacementY = get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    }
     PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, x+displacementX, y+displacementY);
   }
 }
 
-int SA::CalCost(vector<int>& NPE)
+int SA::CalTotalHPWL()
+{
+  int totalHPWL = 0;
+  for(auto& net: NetList)
+  {
+    totalHPWL += net->CalHPWL();
+  }
+  return totalHPWL;
+}
+
+int SA::CalCost(vector<int>& NPE, bool focusWL)
 {
   TreeNode* root = ConstructTree(NPE);
   int min_out_area = INT_MAX, out_of_range_area = 0, shapeIdx = 0;
@@ -428,7 +447,7 @@ int SA::CalCost(vector<int>& NPE)
     }
     else if(cur_width > region_side_len)
     {
-      out_of_range_area= cur_height * (cur_width - region_side_len);
+      out_of_range_area = cur_height * (cur_width - region_side_len);
     }
     else
     {
@@ -442,70 +461,89 @@ int SA::CalCost(vector<int>& NPE)
       shapeIdx = i;
     }
   }
+
+  if(focusWL == false)  return min_out_area * 10;
+  
   PlaceBlock(root, shapeIdx, 0, 0);
-  int HPWL = 0;
-  for(auto& net: NetList)
-  {
-    HPWL += net->calHPWL();
-  }
-  return HPWL;
+
+  return min_out_area * 10 + CalTotalHPWL();
 }
 
-int SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE)
+vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE, bool const &focusWL)
 {
   vector<int> BestNPE = initNPE, curNPE = initNPE;
   int MT, uphill, reject; MT = uphill = reject = 0;
   int N = k * HBList.size();
-  double T0 = 100;
-  int cur_cost = CalCost(curNPE);
+  // double T0 = 100;
+  int cur_cost = CalCost(curNPE, focusWL);
   int best_cost = cur_cost;
+  if (best_cost == 0)
+    goto finishSA;
   // mt19937 random_number_generator(random_device{}());
   // uniform_int_distribution<> rand_move(1, 3);
   // uniform_real_distribution<> rand_prob(0, 1);
   do
   {
-    MT = uphill = reject = 0;
+    double T0 = 1000;
     do
     {
-      // int M = rand_move(random_number_generator);
-      int M = rand() % 3;
-      // int M = 0;
-      vector<int> tryNPE = Perturb(curNPE, M);
-      MT += 1;
-      int try_cost = CalCost(tryNPE);
-      int delta_cost = try_cost - cur_cost;
-      if(delta_cost < 0 || (double)rand()/RAND_MAX < exp(-1*delta_cost/T0))
+      MT = uphill = reject = 0;
+      cout << "T0 :" << T0 << endl;
+      do
       {
-        if(delta_cost > 0)
+        // cout << "best_cost" << best_cost << endl;
+        // cout << "MT" << MT << "uphill" << uphill << endl;
+        // int M = rand_move(random_number_generator);
+        int M = 0;
+        if(focusWL == false)  M = rand() % 3;
+        // int M = 0;
+        vector<int> tryNPE = Perturb(curNPE, M);
+        MT += 1;
+        int try_cost = CalCost(tryNPE, focusWL);
+        int delta_cost = try_cost - cur_cost;
+        if(delta_cost < 0 || ((double)rand()/RAND_MAX < exp(-1*delta_cost/T0)))
         {
-          uphill += 1;
+          if(delta_cost > 0)
+          {
+            uphill += 1;
+          }
+          curNPE = tryNPE;
+          cur_cost = try_cost; 
+          if(cur_cost < best_cost)
+          {
+            BestNPE = curNPE;
+            best_cost = cur_cost;
+            if(best_cost == 0)  goto finishSA;
+          }
         }
-        curNPE = tryNPE;
-        cur_cost = try_cost; 
-        if(cur_cost < best_cost)
+        else
         {
-          BestNPE = curNPE;
-          best_cost = cur_cost;
+          reject += 1;
         }
-      }
-      else
-      {
-        reject += 1;
-      }
-    }while(uphill > N || MT > 2*N);
-    T0 = r * T0;  
-  }while(reject/MT > 0.95 || T0 < epsilon);
-  return best_cost;
+      }while(!(uphill > N || MT > 2*N));
+      T0 = r * T0;  
+    }while(!(reject/MT > 0.95 || T0 < epsilon));
+  }while(focusWL == false);
+
+finishSA:
+  CalCost(BestNPE, true);
+  return BestNPE;
 }
 
 int SA::Run()
 {
-  unsigned seed = 3;
+  unsigned seed = 2;
   srand(seed);
 
   vector<int> initNPE {};
   InitNPE(initNPE);
-  return SAfloorplanning(0.1, 0.95, 5, initNPE);
+
+  initNPE = SAfloorplanning(0.1, 0.9, 10, initNPE, false);
+  int finalWL = CalTotalHPWL();
+  cout << "Find a feasible solution\n"
+       << "Wirelength: " << finalWL << "\n";
+
+  return finalWL;
 }
 
 // First row and second row will be concatenated.
