@@ -506,10 +506,10 @@ vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& in
         {
           reject += 1;
         }
-      }while(uphill <= N && MT <= 2*N);
-      T0 = r * T0;
-    }while(reject/MT <= 0.95 && T0 >= epsilon);
-  }while(forWL == false);
+      }while(!(uphill > N || MT > 2*N));
+      T0 = r * T0;  
+    }while(!(reject/MT > 0.95 || T0 < epsilon));
+  }while(focusWL == false);
 
 Done:
   CalCost(BestNPE ,true);
@@ -524,10 +524,9 @@ int SA::Run()
   vector<int> initNPE {};
   InitNPE(initNPE);
   initNPE = SAfloorplanning(0.1, 0.9, 10, initNPE, false);
-  cout << "Find a feasible floorplan\n" << "Wirelength: " << CalTotalHPWL() << "\n";
-
-  SAfloorplanning(1, 0.95, 5, initNPE, true);
-  cout << "Find a better solution\n" << "Wirelength: " << CalTotalHPWL() << "\n";
+  int finalWL = CalTotalHPWL();
+  cout << "Find a feasible solution\n"
+       << "Wirelength: " << finalWL << "\n";
 
   return CalTotalHPWL();
 }
