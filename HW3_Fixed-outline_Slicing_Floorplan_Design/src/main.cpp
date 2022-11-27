@@ -14,17 +14,6 @@
 #include <random>
 using namespace std;
 
-/* 
-g++ -std=c++17 -o main.out main.cpp
-./main.out ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
-../verifier/verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
-
-make
-../bin/hw3 ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
-../verifier/verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
-*/
-
-
 struct pin
 {
   string id; 
