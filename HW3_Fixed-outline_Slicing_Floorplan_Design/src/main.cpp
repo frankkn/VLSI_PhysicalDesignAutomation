@@ -586,9 +586,6 @@ void WriteResult(string filename, int WL)
 
 int main(int argc, char *argv[])
 {
-  cin.tie(nullptr);
-  ios::sync_with_stdio(false);
-
   // Step 1-1: Read hard blocks
   ifstream fin_hardblocks(argv[1]);
   string s;
