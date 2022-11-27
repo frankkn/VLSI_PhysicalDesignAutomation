@@ -18,6 +18,10 @@ using namespace std;
 g++ -std=c++17 -o main.out main.cpp
 ./main.out ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
 ../verifier/verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
+
+make
+../bin/hw3 ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
+../verifier/verifier ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
 */
 
 
@@ -170,12 +174,12 @@ class SA
     void Complement(vector<int>& curNPE, int startIdx);
     bool isSkewed(vector<int>& curNPE, int i);
     bool isBallot(vector<int>& curNPE, int i);
-    vector<int>& Perturb(vector<int>& curNPE, int M);
+    vector<int> Perturb(vector<int> curNPE, int M);
     TreeNode* ConstructTree(vector<int>& NPE);
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
     int CalTotalHPWL();
-    int CalCost(vector<int>& NPE, bool const & forWL); // focus on WL only
-    vector<int> SAfloorplanning(double epsilon, double r, int k, vector<int>& initNPE, bool const & forWL);
+    int CalCost(vector<int>& NPE, bool const & forWL);
+    vector<int> SAfloorplanning(double epsilon, double r, int k, vector<int>& NPE, bool const & forWL);
   //public:
     SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
     int Run();
@@ -296,7 +300,7 @@ bool SA::isBallot(vector<int>& curNPE, int i)
   return true;
 }
 
-vector<int>& SA::Perturb(vector<int>& curNPE, int M)
+vector<int> SA::Perturb(vector<int> curNPE, int M)
 {
   switch(M)
   {
@@ -305,40 +309,41 @@ vector<int>& SA::Perturb(vector<int>& curNPE, int M)
       vector<int> SwapPos;
       for(int i = 0; i < curNPE.size(); ++i)
       {
-        if(curNPE[i] >= 0 && SwapPos.size() < HBList.size()-1)
-        {
+        if (curNPE[i] >= 0)
           SwapPos.emplace_back(i);
-        }
       }
       int n = SwapPos.size();
-    
-      int r = rand() % n;
-      int pos1 = SwapPos[r];
-      int pos2 = pos1;
-      while(curNPE[++pos2] < 0);
-      // cout << "pos1 = " << pos1 << " Block num = " << curNPE[pos1] << endl;
-      // cout << "pos2 = " << pos2 << " Block num = " << curNPE[pos2] << endl;
-      SWAP(curNPE[pos1], curNPE[pos2]);
+
+      // Below three lines code aims to find adjencent hardblock for swapping
+      // But somehow will incur out-of-region bug ... 
+      // int r = rand() % (n-1);
+      // int swap_pos1 = SwapPos[r];
+      // int swap_pos2 = SwapPos[++r];
+      
+      // Change to pick two random hardblock for swapping
+      int swap_pos1,swap_pos2;
+      swap_pos1 = swap_pos2 = rand() % n;
+      while(swap_pos1 == swap_pos2) swap_pos2 = rand() % n;
+      swap_pos1 = SwapPos[swap_pos1];
+      swap_pos2 = SwapPos[swap_pos2];
+
+      SWAP(curNPE[swap_pos1], curNPE[swap_pos2]);
       break;
     }
     case 1:
     {
       vector<int> InverseStartPos;
       for(int i = 0; i < curNPE.size()-1; ++i)
-      {
         if(curNPE[i] >= 0 && curNPE[i+1] < 0)
-        {
-          InverseStartPos.emplace_back(i+1);
-        }
-      }
+            InverseStartPos.emplace_back(i+1);
       int n = InverseStartPos.size();
-      int r = rand() % n;
-      int startIdx = InverseStartPos[r];
-      // cout << "StartIdx of curNPE = " << startIdx << endl;
-      Complement(curNPE, startIdx);
+      int StartIdx = rand() % n;
+      StartIdx = InverseStartPos[StartIdx];
+      Complement(curNPE, StartIdx);
       break;
     }
-    case 2:  
+    case 2:
+    { 
       vector<int> SwapPos;
       for(int i = 0; i < curNPE.size()-1; ++i)
       {
@@ -366,6 +371,7 @@ vector<int>& SA::Perturb(vector<int>& curNPE, int M)
         SWAP(curNPE[SwapIdx], curNPE[SwapIdx+1]);
       }
       break;
+    }
   }
   return curNPE;
 }
@@ -405,8 +411,15 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
   else
   {
     PlaceBlock(node->lchild, get<2>(node->shape[shapeIdx]).first, x, y);
-    int displacementX = node->type == -1? get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
-    int displacementY = node->type == -2? get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]):0;
+    int displacementX = 0, displacementY = 0;
+    if(node->type == -1)
+    {
+      displacementX = get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    }
+    else
+    {
+      displacementY = get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+    }
     PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, x+displacementX, y+displacementY);
   }
 }
@@ -500,6 +513,7 @@ vector<int> SA::SAfloorplanning(double epsilon, double r, int k, vector<int>& in
           {
             BestNPE = curNPE;
             best_cost = cur_cost;
+            if(best_cost == 0) goto Done;
           }
         }
         else
