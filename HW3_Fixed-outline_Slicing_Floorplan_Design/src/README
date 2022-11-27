@@ -18,6 +18,14 @@
   e.g.:  
   $ ./hw3 ../testcase/n100.hardblocks ../testcase/n100.nets ../testcase/n100.pl ../output/n100.floorplan 0.1  
 
+  In this directory, enter the following commands:
+  Usage: ./run.sh ; y ; <filename> ; <dead space ratio>
+  e.g.:
+  $ ./run.sh
+  $ y
+  $ n100
+  $ 0.1
+
 --How to Verify  
   In this directory, enter the following command:  
   Usage: ../verifier/Verify <hardblock file> <net file> <pl file> <floorplan file> <deadspace ratio>  
