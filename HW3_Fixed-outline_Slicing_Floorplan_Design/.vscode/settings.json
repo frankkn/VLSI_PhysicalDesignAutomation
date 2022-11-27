@@ -6,6 +6,7 @@
     "algorithm": "cpp",
     "tuple": "cpp",
     "utility": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "unordered_map": "cpp"
   }
 }
