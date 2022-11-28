@@ -103,7 +103,7 @@ bool SA::isSkewed(vector<int>& curNPE, int i)
   return true;
 }
 
-bool SA::isBallot(vector<int>& curNPE, int i)
+bool SA::violateBallot(vector<int>& curNPE, int i)
 {
   // SWAP(curNPE[i], curNPE[i+1]);
   // int N = 0;
@@ -120,9 +120,9 @@ bool SA::isBallot(vector<int>& curNPE, int i)
     int N = 0;
     for(int k = 0; k <= i+1; ++k)
     {
-      if(curNPE[i] == -1 || curNPE[i] == -2)  ++N;
-      if(2 * N < i) return false;
+      if(curNPE[k] == -1 || curNPE[k] == -2)  ++N;
     }
+    if(2 * N < i+1) return false;
   }
   return true;
 }
@@ -176,7 +176,7 @@ vector<int> SA::Perturb(vector<int> curNPE, int M)
       {
         if(curNPE[i] >= 0 && curNPE[i+1] < 0)
         {
-          if(isSkewed(curNPE, i) && isBallot(curNPE, i))
+          if(isSkewed(curNPE, i) && !violateBallot(curNPE, i))
           {
             SwapPos.emplace_back(i);
           }
