@@ -303,7 +303,7 @@ int SA::CalCost(vector<int>& NPE, bool const& forWL)
 
 void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int>& initNPE, vector<int>& bestNPE)
 {
-
+  bestNPE = initNPE;
   int MT, uphill, reject; MT = uphill = reject = 0;
   int N = k * HBList.size();
   vector<int> curNPE = initNPE;
