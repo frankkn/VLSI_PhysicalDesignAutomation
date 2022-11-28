@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../module/module.h"
+#include "../Module/module.h"
 using namespace std;
 
 class SA

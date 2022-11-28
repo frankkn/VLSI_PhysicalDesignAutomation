@@ -6,8 +6,9 @@
 #include <tuple>
 #include <unordered_map>
 #include <vector>
-#include "./module/module.h"
+#include "./Module/module.h"
 #include "./SAfloorplan/sa.h"
+#include "./Clock/clock.h"
 
 using namespace std;
 
@@ -30,6 +31,10 @@ void WriteResult(string filename, int WL)
 
 int main(int argc, char *argv[])
 {
+  Clock clock(10*60 - 8);
+  clock.StartClock("Total time");
+  clock.StartClock("Input time");
+
   // Step 1-1: Read hard blocks
   ifstream fin_hardblocks(argv[1]);
   string s;
@@ -102,10 +107,23 @@ int main(int argc, char *argv[])
       }
     }
   }
-
+  clock.EndClock("Input time");
+  
+  clock.StartClock("SA time");
   SA sa(stod(argv[5]));
   int finalWL = sa.Run();
+  clock.EndClock("SA time");
+
+  clock.StartClock("Output time");
   WriteResult(argv[4], finalWL);
+  clock.EndClock("Output time");
+
+  clock.EndClock("Total time");
+
+  clock.PrintDuration("Input time");
+  clock.PrintDuration("SA time");
+  clock.PrintDuration("Output time");
+  clock.PrintDuration("Total time");
 
   return 0;
 }
