@@ -12,18 +12,6 @@
 #include "./Clock/clock.h"
 using namespace std;
 
-void WriteResult(Input* input, string filepath, int WL)
-{
-  ofstream output(filepath);
-
-  output << "Wirelength " << WL << "\n";
-  output << "Blocks" << "\n";
-  for(auto& hb: input->HBList)
-  {
-    output << hb->name << " " << hb->downleft_x << " " << hb->downleft_y << " " << hb->rotated << "\n"; 
-  }
-}
-
 int main(int argc, char *argv[])
 {
   Clock clock(10*60 - 6);
