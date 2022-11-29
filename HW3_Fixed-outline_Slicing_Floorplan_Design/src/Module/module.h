@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 struct pin
@@ -53,4 +54,16 @@ struct TreeNode
       }
     }
     void updateShape();
+};
+
+struct Input
+{
+  double dead_space_ratio;
+  vector<HardBlock*> HBList;
+  unordered_map<string, HardBlock*> HBTable;
+  vector<net*> NetList;
+  unordered_map<string, pin*> PinTable;
+
+  Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio)
+    :HBList(HBList), HBTable(HBTable), NetList(NetList), dead_space_ratio(dead_space_ratio) {}
 };

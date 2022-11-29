@@ -8,7 +8,7 @@ class SA
 { 
   private:
     double region_side_len;
-
+    Input* input;
     Clock& clock;
 
     void CalSideLen(double& dead_space_ratio);
@@ -24,6 +24,6 @@ class SA
     int CalCost(vector<int>& NPE, bool const & forWL);
     void SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int>& curNPE, vector<int>& bestNPE);
   public:
-    SA(double dead_space_ratio, Clock& clock):clock(clock) { CalSideLen(dead_space_ratio); }
+    SA(Input* input, Clock& clock):input(input), clock(clock) { CalSideLen(input->dead_space_ratio); }
     int Run();
 };

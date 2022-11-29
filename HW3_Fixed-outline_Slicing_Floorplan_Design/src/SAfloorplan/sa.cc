@@ -8,14 +8,10 @@
 #include "sa.h"
 using namespace std;
 
-extern vector<HardBlock*> HBList;
-extern unordered_map<string, HardBlock*> HBTable;
-extern vector<net*> NetList;
-
 void SA::CalSideLen(double& dead_space_ratio)
 {
   double total_area = 0;
-  for(const auto& hb: HBList)
+  for(const auto& hb: input->HBList)
   {
     int w = hb->width, h = hb->height;
     total_area += (w * h);
@@ -35,12 +31,12 @@ void SA::InitNPE(vector<int>& NPE)
 {
   vector<int> row;
   deque<vector<int>> rows;
-  int cur_width = HBList[0]->width;
+  int cur_width = input->HBList[0]->width;
   row.emplace_back(0);
   int placedBlock = 1;
-  for(int i = 1; i < HBList.size(); ++i)
+  for(int i = 1; i < input->HBList.size(); ++i)
   {
-    auto curHB = HBList[i];
+    auto curHB = input->HBList[i];
     if(cur_width + curHB->width <= region_side_len)
     {
       row.emplace_back(i);
@@ -211,7 +207,7 @@ TreeNode* SA::ConstructTree(vector<int>& NPE)
     if(element >= 0)
     {
       string hbNode_name = "sb"+ to_string(element);
-      HardBlock* hb = HBTable[hbNode_name];
+      HardBlock* hb = input->HBTable[hbNode_name];
       TreeNode* hbNode = new TreeNode(0, hb);
       st.emplace_back(hbNode);
     }
@@ -254,7 +250,7 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
 int SA::CalTotalHPWL()
 {
   int totalHPWL = 0;
-  for(auto& net: NetList)
+  for(auto& net: input->NetList)
   {
     totalHPWL += net->calHPWL();
   }
@@ -305,7 +301,7 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
 {
   bestNPE = initNPE;
   int MT, uphill, reject; MT = uphill = reject = 0;
-  int N = k * HBList.size();
+  int N = k * input->HBList.size();
   vector<int> curNPE = initNPE;
   int cur_cost = CalCost(curNPE, forWL);
   int best_cost = cur_cost;
@@ -373,7 +369,7 @@ int SA::Run()
   cout << "Find a feasible floorplan.\n" << "Total wirelength: " << CalTotalHPWL() << "\n";
 
   finalNPE = bestNPE;
-  SAfloorplanning(1, 0.95, 5, true, bestNPE, finalNPE);
+  SAfloorplanning(10, 0.95, 5, true, bestNPE, finalNPE);
   int finalWL = CalTotalHPWL();
   cout << "Find a better floorplan.\n" << "Total wirelength: " << finalWL << "\n";
 
