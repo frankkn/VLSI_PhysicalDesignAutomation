@@ -1,12 +1,16 @@
 #pragma once
 #include <vector>
 #include "../Module/module.h"
+#include "../Clock/clock.h"
 using namespace std;
 
 class SA
 { 
   private:
     double region_side_len;
+
+    Clock& clock;
+
     void CalSideLen(double& dead_space_ratio);
     template<class T> void SWAP(T& a, T& b); // "perfect swap" (almost)
     void InitNPE(vector<int>& NPE);
@@ -20,6 +24,6 @@ class SA
     int CalCost(vector<int>& NPE, bool const & forWL);
     void SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int>& curNPE, vector<int>& bestNPE);
   public:
-    SA(double dead_space_ratio) { CalSideLen(dead_space_ratio); }
+    SA(double dead_space_ratio, Clock& clock):clock(clock) { CalSideLen(dead_space_ratio); }
     int Run();
 };

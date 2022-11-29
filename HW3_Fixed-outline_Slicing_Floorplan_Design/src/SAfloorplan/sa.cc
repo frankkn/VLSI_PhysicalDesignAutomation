@@ -324,6 +324,10 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
       MT = uphill = reject = 0;
       do
       {
+        if(clock.OutOfTime())
+        {
+          CalCost(bestNPE, true); return;
+        }
         // int M = rand_move(random_number_generator);
         // int M = rand() % 3;
         int M = 0;

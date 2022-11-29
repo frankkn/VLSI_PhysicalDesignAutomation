@@ -31,7 +31,7 @@ void WriteResult(string filename, int WL)
 
 int main(int argc, char *argv[])
 {
-  Clock clock(10*60 - 8);
+  Clock clock(10*60 - 6);
   clock.StartClock("Total time");
   clock.StartClock("Input time");
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   clock.EndClock("Input time");
   
   clock.StartClock("SA time");
-  SA sa(stod(argv[5]));
+  SA sa(stod(argv[5]), clock);
   int finalWL = sa.Run();
   clock.EndClock("SA time");
 

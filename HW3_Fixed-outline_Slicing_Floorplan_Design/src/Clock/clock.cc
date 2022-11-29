@@ -39,3 +39,11 @@ void Clock::PrintDuration(string const &motion)
   auto d = getDuration(motion).count();
   cout << motion << ": " << d/1000.0 << "seconds\n";
 }
+
+bool Clock::OutOfTime()
+{
+  auto begin = TimeTable["time_limit"].first;
+  auto cur_time = chrono::steady_clock::now();
+  auto d = cur_time - begin;
+  return chrono::duration_cast<chrono::milliseconds>(d)/1000.0 > time_limit;
+}
