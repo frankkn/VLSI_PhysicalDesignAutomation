@@ -6,7 +6,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <vector>
-#include "./ArgParser/argparser.h"
+#include "./ArgParser/argParser.h"
 #include "./Module/module.h"
 #include "./SAfloorplan/sa.h"
 #include "./Clock/clock.h"
