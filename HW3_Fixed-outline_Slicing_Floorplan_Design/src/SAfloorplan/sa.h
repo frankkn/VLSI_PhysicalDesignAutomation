@@ -2,6 +2,7 @@
 #include <vector>
 #include "../Module/module.h"
 #include "../Clock/clock.h"
+#include "../OutputWriter/outputWriter.h"
 using namespace std;
 
 class SA
@@ -25,5 +26,5 @@ class SA
     void SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int>& curNPE, vector<int>& bestNPE);
   public:
     SA(Input* input, Clock& clock):input(input), clock(clock) { CalSideLen(input->dead_space_ratio); }
-    int Run();
+    OutputWriter* Run();
 };

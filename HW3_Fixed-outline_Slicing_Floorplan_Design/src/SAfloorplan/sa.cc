@@ -358,7 +358,7 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
   CalCost(bestNPE, true); return; 
 }
 
-int SA::Run()
+OutputWriter* SA::Run()
 {
   unsigned seed = 2;
   srand(seed);
@@ -373,5 +373,6 @@ int SA::Run()
   int finalWL = CalTotalHPWL();
   cout << "Find a better floorplan.\n" << "Total wirelength: " << finalWL << "\n";
 
-  return finalWL;
+  OutputWriter* ow = new OutputWriter(input);
+  return ow;
 }

@@ -35,12 +35,12 @@ int main(int argc, char *argv[])
   clock.EndClock("Input time");
   
   clock.StartClock("SA time");
-  SA sa(input, clock);
-  int finalWL = sa.Run();
+  SA SAFP(input, clock);
+  OutputWriter* OW = SAFP.Run();
   clock.EndClock("SA time");
 
   clock.StartClock("Output time");
-  WriteResult(input, argv[4], finalWL);
+  OW->WriteResult(argv[4]);
   clock.EndClock("Output time");
 
   clock.EndClock("Total time");
