@@ -316,7 +316,7 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
   // uniform_real_distribution<> rand_prob(0, 1);
   do
   {
-    double T0 = 1000;
+    double T0 = 5000;
     do
     {
       MT = uphill = reject = 0;
@@ -371,7 +371,7 @@ OutputWriter* SA::Run()
   cout << "Find a feasible floorplan.\n" << "Total wirelength: " << CalTotalHPWL() << "\n";
 
   finalNPE = bestNPE;
-  SAfloorplanning(10, 0.95, 5, true, bestNPE, finalNPE);
+  SAfloorplanning(1, 0.99, 5, true, bestNPE, finalNPE);
   int finalWL = CalTotalHPWL();
   cout << "Find a better floorplan.\n" << "Total wirelength: " << finalWL << "\n";
 
