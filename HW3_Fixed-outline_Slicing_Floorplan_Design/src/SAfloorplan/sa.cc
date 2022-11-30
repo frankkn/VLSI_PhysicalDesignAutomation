@@ -372,11 +372,12 @@ OutputWriter* SA::Run()
 
   vector<int> initNPE, bestNPE, finalNPE;
   InitNPE(initNPE);
-  SAfloorplanning(0.1, 0.9, 10, false, initNPE, bestNPE);
-  cout << "Find a feasible floorplan.\n" << "Total wirelength: " << CalTotalHPWL() << "\n";
+  SAfloorplanning(10, 0.85, 10, false, initNPE, bestNPE);
+  cout << "Find a feasible floorplan, total wirelength = " << CalTotalHPWL() << "\n";
 
   finalNPE = bestNPE;
   SAfloorplanning(1, 0.99, 5, true, bestNPE, finalNPE);
+  cout << "Find a better floorplan, total wirelength = " << CalTotalHPWL() << "\n";
 
   OutputWriter* ow = new OutputWriter(input);
   return ow;
