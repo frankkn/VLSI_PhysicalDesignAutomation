@@ -10,7 +10,9 @@
 #include "./Module/module.h"
 #include "./SAfloorplan/sa.h"
 #include "./Clock/clock.h"
+#include "./MemoryUsage/mem.h"
 using namespace std;
+
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +34,9 @@ int main(int argc, char *argv[])
   clock.EndClock("Output time");
 
   clock.EndClock("Total time");
+
+  MemoryUsage MU;
+  MU.PrintMemUsage();
 
   clock.PrintDuration("Input time");
   clock.PrintDuration("SA time");
