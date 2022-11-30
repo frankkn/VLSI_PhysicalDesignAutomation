@@ -30,7 +30,8 @@ int main(int argc, char *argv[])
   clock.EndClock("SA time");
 
   clock.StartClock("Output time");
-  OW->WriteResult(argv[4]);
+  OW->WriteWLseed(argv[4]);
+  // OW->WriteResult(argv[4]);
   clock.EndClock("Output time");
 
   clock.EndClock("Total time");

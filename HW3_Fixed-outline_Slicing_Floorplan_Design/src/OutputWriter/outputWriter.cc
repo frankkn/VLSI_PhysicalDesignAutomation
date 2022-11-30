@@ -17,3 +17,14 @@ void OutputWriter::WriteResult(string const & filepath)
     output << hb->name << " " << hb->downleft_x << " " << hb->downleft_y << " " << hb->rotated << "\n"; 
   }
 }
+
+void OutputWriter::WriteWLseed(string const & filepath)
+{
+  ofstream output(filepath, ios::app);
+  int WL = 0;
+  for(auto& net: input->NetList)
+  {
+    WL += net->calHPWL();
+  }
+  output << "Wirelength = " << WL << "\t" << "Seed = " << input->seed << "\n";
+}

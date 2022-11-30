@@ -367,7 +367,7 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
 
 OutputWriter* SA::Run()
 {
-  unsigned seed = 2;
+  unsigned seed = input->seed;
   srand(seed);
 
   vector<int> initNPE, bestNPE, finalNPE;
