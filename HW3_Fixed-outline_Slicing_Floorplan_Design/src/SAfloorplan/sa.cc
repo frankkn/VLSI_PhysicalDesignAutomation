@@ -123,7 +123,7 @@ bool SA::violateBallot(vector<int>& curNPE, int i)
   return true;
 }
 
-vector<int> SA::Perturb(vector<int> curNPE, int M)
+vector<int>& SA::Perturb(vector<int>& curNPE, int M)
 {
   switch(M)
   {
@@ -259,7 +259,7 @@ int SA::CalTotalHPWL()
   return totalHPWL;
 }
 
-int SA::CalCost(vector<int>& NPE, bool const& forWL)
+int SA::CalSACost(vector<int>& NPE, bool const& forArea)
 {
   TreeNode* root = ConstructTree(NPE);
   int min_out_area = INT_MAX, out_of_range_area = 0, shapeIdx = 0;
@@ -284,32 +284,40 @@ int SA::CalCost(vector<int>& NPE, bool const& forWL)
       out_of_range_area = 0;
     }
     // Pick 1st shape which is within the region due to time-saving.
-    // But it might not be the min-area-shape of all the qualified shape. 
+    // But it might not be the min-area-shape of all the qualified shapes. 
     if(out_of_range_area < min_out_area)
     {
       min_out_area = out_of_range_area;
       shapeIdx = i;
     }
   }
-
-  if(forWL == false)  return min_out_area * 10;
-
-  PlaceBlock(root, shapeIdx, 0, 0);
-
-  return min_out_area * 10 + CalTotalHPWL();
+  // Calculate cost but focus on area only 
+  // Aim to find a feasible solution ASAP without calculating the wirelength
+  if(forArea == true)
+  {
+    return min_out_area * 20;
+  }
+  else
+  // Calculate cost for wirelength but still need to consider area 
+  // since it may still out of range
+  {
+    PlaceBlock(root, shapeIdx, 0, 0);
+    return min_out_area * 20 + CalTotalHPWL();
+  }
 }
 
-void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int>& initNPE, vector<int>& bestNPE)
+void SA::SAfloorplanning(double epsilon, double r, int k, bool forArea, vector<int>& initNPE, vector<int>& bestNPE)
 {
   bestNPE = initNPE;
   int MT, uphill, reject; MT = uphill = reject = 0;
   int N = k * input->HBList.size();
   vector<int> curNPE = initNPE;
-  int cur_cost = CalCost(curNPE, forWL);
+  int cur_cost = CalCost(curNPE, forArea);
   int best_cost = cur_cost;
+  // If cur_cost is 0 initially, then we directly go to second phase of SA
   if(best_cost == 0)
   { 
-    CalCost(bestNPE, true); return; 
+    CalCost(bestNPE, false); return; 
   }
   // mt19937 random_number_generator(random_device{}());
   // uniform_int_distribution<> rand_move(1, 3);
@@ -324,17 +332,19 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
       {
         if(clock.OutOfTime())
         {
-          CalCost(bestNPE, true); return;
+          CalCost(bestNPE, false); return;
         }
         // int M = rand_move(random_number_generator);
         // int M = rand() % 3;
         int M = 0;
-        if(forWL == false)  M = rand() % 3;
+        if(forArea == true)  M = rand() % 3;
         vector<int> tryNPE = Perturb(curNPE, M);
         MT += 1;
-        int try_cost = CalCost(tryNPE, forWL);
+        int try_cost = CalCost(tryNPE, forArea);
         int delta_cost = try_cost - cur_cost;
-        if(delta_cost < 0 || (double)rand()/RAND_MAX < exp(-1*delta_cost/T0))
+        double up = 1.0, low = 0.0;
+        double rand_num = (up-low) * rand()/(RAND_MAX + 1.0) + low; // [0,1)
+        if(delta_cost < 0 || rand_num < exp(-1*delta_cost/T0))
         {
           if(delta_cost > 0) { uphill += 1; }
           curNPE = tryNPE;
@@ -345,7 +355,7 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
             best_cost = cur_cost;
             if(best_cost == 0)
             { 
-              CalCost(bestNPE, true); return; 
+              CalCost(bestNPE, false); return; 
             }
           }
         }
@@ -356,8 +366,8 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
       }while(uphill <= N && MT <= 2*N);
       T0 = r * T0;
     }while(reject/MT <= 0.95 && T0 >= epsilon);
-  }while (forWL == false);
-  CalCost(bestNPE, true); return; 
+  }while (forArea == true);
+  CalCost(bestNPE, false); return; 
 }
 
 OutputWriter* SA::Run()
@@ -367,11 +377,15 @@ OutputWriter* SA::Run()
 
   vector<int> initNPE, bestNPE, finalNPE;
   InitNPE(initNPE);
-  SAfloorplanning(0.1, 0.9, 10, false, initNPE, bestNPE);
+  SAfloorplanning(0.1, 0.9, 10, true, initNPE, bestNPE);
   cout << "Find a feasible floorplan.\n" << "Total wirelength: " << CalTotalHPWL() << "\n";
 
   finalNPE = bestNPE;
+<<<<<<< HEAD
   SAfloorplanning(1, 0.99, 5, true, bestNPE, finalNPE);
+=======
+  SAfloorplanning(1, 0.99, 5, false, bestNPE, finalNPE);
+>>>>>>> f50a17fd974aea39279f95f470645285d9a717ac
   int finalWL = CalTotalHPWL();
   cout << "Find a better floorplan.\n" << "Total wirelength: " << finalWL << "\n";
 
