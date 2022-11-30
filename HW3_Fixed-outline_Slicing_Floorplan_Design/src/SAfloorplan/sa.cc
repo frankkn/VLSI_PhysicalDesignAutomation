@@ -202,24 +202,26 @@ vector<int> SA::Perturb(vector<int> curNPE, int M)
 TreeNode* SA::ConstructTree(vector<int>& NPE)
 {
   vector<TreeNode*> st;
-  for(auto element:NPE)
+  int cutNodeIndex = 0;
+  for(auto& element:NPE)
   {
     if(element >= 0)
     {
-      string hbNode_name = "sb"+ to_string(element);
-      HardBlock* hb = input->HBTable[hbNode_name];
-      TreeNode* hbNode = new TreeNode(0, hb);
-      st.emplace_back(hbNode);
+      // string hbNode_name = "sb"+ to_string(element);
+      // HardBlock* hb = input->HBTable[hbNode_name];
+      // TreeNode* hbNode = new TreeNode(0, hb);
+      st.emplace_back(hbNodeList[element]);
     }
     else
     {
-      TreeNode* VHnode = new TreeNode(element);
-      TreeNode* Rnode = st.back(); st.pop_back();
-      VHnode->rchild = Rnode;
-      TreeNode* Lnode = st.back(); st.pop_back();
-      VHnode->lchild = Lnode;
-      st.emplace_back(VHnode);
-      VHnode->updateShape();
+      TreeNode* cutNode = cutNodeList[cutNodeIndex];
+      ++cutNodeIndex;
+      // TreeNode* VHnode = new TreeNode(element);
+      cutNode->type = element;
+      cutNode->rchild = st.back(); st.pop_back();
+      cutNode->lchild = st.back(); st.pop_back();
+      st.emplace_back(cutNode);
+      cutNode->updateShape();
     }
   }
   return st.back(); // root
