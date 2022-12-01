@@ -20,11 +20,11 @@ class SA
     bool isSkewed(vector<int>& curNPE, int i);
     bool violateBallot(vector<int>& curNPE, int i);
     vector<int> Perturb(vector<int> curNPE, int M);
-    TreeNode* ConstructTree(vector<int>& NPE);
+    TreeNode* ConstructTree(vector<int>& NPE); // Stock meyer
     void PlaceBlock(TreeNode* node, int shapeIdx, int new_x, int new_y);
     int CalTotalHPWL();
-    int CalCost(vector<int>& NPE, bool const & forWL);
-    void SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int>& curNPE, vector<int>& bestNPE);
+    int CalSACost(vector<int>& NPE, bool const & AreaPhase);
+    void SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector<int>& curNPE, vector<int>& bestNPE);
   public:
     SA(Input* input, Clock& clock):input(input), clock(clock)
     { 
