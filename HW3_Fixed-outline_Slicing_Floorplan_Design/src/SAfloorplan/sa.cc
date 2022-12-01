@@ -327,14 +327,19 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
       MT = uphill = reject = 0;
       do
       {
-        if(clock.OutOfTime())
-        {
-          CalSACost(bestNPE, false); return;
-        }
+        if(clock.OutOfTime()) {  CalSACost(bestNPE, false); return;  }
         // int M = rand_move(random_number_generator);
-        // int M = rand() % 3;
-        int M = 0;
-        if(AreaPhase == true)  M = rand() % 3;
+        int M = rand() % 3;
+        // if(AreaPhase)
+        // {
+        //   M = rand() % 3;
+        // }
+        // else
+        // {
+        //   // Faster for phase 1
+        //   // Impact on WL?
+        //   M = 0;
+        // }
         vector<int> tryNPE = Perturb(curNPE, M);
         MT += 1;
         int try_cost = CalSACost(tryNPE, AreaPhase);
@@ -350,9 +355,9 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
             best_cost = cur_cost;
             // If best_cost(try_cost) == 0, it means found one feasible solution
             // Calculate its "real" cost i.e., cost function   
-            if(best_cost == 0)
-            { 
-              CalSACost(bestNPE, false); return; 
+            if(AreaPhase && best_cost == 0)
+            {
+              CalSACost(bestNPE, false); return;         
             }
           }
         }
@@ -362,8 +367,10 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
         }
       }while(uphill <= N && MT <= 2*N);
       T0 = r * T0;
+      // cout << "T0 = " << T0 << "\n";
     }while(reject/MT <= 0.95 && T0 >= epsilon);
   }while (AreaPhase == true);
+  // Use bestNPE to PlaceBlock 
   CalSACost(bestNPE, false); return; 
 }
 
@@ -421,7 +428,7 @@ OutputWriter* SA::Run()
   cout << "Find a feasible floorplan, total wirelength = " << CalTotalHPWL() << "\n";
 
   finalNPE = bestNPE;
-  SAfloorplanning(1, 0.99, 5, false, bestNPE, finalNPE);
+  SAfloorplanning(1, 0.99, 10, false, bestNPE, finalNPE);
   cout << "Find a better floorplan, total wirelength = " << CalTotalHPWL() << "\n";
 
   OutputWriter* ow = new OutputWriter(input);
