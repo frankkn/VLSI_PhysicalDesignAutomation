@@ -7,7 +7,7 @@ class ArgParser
 {
   private:
     double dead_space_ratio;
-    int seed;
+    // int seed;
     vector<HardBlock*> HBList;
     unordered_map<string, HardBlock*> HBTable;
     vector<net*> NetList;

@@ -28,3 +28,5 @@ if [[ ${ans} == "y" ]]; then
   ../verifier/verifier "../testcases/${filename}.hardblocks" "../testcases/${filename}.nets" "../testcases/${filename}.pl" "../output/${filename}.floorplan" "${dsr}"
   set +x
 fi
+
+# ../bin/hw3 ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/$n100.pl ../output/n100.floorplan 0.15 300;

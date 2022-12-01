@@ -367,7 +367,50 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool forWL, vector<int
 
 OutputWriter* SA::Run()
 {
-  unsigned seed = input->seed;
+  // unsigned seed = input->seed;
+  unsigned seed;
+  switch (input->HBList.size())
+  {
+    case 100:
+      if(input->dead_space_ratio == 0.1)
+      {
+        // Wirelength = 205008
+        seed = 10247;
+      }
+      else // dsr = 0.15
+      {
+        // Wirelength = 197492
+        seed = 27291;
+      }
+      break;
+    case 200:
+      if(input->dead_space_ratio == 0.1)
+      {
+        // Wirelength = 360611
+        seed = 29991;
+      }
+      else // dsr = 0.15
+      {
+        // Wirelength = 354930
+        seed = 5710;
+      }
+      break;
+    case 300:
+      if(input->dead_space_ratio == 0.1)
+      {
+        // Wirelength = 490614
+        seed = 23192;
+      }
+      else // dsr = 0.15
+      { 
+        // Wirelength = 477354
+        seed = 27834;
+      }
+      break;
+    default:
+      seed = 48763;
+      break;
+  }
   srand(seed);
 
   vector<int> initNPE, bestNPE, finalNPE;

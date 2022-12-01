@@ -87,11 +87,12 @@ void ArgParser::ReadNet(string const & filepath)
 
 Input* ArgParser::ReadFile(char* argv[])
 {
-  int seed = stoi(argv[6]);
+  // int seed = stoi(argv[6]);
   double dead_space_ratio = stod(argv[5]);
   ReadHardBlock(argv[1]);
   ReadPin(argv[3]);
   ReadNet(argv[2]);
-  Input* input = new Input(HBList, HBTable, NetList, dead_space_ratio, seed);
+  // Input* input = new Input(HBList, HBTable, NetList, dead_space_ratio, seed);
+  Input* input = new Input(HBList, HBTable, NetList, dead_space_ratio);
   return input;
 }

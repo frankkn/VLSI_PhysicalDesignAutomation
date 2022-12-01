@@ -13,7 +13,6 @@
 #include "./MemoryUsage/mem.h"
 using namespace std;
 
-
 int main(int argc, char *argv[])
 {
   Clock clock(10*60 - 6);
@@ -30,8 +29,8 @@ int main(int argc, char *argv[])
   clock.EndClock("SA time");
 
   clock.StartClock("Output time");
-  OW->WriteWLseed(argv[4]);
-  // OW->WriteResult(argv[4]);
+  // OW->WriteWLseed(argv[4]);
+  OW->WriteResult(argv[4]);
   clock.EndClock("Output time");
 
   clock.EndClock("Total time");
