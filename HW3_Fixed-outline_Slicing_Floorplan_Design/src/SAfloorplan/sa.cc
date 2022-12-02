@@ -235,15 +235,16 @@ void SA::PlaceBlock(TreeNode* node, int shapeIdx, int x, int y)
   }
   else
   {
-    PlaceBlock(node->lchild, get<2>(node->shape[shapeIdx]).first, x, y);
+    int left_choice = get<2>(node->shape[shapeIdx]).first;
+    PlaceBlock(node->lchild, left_choice, x, y);
     int displacementX = 0, displacementY = 0;
     if(node->type == -1)
     {
-      displacementX = get<0>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+      displacementX = get<0>(node->lchild->shape[left_choice]);
     }
     else
     {
-      displacementY = get<1>(node->lchild->shape[get<2>(node->shape[shapeIdx]).first]);
+      displacementY = get<1>(node->lchild->shape[left_choice]);
     }
     PlaceBlock(node->rchild, get<2>(node->shape[shapeIdx]).second, x+displacementX, y+displacementY);
   }
@@ -296,6 +297,7 @@ int SA::CalSACost(vector<int>& NPE, bool const& AreaPhase)
   // Aim to find a feasible solution ASAP without calculating the wirelength
   if(AreaPhase == true)  return min_out_area * 500;
 
+  // After finding a floorplan, place hardblocks and determining the new x,y corordinates
   PlaceBlock(root, shapeIdx, 0, 0);
 
   // Calculate cost for wirelength but still need to consider area 
@@ -311,7 +313,7 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
   vector<int> curNPE = initNPE;
   int cur_cost = CalSACost(curNPE, AreaPhase);
   int best_cost = cur_cost;
-  // If cur_cost is 0 initially, then we directly go to second phase of SA
+  // If cur_cost is 0 initially, then we directly go to WL phase of SA
   if(best_cost == 0)
   { 
     CalSACost(bestNPE, false); return; 
@@ -327,19 +329,15 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
       MT = uphill = reject = 0;
       do
       {
-        if(clock.OutOfTime()) {  CalSACost(bestNPE, false); return;  }
+        if(clock.OutOfTime())
+        {
+          CalSACost(bestNPE, false); return;
+        }
         // int M = rand_move(random_number_generator);
-        int M = rand() % 3;
-        // if(AreaPhase)
-        // {
-        //   M = rand() % 3;
-        // }
-        // else
-        // {
-        //   // Faster for phase 1
-        //   // Impact on WL?
-        //   M = 0;
-        // }
+        // int M = rand() % 3;
+
+        // Speedup by setting Area phase using only Move 0
+        int M = AreaPhase? 0 : rand() % 3;
         vector<int> tryNPE = Perturb(curNPE, M);
         MT += 1;
         int try_cost = CalSACost(tryNPE, AreaPhase);
@@ -355,9 +353,9 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
             best_cost = cur_cost;
             // If best_cost(try_cost) == 0, it means found one feasible solution
             // Calculate its "real" cost i.e., cost function   
-            if(AreaPhase && best_cost == 0)
-            {
-              CalSACost(bestNPE, false); return;         
+            if(best_cost == 0)
+            { 
+              CalSACost(bestNPE, false); return; 
             }
           }
         }
@@ -367,10 +365,8 @@ void SA::SAfloorplanning(double epsilon, double r, int k, bool AreaPhase, vector
         }
       }while(uphill <= N && MT <= 2*N);
       T0 = r * T0;
-      // cout << "T0 = " << T0 << "\n";
     }while(reject/MT <= 0.95 && T0 >= epsilon);
   }while (AreaPhase == true);
-  // Use bestNPE to PlaceBlock 
   CalSACost(bestNPE, false); return; 
 }
 
@@ -428,7 +424,7 @@ OutputWriter* SA::Run()
   cout << "Find a feasible floorplan, total wirelength = " << CalTotalHPWL() << "\n";
 
   finalNPE = bestNPE;
-  SAfloorplanning(1, 0.99, 10, false, bestNPE, finalNPE);
+  SAfloorplanning(1, 0.99, 5, false, bestNPE, finalNPE);
   cout << "Find a better floorplan, total wirelength = " << CalTotalHPWL() << "\n";
 
   OutputWriter* ow = new OutputWriter(input);
