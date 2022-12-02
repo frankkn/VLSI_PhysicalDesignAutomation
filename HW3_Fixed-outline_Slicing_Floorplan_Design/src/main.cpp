@@ -15,7 +15,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  Clock clock(10*60 - 6);
+  Clock clock(10*60 - 3);
   clock.StartClock("Total time");
   
   clock.StartClock("Input time");

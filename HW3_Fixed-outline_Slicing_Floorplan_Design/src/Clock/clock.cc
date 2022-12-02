@@ -45,5 +45,7 @@ bool Clock::OutOfTime()
   auto begin = TimeTable["time_limit"].first;
   auto cur_time = chrono::steady_clock::now();
   auto d = cur_time - begin;
-  return chrono::duration_cast<chrono::microseconds>(d)/1000000.0 > time_limit;
+  // Need to debug on line 49
+  // return chrono::duration_cast<chrono::microseconds>(d)/1000000.0 > time_limit;
+  return chrono::duration_cast<chrono::microseconds>(d).count()/1000000.0 > _time_limit;
 }
