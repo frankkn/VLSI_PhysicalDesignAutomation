@@ -22,10 +22,10 @@ if [[ ${ans} == "y" ]]; then
   echo -n "dead space ratio (e.g. 0.2): "
   read dsr
   set -x
-  make clean
+# make clean
   make
-  ../bin/hw3 "../testcases/${filename}.hardblocks" "../testcases/${filename}.nets" "../testcases/${filename}.pl" "../output/${filename}.floorplan" "${dsr}"
-  ../verifier/verifier "../testcases/${filename}.hardblocks" "../testcases/${filename}.nets" "../testcases/${filename}.pl" "../output/${filename}.floorplan" "${dsr}"
+  ../bin/hw3 "../testcases/${filename}.hardblocks" "../testcases/${filename}.nets" "../testcases/${filename}.pl" "../output/${filename}_${dsr}.floorplan" "${dsr}"
+  ../verifier/verifier "../testcases/${filename}.hardblocks" "../testcases/${filename}.nets" "../testcases/${filename}.pl" "../output/${filename}_${dsr}.floorplan" "${dsr}"
   set +x
 fi
 
