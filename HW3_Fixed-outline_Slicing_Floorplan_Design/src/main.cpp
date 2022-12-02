@@ -39,6 +39,9 @@ int main(int argc, char *argv[])
   MU.PrintMemUsage();
 
   clock.PrintDuration("Input time");
+  clock.PrintDuration("SA init time");
+  clock.PrintDuration("SA area phase time");
+  clock.PrintDuration("SA wirelength phase time");
   clock.PrintDuration("SA time");
   clock.PrintDuration("Output time");
   clock.PrintDuration("Total time");

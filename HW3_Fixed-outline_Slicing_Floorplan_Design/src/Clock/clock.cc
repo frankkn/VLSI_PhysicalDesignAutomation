@@ -7,12 +7,12 @@ chrono::seconds Clock::getTimeLimit()
   return time_limit;
 }
 
-chrono::milliseconds Clock::getDuration(string const &motion)
+chrono::microseconds Clock::getDuration(string const &motion)
 {
   auto begin = TimeTable[motion].first;
   auto end = TimeTable[motion].second;
   auto d = end-begin;
-  return chrono::duration_cast<chrono::milliseconds>(d);
+  return chrono::duration_cast<chrono::microseconds>(d);
 }
 
 void Clock::StartClock(string const &motion)

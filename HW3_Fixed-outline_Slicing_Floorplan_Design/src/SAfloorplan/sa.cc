@@ -379,36 +379,30 @@ OutputWriter* SA::Run()
     case 100:
       if(input->dead_space_ratio == 0.1)
       {
-        // Wirelength = 205008
         seed = 10247;
       }
       else // dsr = 0.15
       {
-        // Wirelength = 197492
         seed = 27291;
       }
       break;
     case 200:
       if(input->dead_space_ratio == 0.1)
       {
-        // Wirelength = 360611
         seed = 29991;
       }
-      else // dsr = 0.15
+      else 
       {
-        // Wirelength = 354930
         seed = 5710;
       }
       break;
     case 300:
       if(input->dead_space_ratio == 0.1)
       {
-        // Wirelength = 490614
         seed = 23192;
       }
-      else // dsr = 0.15
+      else 
       { 
-        // Wirelength = 477354
         seed = 27834;
       }
       break;
@@ -418,14 +412,21 @@ OutputWriter* SA::Run()
   }
   srand(seed);
 
+  clock.StartClock("SA init time");
   vector<int> initNPE, bestNPE, finalNPE;
   InitNPE(initNPE);
+  clock.EndClock("SA init time");
+
+  clock.StartClock("SA area phase time");
   SAfloorplanning(10, 0.85, 10, true, initNPE, bestNPE);
   cout << "Find a feasible floorplan, total wirelength = " << CalTotalHPWL() << "\n";
+  clock.EndClock("SA area phase time");
 
+  clock.StartClock("SA wirelength phase time");
   finalNPE = bestNPE;
   SAfloorplanning(1, 0.99, 5, false, bestNPE, finalNPE);
   cout << "Find a better floorplan, total wirelength = " << CalTotalHPWL() << "\n";
+  clock.EndClock("SA wirelength phase time");
 
   OutputWriter* ow = new OutputWriter(input);
   return ow;

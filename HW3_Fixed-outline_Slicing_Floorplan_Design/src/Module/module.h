@@ -63,8 +63,10 @@ struct Input
   unordered_map<string, HardBlock*> HBTable;
   vector<net*> NetList;
   unordered_map<string, pin*> PinTable;
-  int seed;
+  // int seed;
 
-  Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio, int seed = 2)
-    :HBList(HBList), HBTable(HBTable), NetList(NetList), dead_space_ratio(dead_space_ratio), seed(seed) {}
+  // Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio, int seed)
+  //   :HBList(HBList), HBTable(HBTable), NetList(NetList), dead_space_ratio(dead_space_ratio), seed(seed) {}
+    Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio)
+    :HBList(HBList), HBTable(HBTable), NetList(NetList), dead_space_ratio(dead_space_ratio) {}
 };

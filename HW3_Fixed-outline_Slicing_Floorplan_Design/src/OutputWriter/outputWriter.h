@@ -10,5 +10,5 @@ class OutputWriter
   public:
     OutputWriter(Input* input):input(input) {}
     void WriteResult(string const & filepath);
-    void WriteWLseed(string const & filepath);
+    // void WriteWLseed(string const & filepath);
 };
