@@ -379,31 +379,31 @@ OutputWriter* SA::Run()
     case 100:
       if(input->dead_space_ratio == 0.1)
       {
-        seed = 10247;
+        seed = 4201;
       }
       else // dsr = 0.15
       {
-        seed = 27291;
+        seed = 26630;
       }
       break;
     case 200:
       if(input->dead_space_ratio == 0.1)
       {
-        seed = 29991;
+        seed = 9512;
       }
       else 
       {
-        seed = 5710;
+        seed = 4528;
       }
       break;
     case 300:
       if(input->dead_space_ratio == 0.1)
       {
-        seed = 23192;
+        seed = 25183;
       }
       else 
       { 
-        seed = 27834;
+        seed = 15293;
       }
       break;
     default:

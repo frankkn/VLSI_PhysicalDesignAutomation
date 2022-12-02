@@ -67,6 +67,6 @@ struct Input
 
   // Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio, int seed)
   //   :HBList(HBList), HBTable(HBTable), NetList(NetList), dead_space_ratio(dead_space_ratio), seed(seed) {}
-    Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio)
+  Input(vector<HardBlock*> HBList, unordered_map<string, HardBlock*> HBTable, vector<net*> NetList, double dead_space_ratio)
     :HBList(HBList), HBTable(HBTable), NetList(NetList), dead_space_ratio(dead_space_ratio) {}
 };
