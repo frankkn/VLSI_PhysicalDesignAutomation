@@ -29,4 +29,4 @@ if [[ ${ans} == "y" ]]; then
   set +x
 fi
 
-# ../bin/hw3 ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/$n100.pl ../output/n100.floorplan 0.1
+# ../bin/hw3 ../testcases/n100.hardblocks ../testcases/n100.nets ../testcases/n100.pl ../output/n100.floorplan 0.1
