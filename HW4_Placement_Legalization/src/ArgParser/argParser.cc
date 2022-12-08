@@ -52,13 +52,14 @@ void ArgParser::ReadNode(string const &nodePath) {
   for(int i = 0; i < terminalCnt; ++i) {
     getline(fin, s);
     stringstream ss(s);
-    string terminal_name, width, height, tmp;
+    string terminal_name, tmp;
+    int width, height;
     ss >> terminal_name >> width >> height >> tmp;
-    Node* terminal = new Node(terminal_name, stoi(width), stoi(height));
+    Node* terminal = new Node(terminal_name, width, height);
     terminals.emplace_back(terminal);
     NodeTable.emplace(terminal_name, terminal);
   }
-  // cout << NodeTable.size();
+  cout << NodeTable.size();
 }
 
 void ArgParser::ReadPl(string const &plPath) {
