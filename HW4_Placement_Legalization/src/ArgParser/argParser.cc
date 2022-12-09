@@ -25,7 +25,7 @@ void ArgParser::ReadNode(string const &nodePath) {
   string s;
   int nodeCnt, terminalCnt;
   while(getline(fin, s)) {
-    if(s.empty()) break;
+    if(s.empty()) break; // Otherwise, read until EOF
     stringstream ss(s);
     string begin_word, colon;
     while(ss >> begin_word) {
@@ -45,7 +45,7 @@ void ArgParser::ReadNode(string const &nodePath) {
     string cell_name; 
     int width, height;
     ss >> cell_name >> width >> height;
-    Node* cell = new Node(cell_name, width, height);
+    Node* cell = new Node(0, cell_name, width, height);
     cells.emplace_back(cell);
     NodeTable.emplace(cell_name, cell);
   }
@@ -55,19 +55,75 @@ void ArgParser::ReadNode(string const &nodePath) {
     string terminal_name, tmp;
     int width, height;
     ss >> terminal_name >> width >> height >> tmp;
-    Node* terminal = new Node(terminal_name, width, height);
+    Node* terminal = new Node(1, terminal_name, width, height);
     terminals.emplace_back(terminal);
     NodeTable.emplace(terminal_name, terminal);
   }
-  cout << NodeTable.size();
 }
 
 void ArgParser::ReadPl(string const &plPath) {
-
+  ifstream fin(plPath);
+  string s;
+  for(int i = 0; i < cells.size(); ++i) {
+    getline(fin, s);
+    stringstream ss(s);
+    string cell_name, colon, N;
+    double cell_x, cell_y;
+    ss >> cell_name >>  cell_x >> cell_y >> colon >> N;
+    NodeTable.at(cell_name)->x = cell_x;
+    NodeTable.at(cell_name)->y = cell_y;
+  }
+  for(int i = 0; i < terminals.size(); ++i) {
+    getline(fin, s);
+    stringstream ss(s);
+    string terminal_name, colon, N, F;
+    double terminal_x, terminal_y;
+    ss >> terminal_name >> terminal_x >> terminal_y >> colon >> N >> F;
+    NodeTable.at(terminal_name)->x = terminal_x;
+    NodeTable.at(terminal_name)->y = terminal_y;
+  }
 }
 
 void ArgParser::ReadScl(string const &sclPath) {
-
+  ifstream fin(sclPath);
+  string s, tmp, colon;
+  int rowNum = 0;
+  getline(fin, s);
+  stringstream ss(s);
+  ss >> tmp >> colon >> rowNum;
+  // cout << rowNum << endl;
+  getline(fin, s);
+  for(int i = 0; i < rowNum; ++i) {
+    int y = 0, height = 0, siteWidth = 0, siteNum = 0, x = 0;
+    for(int j = 0; j < 7; ++j) {
+      getline(fin, s);
+      // cout << j << "!" << s << endl;
+      if(j == 0 || j == 6) continue;
+      else {
+        stringstream ss(s);
+        string begin_word, colon;
+        ss >> begin_word;
+        if(begin_word == "Coordinate") {
+          ss >> colon >> y;
+        }else if(begin_word == "Height") {
+          ss >> colon >> height;
+        }else if(begin_word == "Sitewidth") {
+          ss >> colon >> siteWidth;
+        }else if(begin_word == "NumSites") {
+          ss >> colon >> siteNum;
+        }else { // begin_word == "SubrowOrigin"
+          ss >> colon >> x;
+        }
+      }
+    }
+    auto corerow = new CoreRow(x, y, height, siteWidth, siteNum);
+    auto subrow = new SubRow(x, x + siteWidth * siteNum);
+    corerow->subrows.emplace_back(subrow);
+    block.emplace_back(corerow);
+  }
+  // for(auto corerow: block) {
+  //   cout << corerow->y << endl;
+  // }
 }
 
 void ArgParser::ReadFile(char argv[]) {
@@ -76,8 +132,7 @@ void ArgParser::ReadFile(char argv[]) {
   ReadAux(auxPath, nodePath, plPath, sclPath);
   string prefix = auxPath.erase(auxPath.find_last_of('/')+1, auxPath.size()-1);
   ReadNode(prefix + nodePath);
-  // ReadPl(prefix + plPath);
-  // ReadScl(prefix + sclPath);
-
+  ReadPl(prefix + plPath);
+  ReadScl(prefix + sclPath);
   // return new Input(maxDisplacement, cells, terminals, blocks);
 }

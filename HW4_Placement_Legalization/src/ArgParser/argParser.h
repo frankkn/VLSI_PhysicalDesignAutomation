@@ -8,7 +8,7 @@ class ArgParser
   int maxDisplacement;
 
   vector<Node*> cells, terminals;
-  vector<Block*> blocks;
+  vector<CoreRow*> block;
   unordered_map<string, Node*> NodeTable;
 
   void ReadAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath);
@@ -19,5 +19,5 @@ class ArgParser
   public:
     ArgParser() {}
     // Input* ReadFile(char *argv);
-    void ReadFile(char *argv);
+    void ReadFile(char argv[]);
 };
