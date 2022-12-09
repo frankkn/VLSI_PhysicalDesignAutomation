@@ -1,10 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "argParser.h"
+#include "./argParser.h"
 using namespace std;
 
-void ArgParser::ReadAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath) {
+void ArgParser::readAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath) {
   ifstream fin(auxPath);
   string s;
   while(getline(fin, s)) {
@@ -20,7 +20,7 @@ void ArgParser::ReadAux(string const & auxPath, string &nodePath, string &plPath
   }
 }
 
-void ArgParser::ReadNode(string const &nodePath) {
+void ArgParser::readNode(string const &nodePath) {
   ifstream fin(nodePath);
   string s;
   int nodeCnt, terminalCnt;
@@ -61,7 +61,7 @@ void ArgParser::ReadNode(string const &nodePath) {
   }
 }
 
-void ArgParser::ReadPl(string const &plPath) {
+void ArgParser::readPl(string const &plPath) {
   ifstream fin(plPath);
   string s;
   for(int i = 0; i < cells.size(); ++i) {
@@ -84,7 +84,7 @@ void ArgParser::ReadPl(string const &plPath) {
   }
 }
 
-void ArgParser::ReadScl(string const &sclPath) {
+void ArgParser::readScl(string const &sclPath) {
   ifstream fin(sclPath);
   string s, tmp, colon;
   int rowNum = 0;
@@ -126,13 +126,13 @@ void ArgParser::ReadScl(string const &sclPath) {
   // }
 }
 
-void ArgParser::ReadFile(char argv[]) {
+Input* ArgParser::readFile(char argv[]) {
   string auxPath = string(argv);
   string nodePath, plPath, sclPath;
-  ReadAux(auxPath, nodePath, plPath, sclPath);
+  readAux(auxPath, nodePath, plPath, sclPath);
   string prefix = auxPath.erase(auxPath.find_last_of('/')+1, auxPath.size()-1);
-  ReadNode(prefix + nodePath);
-  ReadPl(prefix + plPath);
-  ReadScl(prefix + sclPath);
-  // return new Input(maxDisplacement, cells, terminals, blocks);
+  readNode(prefix + nodePath);
+  readPl(prefix + plPath);
+  readScl(prefix + sclPath);
+  return new Input(maxDisplacement, cells, terminals, block);
 }

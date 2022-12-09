@@ -1,3 +1,4 @@
+#pragma once
 #include <unordered_map>
 #include <vector>
 #include "../Module/module.h"
@@ -11,13 +12,12 @@ class ArgParser
   vector<CoreRow*> block;
   unordered_map<string, Node*> NodeTable;
 
-  void ReadAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath);
-  void ReadNode(string const & nodePath);
-  void ReadPl(string const & plPath);
-  void ReadScl(string const & filePath);
+  void readAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath);
+  void readNode(string const & nodePath);
+  void readPl(string const & plPath);
+  void readScl(string const & filePath);
 
   public:
     ArgParser() {}
-    // Input* ReadFile(char *argv);
-    void ReadFile(char argv[]);
+    Input* readFile(char argv[]);
 };
