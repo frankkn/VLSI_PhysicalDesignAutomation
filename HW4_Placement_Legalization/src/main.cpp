@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
   auto input = AP.readFile(argv[1]);
   
   AbacusLegalizer AL(input);
+  AL.cutSubRow();
+  
   // AL.run();
 
   return 0;

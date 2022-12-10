@@ -6,9 +6,10 @@ class AbacusLegalizer {
   private:
     Input* input;
     
-    void cutSubRow();
+    // void cutSubRow();
 
   public:
     AbacusLegalizer(Input* input):input(input) {}
+    void cutSubRow();
     // OutputWriter* run();
 };
