@@ -12,34 +12,34 @@ void AbacusLegalizer::cutSubRow()
   {
     for(auto &terminal: input->terminals) 
     {
-      auto curSubRow = corerow->subrows.back();
+      auto curSubrow = corerow->subrows.back();
       if(terminal->y > corerow->y || terminal->y + terminal->height <= corerow->y) { continue; }
       int tLeftX = terminal->x, tRightX = terminal->x + terminal->width;
-      if(curSubRow->leftX >= tLeftX) 
+      if(curSubrow->leftX >= tLeftX) 
       {
-        if(curSubRow->rightX > tRightX) 
+        if(curSubrow->rightX > tRightX) 
         {
-          if(curSubRow->leftX <= tRightX) // curSubRow overlaps terminal
+          if(curSubrow->leftX <= tRightX) // curSubrow overlaps terminal
           {
-            curSubRow->leftX = tRightX;
+            curSubrow->leftX = tRightX;
           }
         }
         else 
         {
-          delete curSubRow;
+          delete curSubrow;
           corerow->subrows.pop_back();
         }
       }
       else 
       {
-        if(curSubRow->rightX > tRightX) 
+        if(curSubrow->rightX > tRightX) 
         {
-          corerow->subrows.emplace_back(new SubRow(tRightX, curSubRow->rightX));
-          curSubRow->rightX = tLeftX;
+          corerow->subrows.emplace_back(new SubRow(tRightX, curSubrow->rightX));
+          curSubrow->rightX = tLeftX;
         }
         else 
         {
-          curSubRow->rightX = tLeftX;
+          curSubrow->rightX = tLeftX;
         }
       }
     }
