@@ -2,7 +2,8 @@
 #include "../Module/module.h"
 using namespace std;
 
-class AbacusLegalizer {
+class AbacusLegalizer 
+{
   private:
     Input* input;
     
@@ -11,5 +12,7 @@ class AbacusLegalizer {
   public:
     AbacusLegalizer(Input* input):input(input) {}
     void cutSubRow();
+    void locateCellCorerow(Node* cell, int &rowIdx);
+    void locateCellSubrow(CoreRow* row, Node* cell, int &subrowIdx);
     // OutputWriter* run();
 };

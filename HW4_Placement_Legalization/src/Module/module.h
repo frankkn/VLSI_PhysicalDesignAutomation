@@ -3,7 +3,8 @@
 #include <string>
 using namespace std;
 
-struct Node {
+struct Node 
+{
   int type; // 0:cell 1:terminal
   string name;
   int width, height;
@@ -13,13 +14,16 @@ struct Node {
     :type(type), name(name), width(width), height(height), x(x), y(y) {}
 };
 
-struct SubRow {
+struct SubRow 
+{
   int leftX, rightX;
+  int capacity;
 
-  SubRow(int leftX, int rightX):leftX(leftX), rightX(rightX) {}
+  SubRow(int leftX, int rightX):leftX(leftX), rightX(rightX), capacity(rightX-leftX) {}
 };
 
-struct CoreRow {
+struct CoreRow 
+{
   double x, y; // downleft coordinate
   int height, siteWidth, siteNum;
   vector<SubRow*> subrows;
@@ -28,13 +32,15 @@ struct CoreRow {
     :x(x), y(y), height(height), siteWidth(siteWidth), siteNum(siteNum) {}
 };
 
-struct Block {
+struct Block 
+{
   vector<CoreRow*> block;
 
   Block() {}
 };
 
-struct Input {
+struct Input 
+{
   int maxDisplacement;
   vector<Node*> cells, terminals;
   vector<CoreRow*> block;

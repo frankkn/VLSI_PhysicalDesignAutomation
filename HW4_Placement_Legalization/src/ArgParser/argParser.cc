@@ -4,34 +4,46 @@
 #include "./argParser.h"
 using namespace std;
 
-void ArgParser::readAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath) {
+void ArgParser::readAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath)
+{
   ifstream fin(auxPath);
   string s;
-  while(getline(fin, s)) {
+  while(getline(fin, s)) 
+  {
     stringstream ss(s);
     string begin_word, colon;
-    while(ss >> begin_word) {
-      if(begin_word == "RowBasedPlacement") {
+    while(ss >> begin_word) 
+    {
+      if(begin_word == "RowBasedPlacement") 
+      {
         ss >> colon >> nodePath >> plPath >> sclPath;
-      }else {
+      }
+      else 
+      {
         ss >> colon >> maxDisplacement;
       }
     }
   }
 }
 
-void ArgParser::readNode(string const &nodePath) {
+void ArgParser::readNode(string const &nodePath) 
+{
   ifstream fin(nodePath);
   string s;
   int nodeCnt, terminalCnt;
-  while(getline(fin, s)) {
+  while(getline(fin, s)) 
+  {
     if(s.empty()) break; // Otherwise, read until EOF
     stringstream ss(s);
     string begin_word, colon;
-    while(ss >> begin_word) {
-      if(begin_word == "NumNodes") {
+    while(ss >> begin_word) 
+    {
+      if(begin_word == "NumNodes") 
+      {
         ss >> colon >> nodeCnt;
-      }else {
+      }
+      else 
+      {
         ss >> colon >> terminalCnt;
       }
     }
@@ -39,7 +51,8 @@ void ArgParser::readNode(string const &nodePath) {
 
   int cellCnt = nodeCnt - terminalCnt;
 
-  for(int i = 0; i < cellCnt; ++i) {
+  for(int i = 0; i < cellCnt; ++i) 
+  {
     getline(fin, s);
     stringstream ss(s);
     string cell_name; 
@@ -49,7 +62,8 @@ void ArgParser::readNode(string const &nodePath) {
     cells.emplace_back(cell);
     NodeTable.emplace(cell_name, cell);
   }
-  for(int i = 0; i < terminalCnt; ++i) {
+  for(int i = 0; i < terminalCnt; ++i) 
+  {
     getline(fin, s);
     stringstream ss(s);
     string terminal_name, tmp;
@@ -61,10 +75,12 @@ void ArgParser::readNode(string const &nodePath) {
   }
 }
 
-void ArgParser::readPl(string const &plPath) {
+void ArgParser::readPl(string const &plPath) 
+{
   ifstream fin(plPath);
   string s;
-  for(int i = 0; i < cells.size(); ++i) {
+  for(int i = 0; i < cells.size(); ++i) 
+  {
     getline(fin, s);
     stringstream ss(s);
     string cell_name, colon, N;
@@ -73,7 +89,8 @@ void ArgParser::readPl(string const &plPath) {
     NodeTable.at(cell_name)->x = cell_x;
     NodeTable.at(cell_name)->y = cell_y;
   }
-  for(int i = 0; i < terminals.size(); ++i) {
+  for(int i = 0; i < terminals.size(); ++i) 
+  {
     getline(fin, s);
     stringstream ss(s);
     string terminal_name, colon, N, F;
@@ -84,7 +101,8 @@ void ArgParser::readPl(string const &plPath) {
   }
 }
 
-void ArgParser::readScl(string const &sclPath) {
+void ArgParser::readScl(string const &sclPath) 
+{
   ifstream fin(sclPath);
   string s, tmp, colon;
   int rowNum = 0;
@@ -93,25 +111,38 @@ void ArgParser::readScl(string const &sclPath) {
   ss >> tmp >> colon >> rowNum;
   // cout << rowNum << endl;
   getline(fin, s);
-  for(int i = 0; i < rowNum; ++i) {
+  for(int i = 0; i < rowNum; ++i) 
+  {
     int y = 0, height = 0, siteWidth = 0, siteNum = 0, x = 0;
-    for(int j = 0; j < 7; ++j) {
+    for(int j = 0; j < 7; ++j) 
+    {
       getline(fin, s);
       // cout << j << "!" << s << endl;
       if(j == 0 || j == 6) continue;
-      else {
+      else 
+      {
         stringstream ss(s);
         string begin_word, colon;
         ss >> begin_word;
-        if(begin_word == "Coordinate") {
+        if(begin_word == "Coordinate")
+        {
           ss >> colon >> y;
-        }else if(begin_word == "Height") {
+        }
+        else if(begin_word == "Height")
+        {
           ss >> colon >> height;
-        }else if(begin_word == "Sitewidth") {
+        }
+        else if(begin_word == "Sitewidth")
+        {
           ss >> colon >> siteWidth;
-        }else if(begin_word == "NumSites") {
+        }
+        else if(begin_word == "NumSites")
+        {
           ss >> colon >> siteNum;
-        }else { // begin_word == "SubrowOrigin"
+        }
+        // begin_word == "SubrowOrigin"
+        else 
+        { 
           ss >> colon >> x;
         }
       }
@@ -126,7 +157,8 @@ void ArgParser::readScl(string const &sclPath) {
   // }
 }
 
-Input* ArgParser::readFile(char argv[]) {
+Input* ArgParser::readFile(char argv[]) 
+{
   string auxPath = string(argv);
   string nodePath, plPath, sclPath;
   readAux(auxPath, nodePath, plPath, sclPath);
