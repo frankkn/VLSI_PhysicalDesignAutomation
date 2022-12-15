@@ -43,7 +43,7 @@ void AbacusLegalizer::cutSubRow()
         }
       }
     }
-  }
+  } 
 }
 
 void AbacusLegalizer::locateCellCorerow(Node* cell, int &corerowIdx)
@@ -102,7 +102,17 @@ void AbacusLegalizer::locateCellSubrow(CoreRow* corerow, Node* cell, int &subrow
     }
     else 
     {
-      if(i == 0) { subrowIdx = 0; }
+      if(i == 0)
+      { 
+        if(cell->width <= curSubrow->capacity)
+        {
+          subrowIdx = 0;
+        }
+        else if(i+1 < corerow->subrows.size() && cell->width <= corerow->subrows[i+1]->capacity)
+        {
+          subrowIdx = 1;
+        }
+      }
       else // cell is inside certain terminal
       {
         // Determine which way (Left:i-1; Right:i) to move first
@@ -141,4 +151,112 @@ void AbacusLegalizer::locateCellSubrow(CoreRow* corerow, Node* cell, int &subrow
   }
   subrowIdx = -1;
   return;
+}
+
+void AbacusLegalizer::addCell(Cluster* c, Node* i)
+{
+  c->nodes.emplace_back(i);
+  c->e_c += i->e;
+  c->q_c += i->e * (i->bestX - c->w_c);
+  c->w_c += i->width; 
+}
+
+// Add c into its predecessor cPrime
+void AbacusLegalizer::addCluster(Cluster* cPrime, Cluster* c)
+{
+  cPrime->nodes.insert(cPrime->nodes.end(), c->nodes.begin(), c->nodes.end());
+  cPrime->e_c += c->e_c;
+  cPrime->q_c += c->q_c - c->e_c * cPrime->w_c; 
+  cPrime->w_c += c->w_c;
+}
+
+void AbacusLegalizer::collapse(Cluster* c, SubRow* s)
+{
+  // Place cluster c
+  c->x_c = c->q_c / c->e_c;
+
+  // Limit position between subrow->min and subrow->max - c->width
+  if(c->x_c < s->leftX)
+  {
+    c->x_c = s->leftX;
+  }
+  if(c->x_c > s->rightX - c->w_c)
+  {
+    c->x_c = s->rightX - c->w_c;
+  }
+
+  // Overlap between c and its predecessor c'(cPrime)?
+  auto cPrime = c->prevC;
+  if(cPrime && cPrime->x_c + cPrime->w_c > c->x_c)
+  {
+    addCluster(cPrime, c);
+    delete c;
+    c = cPrime;
+    collapse(cPrime, s);
+  }
+}
+ 
+void AbacusLegalizer::placeTrialRow(Node* cell, int corerowIdx, int subrowIdx)
+{
+  if(subrowIdx == -1)
+  {
+    cell->bestX = cell->bestY = numeric_limits<double>::max();
+    return;
+  }
+
+  // place cell into subrow 
+  auto cursubrow = input->block[corerowIdx]->subrows[subrowIdx];
+  if(cell->x < cursubrow->leftX) // stick within left bound of subrow
+  {
+    cell->bestX = cursubrow->leftX;
+  }
+  else if(cell->x > cursubrow->rightX - cell->width) // stick to the right bound - cell->width of subrow 
+  {
+    cell->bestX = cursubrow->rightX - cell->width;
+  }
+
+  auto curLastCluster = cursubrow->lastCluster;
+  if(curLastCluster == nullptr || curLastCluster->x_c + curLastCluster->w_c <= cell->bestX)
+  {
+    auto cluster = new Cluster(cell->bestX, 0.0, 0.0, 0.0, curLastCluster);
+    addCell(cluster, cell);
+    cell->bestX = cluster->x_c;
+    cursubrow->lastCluster = cluster;
+  }
+  else
+  {
+    addCell(curLastCluster, cell);
+    collapse(curLastCluster, cursubrow);
+    cell->bestX = curLastCluster->x_c + curLastCluster->w_c - cell->width;
+    cursubrow->lastCluster = curLastCluster;
+  }
+  cell->bestY = input->block[corerowIdx]->y;
+}
+
+double AbacusLegalizer::determineCost(Node* cell)
+{
+
+}
+
+void AbacusLegalizer::abacusDP()
+{
+  sort(input->cells.begin(), input->cells.end(), [&](auto &a, auto &b){return a->x < b->x; });
+  for(auto cell: input->cells)
+  {
+    double cBest {numeric_limits<double>::max()};
+    int bestCorerowIdx = -1;
+    locateCellCorerow(cell, bestCorerowIdx);
+    int bestSubrowIdx = -1;
+    locateCellSubrow(input->block[bestCorerowIdx], cell, bestSubrowIdx);
+    
+    // Current row cost:
+    placeTrialRow(cell, bestCorerowIdx, bestSubrowIdx);
+    int curCost = determineCost(cell);
+    cBest = curCost < cBest? curCost: cBest;
+    
+    // Upper rows cost:
+
+    
+    // Lower rows cost:
+  }
 }
