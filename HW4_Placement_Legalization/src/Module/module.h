@@ -35,6 +35,8 @@ struct SubRow
   int capacity;
   Cluster* lastCluster;
 
+  void updateInfo(int &newLeftX, int &newRightX);
+
   SubRow(int leftX, int rightX):leftX(leftX), rightX(rightX), capacity(rightX-leftX) {}
 };
 

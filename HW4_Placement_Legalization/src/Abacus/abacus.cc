@@ -21,7 +21,7 @@ void AbacusLegalizer::cutSubRow()
         {
           if(curSubrow->leftX <= tRightX) // curSubrow overlaps terminal
           {
-            curSubrow->leftX = tRightX;
+            curSubrow->updateInfo(tRightX, curSubrow->rightX);
           }
         }
         else 
@@ -35,12 +35,11 @@ void AbacusLegalizer::cutSubRow()
         if(curSubrow->rightX > tRightX) 
         {
           corerow->subrows.emplace_back(new SubRow(tRightX, curSubrow->rightX));
-          curSubrow->rightX = tLeftX;
-          curSubrow->capacity = curSubrow->rightX - curSubrow->leftX;
+          curSubrow->updateInfo(curSubrow->leftX, tLeftX);
         }
         else 
         {
-          curSubrow->rightX = tLeftX;
+          curSubrow->updateInfo(curSubrow->leftX, tLeftX);
         }
       }
     }
