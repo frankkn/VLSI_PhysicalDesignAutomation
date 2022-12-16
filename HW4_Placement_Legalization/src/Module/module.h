@@ -14,9 +14,19 @@ struct Node
 
   Node
   (
-    int const &type, string const &name, int const &width, int const &height, int const &e,
+    int const &type, string const &name, int const &width, int const &height,
     double const &x = 0.0, double const &y = 0.0, double const &bestX = 0.0, double const &bestY =0.0
-  ):type(type), name(name), width(width), height(height), e(width), x(x), y(y), bestX(0.0), bestY(0.0) {}
+  ):type(type), name(name), width(width), height(height), x(x), y(y), bestX(0.0), bestY(0.0) {}
+};
+
+struct Cluster
+{
+  double x_c, e_c, q_c, w_c; // pos, weight, used to give OPT pos for cell 1, width
+  vector<Node*> nodes; 
+  Cluster* prevC;
+
+  Cluster(double const &x_c, double const &e_c, double const &q_c, double const &w_c, Cluster* prevC)
+    :x_c(x_c), e_c(e_c), q_c(q_c), w_c(w_c), prevC(nullptr) {}
 };
 
 struct SubRow 
@@ -36,16 +46,6 @@ struct CoreRow
 
   CoreRow(int x, int y, int height, int siteWidth, int siteNum)
     :x(x), y(y), height(height), siteWidth(siteWidth), siteNum(siteNum) {}
-};
-
-struct Cluster
-{
-  double x_c, e_c, q_c, w_c; // pos, weight, used to give OPT pos for cell 1, width
-  vector<Node*> nodes; 
-  Cluster* prevC;
-
-  Cluster(double const &x_c, double const &e_c, double const &q_c, double const &w_c, Cluster* prevC)
-    :x_c(x_c), e_c(e_c), q_c(q_c), w_c(w_c), prevC(nullptr) {}
 };
 
 struct Block 
