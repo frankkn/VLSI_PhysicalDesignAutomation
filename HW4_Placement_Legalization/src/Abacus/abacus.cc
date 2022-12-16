@@ -36,6 +36,7 @@ void AbacusLegalizer::cutSubRow()
         {
           corerow->subrows.emplace_back(new SubRow(tRightX, curSubrow->rightX));
           curSubrow->rightX = tLeftX;
+          curSubrow->capacity = curSubrow->rightX - curSubrow->leftX;
         }
         else 
         {
@@ -62,7 +63,6 @@ void AbacusLegalizer::locateCellCorerow(Node* cell, int &corerowIdx)
       break;
     }
   }
-  corerowIdx = input->block.size()-1;
 }
 
 void AbacusLegalizer::locateCellSubrow(CoreRow* corerow, Node* cell, int &subrowIdx)
@@ -233,10 +233,10 @@ void AbacusLegalizer::placeTrialRow(Node* cell, int corerowIdx, int subrowIdx)
   cell->bestY = input->block[corerowIdx]->y;
 }
 
-double AbacusLegalizer::determineCost(Node* cell)
-{
+// double AbacusLegalizer::determineCost(Node* cell)
+// {
 
-}
+// }
 
 void AbacusLegalizer::abacusDP()
 {
@@ -251,8 +251,8 @@ void AbacusLegalizer::abacusDP()
     
     // Current row cost:
     placeTrialRow(cell, bestCorerowIdx, bestSubrowIdx);
-    int curCost = determineCost(cell);
-    cBest = curCost < cBest? curCost: cBest;
+    // int curCost = determineCost(cell);
+    // cBest = curCost < cBest? curCost: cBest;
     
     // Upper rows cost:
 

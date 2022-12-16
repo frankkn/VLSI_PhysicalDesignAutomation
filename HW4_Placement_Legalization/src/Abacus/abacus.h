@@ -18,7 +18,7 @@ class AbacusLegalizer
     void addCluster(Cluster* cPrime, Cluster* c);
     void collapse(Cluster* c, SubRow* s);
     void placeTrialRow(Node* cell, int corerowIdx, int subrowIdx);
-    double determineCost(Node* cell);
+    // double determineCost(Node* cell);
     void abacusDP();
     // OutputWriter* run();
 };
