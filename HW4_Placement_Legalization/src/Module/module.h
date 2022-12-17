@@ -37,7 +37,7 @@ struct SubRow
 
   void updateInfo(int &newLeftX, int &newRightX);
 
-  SubRow(int leftX, int rightX):leftX(leftX), rightX(rightX), capacity(rightX-leftX) {}
+  SubRow(int leftX, int rightX):leftX(leftX), rightX(rightX), capacity(rightX-leftX), lastCluster(nullptr) {}
 };
 
 struct CoreRow 
