@@ -16,6 +16,9 @@ int main(int argc, char *argv[])
   AbacusLegalizer AL(input);
   OutputWriter* OW = AL.run();
   OW->WriteResult(argv[1]);
-  
+
+  // OutputWriter* OW = AL.solve();
+  // OW->WriteResult(argv[1]);
+
   return 0;
 }
