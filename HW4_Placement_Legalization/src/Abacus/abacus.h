@@ -1,5 +1,6 @@
 #pragma once
 #include "../Module/module.h"
+#include "../OutputWriter/outputwriter.h"
 using namespace std;
 
 class AbacusLegalizer 
@@ -20,6 +21,7 @@ class AbacusLegalizer
     void placeTrialRow(Node* cell, int &corerowIdx, int &subrowIdx);
     double determineCost(Node* cell);
     void placeFinalRow(Node* cell, int &bestCorerowIdx, int &bestSubrowIdx);
+    void transformPosition();
     void abacusDP();
-    // OutputWriter* run();
+    OutputWriter* run();
 };

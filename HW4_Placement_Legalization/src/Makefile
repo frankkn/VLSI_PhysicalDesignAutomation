@@ -3,7 +3,7 @@ OPT = -O3
 # LIBS = -static-libstdc++
 LIBS = -std=c++17
 
-UDLIBS = ./ArgParser/argParser.cc ./Module/module.cc ./Abacus/abacus.cc
+UDLIBS = ./ArgParser/argParser.cc ./Module/module.cc ./Abacus/abacus.cc ./OutputWriter/outputwriter.cc
 
 all: main
 

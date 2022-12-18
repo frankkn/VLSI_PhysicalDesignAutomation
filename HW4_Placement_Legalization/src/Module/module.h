@@ -16,16 +16,17 @@ struct Node
   (
     int const &type, string const &name, int const &width, int const &height,
     double const &x = 0.0, double const &y = 0.0, double const &bestX = 0.0, double const &bestY =0.0
-  ):type(type), name(name), width(width), height(height), x(x), y(y), bestX(0.0), bestY(0.0) {}
+  ):type(type), name(name), width(width), height(height), e(width), x(x), y(y), bestX(0.0), bestY(0.0) {}
 };
 
 struct Cluster
 {
-  double x_c, e_c, q_c, w_c; // pos, weight, used to give OPT pos for cell 1, width
+  double x_c, q_c; // pos, weight, used to give OPT pos for cell 1, width
+  int w_c, e_c;
   vector<Node*> nodes; 
   Cluster* prevC;
 
-  Cluster(double const &x_c, double const &e_c, double const &q_c, double const &w_c, Cluster* prevC)
+  Cluster(double const &x_c, int const &e_c, double const &q_c, int const &w_c, Cluster* prevC)
     :x_c(x_c), e_c(e_c), q_c(q_c), w_c(w_c), prevC(nullptr) {}
 };
 
