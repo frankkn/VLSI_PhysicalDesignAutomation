@@ -12,9 +12,9 @@ class AbacusLegalizer
 	void addCell(Cluster* c, Cell* i, double optimalX);
 	void addCluster(Cluster* cPrime, Cluster* c);
 	Cluster* collapse(Cluster* c, SubRow* s);
-	void placeTrialRow(int const &rowIdx, int const &subrowIdx,Cell *cell);
-	void placeFinalRow(int const &rowIdx, int const &subRowIdx, Cell *cell);
-	double calCost(Cell const *cell);
+	void placeTrialRow(int &rowIdx, int &subrowIdx,Cell *cell);
+	void placeFinalRow(int &rowIdx, int &subRowIdx, Cell *cell);
+	double calCost(Cell *cell);
 	void transformPosition();
 	void abacusDP();
 	void calDisplacement();

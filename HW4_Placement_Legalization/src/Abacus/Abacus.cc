@@ -4,12 +4,12 @@
 #include <cstdio>
 #include <limits>
 #include <iostream>
+#define DBL_MAX numeric_limits<double>::max()
 using namespace std;
 
 void AbacusLegalizer::cutSubRow()
 {
 	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->x < b->x; });
-
 	for(auto &row: input->rowList) 
   {
     for(auto &terminal: input->terminalList) 
@@ -50,7 +50,7 @@ void AbacusLegalizer::cutSubRow()
 
 int AbacusLegalizer::locateCellRow(Cell *cell)
 {
-	double min_dist = numeric_limits<double>::max();
+	double min_dist = DBL_MAX;
 	int row_idx = -1;
 	for(int i = 0; i < input->rowList.size(); ++i)
 	{
@@ -72,12 +72,12 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 {
 	if(row->subRows.empty())	return -1;
 
-	if(cell->x >= row->subRows.back()->x_max && cell->width <= row->subRows.back()->capacity)
-	{
-		return row->subRows.size() - 1;
-	}
-	else
-	{
+	// if(cell->x >= row->subRows.back()->x_max && cell->width <= row->subRows.back()->capacity)
+	// {
+	// 	return row->subRows.size()-1;
+	// }
+	// else
+	// {
 		for(int i = 0; i < row->subRows.size(); ++i)
 		{
 			auto curSubrow = row->subRows[i];
@@ -137,7 +137,7 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 				}
 			}
 		}
-	}
+	// }
 	return -1;
 }
 
@@ -178,12 +178,12 @@ Cluster* AbacusLegalizer::collapse(Cluster* cluster, SubRow* subRow)
 	return cluster;
 }
 
-void AbacusLegalizer::placeTrialRow(int const &rowIdx, int const &subrowIdx, Cell *cell)
+void AbacusLegalizer::placeTrialRow(int &rowIdx, int &subrowIdx, Cell *cell)
 {
 	auto const &row = input->rowList.at(rowIdx);
 	if(subrowIdx == -1)
 	{
-		cell->optimalX = cell->optimalY = numeric_limits<double>::max();
+		cell->optimalX = cell->optimalY = DBL_MAX;
 		return;
 	}
 
@@ -235,7 +235,7 @@ void AbacusLegalizer::placeTrialRow(int const &rowIdx, int const &subrowIdx, Cel
 	cell->optimalY = row->y;
 }
 
-void AbacusLegalizer::placeFinalRow(int const &rowIdx, int const &subRowIdx, Cell *cell)
+void AbacusLegalizer::placeFinalRow(int &rowIdx, int &subRowIdx, Cell *cell)
 {
 	auto subRow = input->rowList[rowIdx]->subRows[subRowIdx];
 	subRow->capacity -= cell->width;
@@ -261,44 +261,44 @@ void AbacusLegalizer::placeFinalRow(int const &rowIdx, int const &subRowIdx, Cel
 }
 
 
-double AbacusLegalizer::calCost(Cell const *cell)
+double AbacusLegalizer::calCost(Cell *cell)
 {
-    if (cell->optimalX == numeric_limits<double>::max() ||
-        cell->optimalY == numeric_limits<double>::max())
-        return numeric_limits<double>::max();
-
-    double x = cell->optimalX - cell->x,
-           y = cell->optimalY - cell->y;
-    return sqrt(x * x + y * y);
+	if (cell->optimalX == DBL_MAX||cell->optimalY == DBL_MAX)
+	{
+		return DBL_MAX;
+	}
+	double x = cell->optimalX - cell->x,
+					y = cell->optimalY - cell->y;
+	return sqrt(x * x + y * y);
 }
 
 void AbacusLegalizer::transformPosition()
 {
-    for (auto const &row : input->rowList)
-    {
-        int siteWidth = row->width;
-        for (auto const &subRow : row->subRows)
-        {
-            auto cluster = subRow->lastCluster;
-            while (cluster != nullptr)
-            {
-                double shiftX = cluster->x - subRow->x_min;
-                if (shiftX - floor(shiftX / siteWidth) * siteWidth <= siteWidth / 2.0)
-                    cluster->x = floor(shiftX / siteWidth) * siteWidth + subRow->x_min;
-                else
-                    cluster->x = ceil(shiftX / siteWidth) * siteWidth + subRow->x_min;
+	for (auto const &row : input->rowList)
+	{
+		int siteWidth = row->width;
+		for (auto const &subRow : row->subRows)
+		{
+			auto cluster = subRow->lastCluster;
+			while (cluster != nullptr)
+			{
+				double shiftX = cluster->x - subRow->x_min;
+				if (shiftX - floor(shiftX / siteWidth) * siteWidth <= siteWidth / 2.0)
+						cluster->x = floor(shiftX / siteWidth) * siteWidth + subRow->x_min;
+				else
+						cluster->x = ceil(shiftX / siteWidth) * siteWidth + subRow->x_min;
 
-                int optimalX = cluster->x;
-                for (auto &cell : cluster->member)
-                {
-                    cell->optimalX = optimalX;
-                    cell->optimalY = row->y;
-                    optimalX += cell->width;
-                }
-                cluster = cluster->predecessor;
-            }
-        }
-    }
+				int optimalX = cluster->x;
+				for (auto &cell : cluster->member)
+				{
+						cell->optimalX = optimalX;
+						cell->optimalY = row->y;
+						optimalX += cell->width;
+				}
+				cluster = cluster->predecessor;
+			}
+		}
+	}
 }
 
 void AbacusLegalizer::abacusDP()
@@ -309,32 +309,32 @@ void AbacusLegalizer::abacusDP()
 		int bestRowIdx = locateCellRow(cell);
 		int bestSubRowIdx = locateCellSubRow(input->rowList[bestRowIdx], cell);
 		placeTrialRow(bestRowIdx, bestSubRowIdx, cell);
-		double bestCost = calCost(cell);
+		double cBest = calCost(cell);
 
 		int uplowIdx = bestRowIdx+1, lowRowIdx = bestRowIdx-1;
-		while(uplowIdx < input->rowList.size()-1 && abs(cell->y - input->rowList[uplowIdx]->y) < bestCost)
+		while(uplowIdx < input->rowList.size()-1 && abs(cell->y - input->rowList[uplowIdx]->y) < cBest)
 		{
 			int upSubrowIdx = locateCellSubRow(input->rowList[uplowIdx], cell);
 			placeTrialRow(uplowIdx, upSubrowIdx, cell);
-			double cost = calCost(cell);
-			if (cost < bestCost)
+			double curCost = calCost(cell);
+			if (curCost < cBest)
 			{
 					bestRowIdx = uplowIdx;
 					bestSubRowIdx = upSubrowIdx;
-					bestCost = cost;
+					cBest = curCost;
 			}
 			++uplowIdx;
 		}
-		while(lowRowIdx>0 && abs(cell->y - input->rowList[lowRowIdx]->y) < bestCost)
+		while(lowRowIdx>0 && abs(cell->y - input->rowList[lowRowIdx]->y) < cBest)
 		{
 			int lowSubrowIdx = locateCellSubRow(input->rowList[lowRowIdx], cell);
 			placeTrialRow(lowRowIdx, lowSubrowIdx, cell);
-			double cost = calCost(cell);
-			if (cost < bestCost)
+			double curCost = calCost(cell);
+			if (curCost < cBest)
 			{
 					bestRowIdx = lowRowIdx;
 					bestSubRowIdx = lowSubrowIdx;
-					bestCost = cost;
+					cBest = curCost;
 			}
 			--lowRowIdx ;
 		}
@@ -345,25 +345,26 @@ void AbacusLegalizer::abacusDP()
 
 void AbacusLegalizer::calDisplacement()
 {
-    double sum = 0, max = 0;
-    for (auto const &cell : input->cellList)
-    {
-        double x = cell->optimalX - cell->x,
-               y = cell->optimalY - cell->y,
-               dis = sqrt(x * x + y * y);
-        sum += dis;
-        if (max < dis)
-            max = dis;
-    }
-    printf("total displacement: %.2f\n", sum);
-    printf("max displacement:   %.2f\n", max);
+	double totalDist = 0, maxDist = 0;
+	for(auto &cell: input->cellList)
+	{
+		double x = cell->optimalX - cell->x;
+		double y = cell->optimalY - cell->y;
+		double dis = sqrt(x*x + y*y);
+		totalDist += dis;
+		if(maxDist < dis)
+		{
+			maxDist = dis;
+		}
+	}
+	printf("Max displacement of cells   = %.2f\n", maxDist);
+	printf("Total displacement of cells = %.2f\n", totalDist);
 }
 
 OutputWriter *AbacusLegalizer::run()
 {
-    cutSubRow();
-    abacusDP();
-    calDisplacement();
-
-    return new OutputWriter(input);
+	cutSubRow();
+	abacusDP();
+	calDisplacement();
+	return new OutputWriter(input);
 }
