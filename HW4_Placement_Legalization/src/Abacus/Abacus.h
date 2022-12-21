@@ -1,6 +1,6 @@
 #pragma once
-#include "../OutputWriter/OutputWriter.h"
 #include "../Module/Module.h"
+#include "../OutputWriter/OutputWriter.h"
 
 class AbacusLegalizer
 {

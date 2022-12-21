@@ -1,6 +1,5 @@
 #include <fstream>
 #include "OutputWriter.h"
-#include <iostream>
 using namespace std;
 
 void OutputWriter::WriteResult(char argv[])

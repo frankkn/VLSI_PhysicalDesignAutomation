@@ -1,6 +1,6 @@
-#include "ArgParser.h"
-#include <unordered_map>
 #include <iostream>
+#include <unordered_map>
+#include "ArgParser.h"
 using namespace std;
 
 void Parser::readAux(string const & auxPath, string &nodePath, string &plPath, string &sclPath)
