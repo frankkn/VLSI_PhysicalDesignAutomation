@@ -12,11 +12,7 @@ void Legalizer::placeRowFinal(int const &rowIdx, int const &subRowIdx, Cell *cel
 	auto cluster = subRow->lastCluster;
 	if (cluster == nullptr || cluster->x + cluster->width <= optimalX)
 	{
-		cluster = new Cluster(optimalX,
-													subRow->lastCluster,
-													0,
-													0.0,
-													0);
+		cluster = new Cluster(optimalX, subRow->lastCluster, 0, 0.0, 0);
 		addCell(cluster, cell, optimalX);
 		subRow->lastCluster = cluster;
 		// cluster->member.emplace_back(cell);
