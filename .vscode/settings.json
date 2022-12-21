@@ -49,6 +49,7 @@
     "xtree": "cpp",
     "xutility": "cpp",
     "set": "cpp",
-    "*.tcc": "cpp"
+    "*.tcc": "cpp",
+    "random": "cpp"
   }
 }
