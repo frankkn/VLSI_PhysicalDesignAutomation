@@ -11,8 +11,8 @@ void AbacusLegalizer::cutSubRow()
 {
 	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->x < b->x; });
 	for(auto &row: input->rowList)
-  {
-    for(auto &terminal: input->terminalList)
+	{
+		for(auto &terminal: input->terminalList)
     {
       auto curSubrow = row->subRows.back();
       if(terminal->y > row->y || terminal->y + terminal->height <= row->y) { continue; }
