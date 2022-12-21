@@ -178,7 +178,7 @@ Cluster* AbacusLegalizer::collapse(Cluster* cluster, SubRow* subRow)
 	return cluster;
 }
 
-void AbacusLegalizer::placeRowTrail(int const &rowIdx, int const &subrowIdx, Cell *cell)
+void AbacusLegalizer::placeTrialRow(int const &rowIdx, int const &subrowIdx, Cell *cell)
 {
 	auto const &row = input->rowList.at(rowIdx);
 	if(subrowIdx == -1)
@@ -235,7 +235,7 @@ void AbacusLegalizer::placeRowTrail(int const &rowIdx, int const &subrowIdx, Cel
 	cell->optimalY = row->y;
 }
 
-void AbacusLegalizer::placeRowFinal(int const &rowIdx, int const &subRowIdx, Cell *cell)
+void AbacusLegalizer::placeFinalRow(int const &rowIdx, int const &subRowIdx, Cell *cell)
 {
 	auto subRow = input->rowList[rowIdx]->subRows[subRowIdx];
 	subRow->capacity -= cell->width;
@@ -272,7 +272,7 @@ double AbacusLegalizer::calCost(Cell const *cell)
     return sqrt(x * x + y * y);
 }
 
-void AbacusLegalizer::determinePosition()
+void AbacusLegalizer::transformPosition()
 {
     for (auto const &row : input->rowList)
     {
@@ -303,45 +303,44 @@ void AbacusLegalizer::determinePosition()
 
 void AbacusLegalizer::abacusDP()
 {
-    sort(input->cellList.begin(), input->cellList.end(), [&](auto &a, auto&b){ return a->x < b->x;});
-    for (auto const &cell : input->cellList)
-    {
-			int bestRowIdx = locateCellRow(cell),
-					bestSubRowIdx = locateCellSubRow(input->rowList[bestRowIdx], cell);
-			placeRowTrail(bestRowIdx, bestSubRowIdx, cell);
-			double bestCost = calCost(cell);
-			int downFinder = bestRowIdx-1, upFinder = bestRowIdx+1;
+	sort(input->cellList.begin(), input->cellList.end(), [&](auto &a, auto&b){ return a->x < b->x;});
+	for (auto const &cell : input->cellList)
+	{
+		int bestRowIdx = locateCellRow(cell);
+		int bestSubRowIdx = locateCellSubRow(input->rowList[bestRowIdx], cell);
+		placeTrialRow(bestRowIdx, bestSubRowIdx, cell);
+		double bestCost = calCost(cell);
 
-			while (downFinder > 0 && abs(cell->y - input->rowList[downFinder]->y) < bestCost)
+		int uplowIdx = bestRowIdx+1, lowRowIdx = bestRowIdx-1;
+		while(uplowIdx < input->rowList.size()-1 && abs(cell->y - input->rowList[uplowIdx]->y) < bestCost)
+		{
+			int upSubrowIdx = locateCellSubRow(input->rowList[uplowIdx], cell);
+			placeTrialRow(uplowIdx, upSubrowIdx, cell);
+			double cost = calCost(cell);
+			if (cost < bestCost)
 			{
-				int lowSubrowIdx = locateCellSubRow(input->rowList[downFinder], cell);
-				placeRowTrail(downFinder, lowSubrowIdx, cell);
-				double cost = calCost(cell);
-				if (cost < bestCost)
-				{
-						bestRowIdx = downFinder;
-						bestSubRowIdx = lowSubrowIdx;
-						bestCost = cost;
-				}
-				--downFinder ;
+					bestRowIdx = uplowIdx;
+					bestSubRowIdx = upSubrowIdx;
+					bestCost = cost;
 			}
-
-			while (upFinder < input->rowList.size() - 1 && abs(cell->y - input->rowList[upFinder]->y) < bestCost)
+			++uplowIdx;
+		}
+		while(lowRowIdx>0 && abs(cell->y - input->rowList[lowRowIdx]->y) < bestCost)
+		{
+			int lowSubrowIdx = locateCellSubRow(input->rowList[lowRowIdx], cell);
+			placeTrialRow(lowRowIdx, lowSubrowIdx, cell);
+			double cost = calCost(cell);
+			if (cost < bestCost)
 			{
-				int upSubrowIdx = locateCellSubRow(input->rowList[upFinder], cell);
-				placeRowTrail(upFinder, upSubrowIdx, cell);
-				double cost = calCost(cell);
-				if (cost < bestCost)
-				{
-						bestRowIdx = upFinder;
-						bestSubRowIdx = upSubrowIdx;
-						bestCost = cost;
-				}
-				++upFinder;
+					bestRowIdx = lowRowIdx;
+					bestSubRowIdx = lowSubrowIdx;
+					bestCost = cost;
 			}
-        placeRowFinal(bestRowIdx, bestSubRowIdx, cell);
-    }
-    determinePosition();
+			--lowRowIdx ;
+		}
+		placeFinalRow(bestRowIdx, bestSubRowIdx, cell);
+	}
+	transformPosition();
 }
 
 void AbacusLegalizer::calDisplacement()
