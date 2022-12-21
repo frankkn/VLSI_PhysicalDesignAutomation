@@ -37,11 +37,11 @@ $ ./hw4 ../testcase/adaptec1/adaptec1.aux
 ## How to Test
 In this directory, enter the following command:
 ```
-$ make test $(name)
+$ ../verifier/verify $(testcase path) $(result path)
 ```
-It will test on $(name) and run verifier to verify the answer.
+It will test on $(testcase) and run verifier to verify the answer.
 
 e.g. test on adaptec1 and verify the answer
 ```
-$ make test adaptec1
+$ ../verifier/verify ../testcase/adaptec1/adaptec1.aux ../output/adaptec1.result
 ```
