@@ -2,7 +2,7 @@
 #include "../OutputWriter/OutputWriter.h"
 #include "../Module/Module.h"
 
-class Legalizer
+class AbacusLegalizer
 {
     Input *input;
 
@@ -10,18 +10,19 @@ class Legalizer
     void addCluster(Cluster* cPrime, Cluster* c);
     Cluster* collapse(Cluster* c, SubRow* s);
 
-    void divideRow();
-    int getRowIdx(Cell const *cell);
-    int getSubRowIdx(Row const *row, Cell const *cell);
+    void cutSubRow();
+    int locateCellRow(Cell *cell);
+    int locateCellSubRow(Row *row, Cell *cell);
+
     void placeRowTrail(int const &rowIdx, int const &subrowIdx,Cell *cell);
     void placeRowFinal(int const &rowIdx, int const &subRowIdx, Cell *cell);
     double calCost(Cell const *cell);
     void determinePosition();
-    void abacusProcess();
+    void abacusDP();
     void calDisplacement();
 
 
 public:
-    Legalizer(Input *input) : input(input) {}
-    ResultWriter *solve();
+    AbacusLegalizer(Input *input):input(input) {}
+    OutputWriter *run();
 };

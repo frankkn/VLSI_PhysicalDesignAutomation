@@ -9,10 +9,10 @@ int main(int argc, char **argv)
 	Parser parser;
 	auto input = parser.parse(argv[1]);
 
-	Legalizer legalizer(input);
-	auto result = legalizer.solve();
-
-	result->write(argv);
+	AbacusLegalizer AL(input);
+	
+	OutputWriter* OW = AL.run();
+	OW->WriteResult(argv[2]);
 
 	return 0;
 }
