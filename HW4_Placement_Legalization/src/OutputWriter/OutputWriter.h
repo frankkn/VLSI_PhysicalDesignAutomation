@@ -1,11 +1,11 @@
 #pragma once
 #include "../Module/Module.h"
 
-class ResultWriter
+class OutputWriter
 {
 	Input *input;
 
 public:
-	ResultWriter(Input *input) : input(input) {}
-	void write(char *argv[]);
+	OutputWriter(Input *input):input(input) {}
+	void WriteResult(char argv[]);
 };

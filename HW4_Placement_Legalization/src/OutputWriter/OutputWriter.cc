@@ -1,23 +1,22 @@
 #include <fstream>
 #include "OutputWriter.h"
+#include <iostream>
 using namespace std;
 
-void ResultWriter::write(char *argv[])
+void OutputWriter::WriteResult(char argv[])
 {
-    string auxFilePath(argv[1]);
-    auto filename = auxFilePath.substr(auxFilePath.find_last_of('/') + 1,
-                                       auxFilePath.find_last_of('.') - auxFilePath.find_last_of('/') - 1);
-    ofstream fout("../output/" + filename + ".result");
-    for (auto const &cell : input->cellList)
-    {
-        fout << cell->name << ' '
-             << static_cast<int>(cell->optimalX) << ' '
-             << static_cast<int>(cell->optimalY) << " : N\n";
-    }
-    for (auto const &terminal : input->terminalList)
-    {
-        fout << terminal->name << ' '
-             << static_cast<int>(terminal->x) << ' '
-             << static_cast<int>(terminal->y) << " : N /FIXED\n";
-    }
-}
+  string auxPath = string(argv);
+  cout << auxPath << endl;
+  string outputPath = auxPath.erase(0, auxPath.find_last_of('/')+1).erase(auxPath.find_last_of('.'), auxPath.size()-1);
+  ofstream out("../output/" + outputPath + ".result");
+  cout << outputPath << endl;
+  for(auto &cell: input->cellList)
+  {
+    out << cell->name << " " << static_cast<int>(cell->optimalX) << " " << static_cast<int>(cell->optimalY) << "\n";
+  }
+  for(auto &terminal: input->terminalList)
+  {
+    out << terminal->name << " " << static_cast<int>(terminal->x) << " " << static_cast<int>(terminal->y) << "\n";
+  }
+}   
+
