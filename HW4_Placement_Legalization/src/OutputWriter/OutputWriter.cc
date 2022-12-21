@@ -16,5 +16,5 @@ void OutputWriter::WriteResult(char argv[])
   {
     out << terminal->name << " " << static_cast<int>(terminal->x) << " " << static_cast<int>(terminal->y) << "\n";
   }
-}   
+}
 

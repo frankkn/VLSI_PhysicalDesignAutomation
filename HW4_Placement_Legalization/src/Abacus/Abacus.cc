@@ -10,36 +10,36 @@ using namespace std;
 void AbacusLegalizer::cutSubRow()
 {
 	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->x < b->x; });
-	for(auto &row: input->rowList) 
+	for(auto &row: input->rowList)
   {
-    for(auto &terminal: input->terminalList) 
+    for(auto &terminal: input->terminalList)
     {
       auto curSubrow = row->subRows.back();
       if(terminal->y > row->y || terminal->y + terminal->height <= row->y) { continue; }
       int t_min_x = terminal->x, t_max_x = terminal->x + terminal->width;
-      if(curSubrow->x_min >= t_min_x) 
+      if(curSubrow->x_min >= t_min_x)
       {
-        if(curSubrow->x_max > t_max_x) 
+        if(curSubrow->x_max > t_max_x)
         {
-          if(curSubrow->x_min <= t_max_x) // curSubrow overlaps terminal
+          if(curSubrow->x_min <= t_max_x)// curSubrow overlaps terminal
           {
             curSubrow->updateInfo(t_max_x, curSubrow->x_max);
           }
         }
-        else 
+        else
         {
           delete curSubrow;
           row->subRows.pop_back();
         }
       }
-      else 
+      else
       {
-        if(curSubrow->x_max > t_max_x) 
+        if(curSubrow->x_max > t_max_x)
         {
           row->subRows.emplace_back(new SubRow(t_max_x, curSubrow->x_max));
           curSubrow->updateInfo(curSubrow->x_min, t_min_x);
         }
-        else 
+        else
         {
           curSubrow->updateInfo(curSubrow->x_min, t_min_x);
         }
@@ -71,72 +71,70 @@ int AbacusLegalizer::locateCellRow(Cell *cell)
 int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 {
 	if(row->subRows.empty())	return -1;
-
 	// if(cell->x >= row->subRows.back()->x_max && cell->width <= row->subRows.back()->capacity)
 	// {
 	// 	return row->subRows.size()-1;
 	// }
 	// else
 	// {
-		for(int i = 0; i < row->subRows.size(); ++i)
+	for(int i = 0; i < row->subRows.size(); ++i)
+	{
+		auto curSubrow = row->subRows[i];
+		if(cell->x >= curSubrow->x_max)	continue;
+		if(cell->x >= curSubrow->x_min)
 		{
-			auto curSubrow = row->subRows[i];
-			if(cell->x >= curSubrow->x_max)	continue;
-
-			if(cell->x >= curSubrow->x_min)
+			if(cell->width <= curSubrow->capacity)
+			{
+				return i;
+			}
+			if(i+1 < row->subRows.size() && cell->width <= row->subRows[i+1]->capacity)
+			{
+				return i+1;
+			}
+		}
+		else
+		{
+			if(i == 0)
 			{
 				if(cell->width <= curSubrow->capacity)
 				{
-					return i;
+					return 0;
 				}
-				if(i+1 < row->subRows.size() && cell->width <= row->subRows[i+1]->capacity)
+				else if(i+1 < row->subRows.size() && cell->width <= row->subRows[i+1]->capacity)
 				{
-					return i+1;
+					return 1;
 				}
 			}
 			else
 			{
-				if(i == 0)
+				// Determine which direction (Left:i-1; Right:i) to move
+				auto left_dist = cell->x - row->subRows[i-1]->x_max + cell->width;
+				auto right_dist = curSubrow->x_min - cell->x;
+				if(left_dist < right_dist)
 				{
-					if(cell->width <= curSubrow->capacity)
+					if(cell->width <= row->subRows[i-1]->capacity)
 					{
-						return 0;
+						return i-1;
 					}
-					else if(i+1 < row->subRows.size() && cell->width <= row->subRows[i+1]->capacity)
+					else if(cell->width <= curSubrow->capacity)
 					{
-						return 1;
+						return i;
 					}
 				}
 				else
 				{
-					// Determine which direction (Left:i-1; Right:i) to move
-					auto left_dist = cell->x - row->subRows[i-1]->x_max + cell->width;
-					auto right_dist = curSubrow->x_min - cell->x;
-					if(left_dist < right_dist)
+					if(cell->width <= curSubrow->capacity)
 					{
-						if(cell->width <= row->subRows[i-1]->capacity)
-						{
-							return i-1;
-						}
-						else if(cell->width <= curSubrow->capacity)
-						{
-							return i;
-						}
+						return i;
 					}
-					else
+					else if(cell->width <= row->subRows[i-1]->capacity)
 					{
-						if(cell->width <= curSubrow->capacity)
-						{
-							return i;
-						}
-						else if(cell->width <= row->subRows[i-1]->capacity)
-						{
-							return i-1;
-						}
+						return i-1;
 					}
 				}
 			}
 		}
+	}
 	// }
 	return -1;
 }
@@ -145,8 +143,8 @@ void AbacusLegalizer::addCell(Cluster* cluster, Cell* cell, double optimalX)
 {
   cluster->member.emplace_back(cell);
   cluster->weight += cell->weight;
-  cluster->q += cell->weight * (optimalX - cluster->width);
-  cluster->width += cell->width; 
+  cluster->q += cell->weight*(optimalX - cluster->width);
+  cluster->width += cell->width;
 }
 
 // Add c into its predecessor cPrime
@@ -164,9 +162,13 @@ Cluster* AbacusLegalizer::collapse(Cluster* cluster, SubRow* subRow)
 	cluster->x = cluster->q / cluster->weight;
 	// Limit position between x_min and x_max - w_c(c)
 	if (cluster->x < subRow->x_min)
-			cluster->x = subRow->x_min;
+	{
+		cluster->x = subRow->x_min;
+	}
 	if (cluster->x > subRow->x_max - cluster->width)
-			cluster->x = subRow->x_max - cluster->width;
+	{
+		cluster->x = subRow->x_max - cluster->width;
+	}
 	// Overlap between c and its predecessor c'?
 	auto prevCluster = cluster->predecessor;
 	if (prevCluster != nullptr && prevCluster->x + prevCluster->width > cluster->x)
@@ -189,15 +191,18 @@ void AbacusLegalizer::placeTrialRow(int &rowIdx, int &subrowIdx, Cell *cell)
 
 	auto const &subRow = row->subRows[subrowIdx];
 	double optimalX = cell->x;
-	if (cell->x < subRow->x_min)
-			optimalX = subRow->x_min;
-	else if (cell->x > subRow->x_max - cell->width)
-			optimalX = subRow->x_max - cell->width;
-
-	auto cluster = subRow->lastCluster;
-	if (cluster == nullptr || cluster->x + cluster->width <= optimalX)
+	if(cell->x < subRow->x_min)
 	{
-			cell->optimalX = optimalX;
+		optimalX = subRow->x_min;
+	}
+	else if(cell->x > subRow->x_max - cell->width)
+	{
+		optimalX = subRow->x_max - cell->width;
+	}
+	auto cluster = subRow->lastCluster;
+	if(cluster == nullptr || cluster->x + cluster->width <= optimalX)
+	{
+		cell->optimalX = optimalX;
 	}
 	else
 	{
@@ -260,16 +265,14 @@ void AbacusLegalizer::placeFinalRow(int &rowIdx, int &subRowIdx, Cell *cell)
 	}
 }
 
-
 double AbacusLegalizer::calCost(Cell *cell)
 {
 	if (cell->optimalX == DBL_MAX||cell->optimalY == DBL_MAX)
 	{
 		return DBL_MAX;
 	}
-	double x = cell->optimalX - cell->x,
-					y = cell->optimalY - cell->y;
-	return sqrt(x * x + y * y);
+	double x = cell->optimalX - cell->x, y = cell->optimalY - cell->y;
+	return sqrt(x*x + y*y);
 }
 
 void AbacusLegalizer::transformPosition()
@@ -284,16 +287,19 @@ void AbacusLegalizer::transformPosition()
 			{
 				double shiftX = cluster->x - subRow->x_min;
 				if (shiftX - floor(shiftX / siteWidth) * siteWidth <= siteWidth / 2.0)
-						cluster->x = floor(shiftX / siteWidth) * siteWidth + subRow->x_min;
+				{
+					cluster->x = floor(shiftX / siteWidth) * siteWidth + subRow->x_min;
+				}
 				else
-						cluster->x = ceil(shiftX / siteWidth) * siteWidth + subRow->x_min;
-
+				{
+					cluster->x = ceil(shiftX / siteWidth) * siteWidth + subRow->x_min;
+				}
 				int optimalX = cluster->x;
 				for (auto &cell : cluster->member)
 				{
-						cell->optimalX = optimalX;
-						cell->optimalY = row->y;
-						optimalX += cell->width;
+					cell->optimalX = optimalX;
+					cell->optimalY = row->y;
+					optimalX += cell->width;
 				}
 				cluster = cluster->predecessor;
 			}

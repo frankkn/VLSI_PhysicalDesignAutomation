@@ -2,7 +2,6 @@
 #include "Abacus/Abacus.h"
 #include "ArgParser/ArgParser.h"
 #include "Module/Module.h"
-// #include "GlobalTimer/GlobalTimer.h"
 
 int main(int argc, char **argv)
 {
