@@ -1,24 +1,18 @@
-#include <algorithm>
-#include <fstream>
 #include <iostream>
-#include "./ArgParser/argParser.h"
-#include "./Abacus/abacus.h"
-#include "./OutputWriter/outputwriter.h"
-using namespace std;
+#include "Abacus/Abacus.h"
+#include "ArgParser/ArgParser.h"
+#include "Module/Module.h"
+// #include "GlobalTimer/GlobalTimer.h"
 
-// ../bin/hw4 ../testcase/adaptec1/adaptec1.aux
-
-int main(int argc, char *argv[])
+int main(int argc, char **argv)
 {
-  ArgParser AP;
-  auto input = AP.readFile(argv[1]);
-  
-  AbacusLegalizer AL(input);
-  OutputWriter* OW = AL.run();
-  OW->WriteResult(argv[1]);
+	Parser parser;
+	auto input = parser.parse(argv[1]);
 
-  // OutputWriter* OW = AL.solve();
-  // OW->WriteResult(argv[1]);
+	Legalizer legalizer(input);
+	auto result = legalizer.solve();
 
-  return 0;
+	result->write(argv);
+
+	return 0;
 }
