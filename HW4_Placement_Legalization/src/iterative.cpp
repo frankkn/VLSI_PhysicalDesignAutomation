@@ -1,42 +1,3 @@
-void Legalizer::addCell(Cluster* cluster, Cell* cell, double optimalX)
-{
-  cluster->member.emplace_back(cell);
-  cluster->weight += cell->weight;
-  cluster->q += cell->weight * (optimalX - cluster->width);
-  cluster->width += cell->width; 
-}
-
-void Legalizer::addCluster(Cluster* prevCluster, Cluster* cluster)
-{
-  prevCluster->member.insert(prevCluster->member.end(), cluster->member.begin(), cluster->member.end());
-  prevCluster->weight += cluster->weight;
-  prevCluster->q += cluster->q - cluster->weight * prevCluster->width; 
-  prevCluster->width += cluster->width;
-	delete cluster;
-	cluster = prevCluster;
-}
-
-void Legalizer::collapse(Cluster* cluster, SubRow* subRow)
-{
-  cluster->x = cluster->q / cluster->weight;
-
-  if(cluster->x < subRow->minX)
-  {
-    cluster->x = subRow->minX;
-  }
-  if(cluster->x > subRow->maxX - cluster->width)
-  {
-    cluster->x = subRow->maxX - cluster->width;
-  }
-
-  auto prevCluster = cluster->predecessor;
-  if(prevCluster != nullptr && prevCluster->x + prevCluster->width > cluster->x)
-  {
-    addCluster(prevCluster, cluster);
-    collapse(prevCluster, subRow);
-  }
-}
-
 void Legalizer::placeRowFinal(int const &rowIdx, int const &subRowIdx, Cell *cell)
 {
 	auto subRow = input->rows[rowIdx]->subRows[subRowIdx];
@@ -58,11 +19,36 @@ void Legalizer::placeRowFinal(int const &rowIdx, int const &subRowIdx, Cell *cel
 													0);
 		addCell(cluster, cell, optimalX);
 		subRow->lastCluster = cluster;
+		// cluster->member.emplace_back(cell);
 	}
 	else
 	{
 		addCell(cluster, cell, optimalX);
-		collapse(cluster, subRow);
+		while (true)
+		{
+			cluster->x = cluster->q / cluster->weight;
+
+			if (cluster->x < subRow->minX)
+					cluster->x = subRow->minX;
+			if (cluster->x > subRow->maxX - cluster->width)
+					cluster->x = subRow->maxX - cluster->width;
+
+			auto prevCluster = cluster->predecessor;
+			if (prevCluster != nullptr && prevCluster->x + prevCluster->width > cluster->x)
+			{
+					prevCluster->member.insert(prevCluster->member.end(), cluster->member.begin(), cluster->member.end());
+					prevCluster->weight += cluster->weight;
+					prevCluster->q += cluster->q - cluster->weight * prevCluster->width;
+					prevCluster->width += cluster->width;
+
+					delete cluster;
+					cluster = prevCluster;
+			}
+			else
+			{
+					break;
+			}
+		}
 		subRow->lastCluster = cluster;
 	}
 }
