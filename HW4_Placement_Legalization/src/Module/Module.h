@@ -18,26 +18,26 @@ struct Cluster
 	double x, q;
 	int width, weight;
 	vector<Cell*> member;
-	Cluster *predecessor;
+	Cluster *prevCluster;
 
-	Cluster(Cluster *predecessor, double const &x, int const &weight, double const &q, int const &width)
-		:predecessor(predecessor), x(x), q(q), width(width), weight(weight) {}
+	Cluster(Cluster *prevCluster, double const &x, int const &weight, double const &q, int const &width)
+		:prevCluster(prevCluster), x(x), q(q), width(width), weight(weight) {}
 };
 
-struct SubRow
+struct Subrow
 {
 	int x_min, x_max, capacity;
 	Cluster *lastCluster;
 
 	void updateInfo(int const &new_x_min, int const &new_x_max);
 
-	SubRow(int const &x_min, int const &x_max):x_min(x_min), x_max(x_max), capacity(x_max - x_min), lastCluster(nullptr) {}
+	Subrow(int const &x_min, int const &x_max):x_min(x_min), x_max(x_max), capacity(x_max - x_min), lastCluster(nullptr) {}
 };
 
 struct Row
 {
 	int width, height, y;
-	vector<SubRow*> subrows;
+	vector<Subrow*> subrows;
 
 	Row(int &width, int &height, int &y):width(width), height(height), y(y) {}
 };
