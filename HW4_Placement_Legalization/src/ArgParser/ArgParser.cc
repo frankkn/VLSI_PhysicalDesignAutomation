@@ -85,8 +85,8 @@ void Parser::readPl(string const &plPath)
     string cell_name, colon, N;
     double cell_x, cell_y;
     ss >> cell_name >>  cell_x >> cell_y >> colon >> N;
-    NodeTable.at(cell_name)->x = cell_x;
-    NodeTable.at(cell_name)->y = cell_y;
+    NodeTable.at(cell_name)->globalX = cell_x;
+    NodeTable.at(cell_name)->globalY = cell_y;
   }
   for(int i = 0; i < terminalList.size(); ++i) 
   {
@@ -95,8 +95,8 @@ void Parser::readPl(string const &plPath)
     string terminal_name, colon, N, F;
     double terminal_x, terminal_y;
     ss >> terminal_name >> terminal_x >> terminal_y >> colon >> N >> F;
-    NodeTable.at(terminal_name)->x = terminal_x;
-    NodeTable.at(terminal_name)->y = terminal_y;
+    NodeTable.at(terminal_name)->globalX = terminal_x;
+    NodeTable.at(terminal_name)->globalY = terminal_y;
   }
 }
 

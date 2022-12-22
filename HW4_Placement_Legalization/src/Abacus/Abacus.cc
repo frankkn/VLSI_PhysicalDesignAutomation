@@ -9,14 +9,14 @@ using namespace std;
 
 void AbacusLegalizer::cutSubRow()
 {
-	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->x < b->x; });
+	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->globalX < b->globalX; });
 	for(auto &row: input->rowList)
 	{
 		for(auto &terminal: input->terminalList)
     {
       auto curSubrow = row->subrows.back();
-      if(terminal->y > row->y || terminal->y + terminal->height <= row->y) { continue; }
-      int t_min_x = terminal->x, t_max_x = terminal->x + terminal->width;
+      if(terminal->globalY > row->y || terminal->globalY + terminal->height <= row->y) { continue; }
+      int t_min_x = terminal->globalX, t_max_x = terminal->globalX + terminal->width;
       if(curSubrow->x_min >= t_min_x)
       {
         if(curSubrow->x_max > t_max_x)
@@ -54,7 +54,7 @@ int AbacusLegalizer::locateCellRow(Cell *cell)
 	int row_idx = -1;
 	for(int i = 0; i < input->rowList.size(); ++i)
 	{
-		double cur_dist = abs(cell->y - input->rowList[i]->y);
+		double cur_dist = abs(cell->globalY - input->rowList[i]->y);
 		if (cur_dist < min_dist)
 		{
 				min_dist = cur_dist;
@@ -80,8 +80,8 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 	for(int i = 0; i < row->subrows.size(); ++i)
 	{
 		auto curSubrow = row->subrows[i];
-		if(cell->x >= curSubrow->x_max)	continue;
-		if(cell->x >= curSubrow->x_min)
+		if(cell->globalX >= curSubrow->x_max)	continue;
+		if(cell->globalX >= curSubrow->x_min)
 		{
 			if(cell->width <= curSubrow->capacity)
 			{
@@ -108,8 +108,8 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 			else
 			{
 				// Determine which direction (Left:i-1; Right:i) to move
-				auto left_dist = cell->x - row->subrows[i-1]->x_max + cell->width;
-				auto right_dist = curSubrow->x_min - cell->x;
+				auto left_dist = cell->globalX - row->subrows[i-1]->x_max + cell->width;
+				auto right_dist = curSubrow->x_min - cell->globalX;
 				if(left_dist < right_dist)
 				{
 					if(cell->width <= row->subrows[i-1]->capacity)
@@ -190,12 +190,12 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 	}
 
 	auto const &subRow = row->subrows[subrowIdx];
-	double finalX = cell->x;
-	if(cell->x < subRow->x_min)
+	double finalX = cell->globalX;
+	if(cell->globalX < subRow->x_min)
 	{
 		finalX = subRow->x_min;
 	}
-	else if(cell->x > subRow->x_max - cell->width)
+	else if(cell->globalX > subRow->x_max - cell->width)
 	{
 		finalX = subRow->x_max - cell->width;
 	}
@@ -245,10 +245,10 @@ void AbacusLegalizer::placeFinalRow(Cell *cell, int &rowIdx, int &subRowIdx)
 	auto subRow = input->rowList[rowIdx]->subrows[subRowIdx];
 	subRow->capacity -= cell->width;
 
-	double finalX = cell->x;
-	if(cell->x < subRow->x_min)
+	double finalX = cell->globalX;
+	if(cell->globalX < subRow->x_min)
 		finalX = subRow->x_min;
-	else if (cell->x > subRow->x_max - cell->width)
+	else if (cell->globalX > subRow->x_max - cell->width)
 		finalX = subRow->x_max - cell->width;
 
 	auto cluster = subRow->lastCluster;
@@ -271,7 +271,7 @@ double AbacusLegalizer::determineCost(Cell *cell)
 	{
 		return DBL_MAX;
 	}
-	double x = cell->finalX - cell->x, y = cell->finalY - cell->y;
+	double x = cell->finalX - cell->globalX, y = cell->finalY - cell->globalY;
 	return sqrt(x*x + y*y);
 }
 
@@ -309,7 +309,7 @@ void AbacusLegalizer::transformPosition()
 
 void AbacusLegalizer::searchUpRow(Cell* cell, int &upRowIdx, int &bestRowIdx, int &bestSubrowIdx, double cBest)
 {
-	while(upRowIdx < input->rowList.size()-1 && abs(cell->y - input->rowList[upRowIdx]->y) < cBest)
+	while(upRowIdx < input->rowList.size()-1 && abs(cell->globalY - input->rowList[upRowIdx]->y) < cBest)
 	{
 		int upSubrowIdx = locateCellSubRow(input->rowList[upRowIdx], cell);
 		placeTrialRow(cell, upRowIdx, upSubrowIdx);
@@ -326,7 +326,7 @@ void AbacusLegalizer::searchUpRow(Cell* cell, int &upRowIdx, int &bestRowIdx, in
 
 void AbacusLegalizer::searchDownRow(Cell* cell, int &downRowIdx, int &bestRowIdx, int &bestSubrowIdx, double cBest)
 {
-	while(downRowIdx>0 && abs(cell->y - input->rowList[downRowIdx]->y) < cBest)
+	while(downRowIdx>0 && abs(cell->globalY - input->rowList[downRowIdx]->y) < cBest)
 	{
 		int lowSubrowIdx = locateCellSubRow(input->rowList[downRowIdx], cell);
 		placeTrialRow(cell, downRowIdx, lowSubrowIdx);
@@ -343,7 +343,7 @@ void AbacusLegalizer::searchDownRow(Cell* cell, int &downRowIdx, int &bestRowIdx
 
 void AbacusLegalizer::abacusDP()
 {
-	sort(input->cellList.begin(), input->cellList.end(), [&](auto &a, auto&b){ return a->x < b->x;});
+	sort(input->cellList.begin(), input->cellList.end(), [&](auto &a, auto&b){ return a->globalX < b->globalX;});
 	for(auto const &cell : input->cellList)
 	{
 		int bestRowIdx = locateCellRow(cell);
@@ -363,8 +363,8 @@ void AbacusLegalizer::calDisplacement()
 	double totalDist = 0, maxDist = 0;
 	for(auto &cell: input->cellList)
 	{
-		double x = cell->finalX - cell->x;
-		double y = cell->finalY - cell->y;
+		double x = cell->finalX - cell->globalX;
+		double y = cell->finalY - cell->globalY;
 		double dis = sqrt(x*x + y*y);
 		totalDist += dis;
 		if(maxDist < dis)

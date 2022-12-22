@@ -7,10 +7,10 @@ struct Cell
 {
 	string name;
 	int width, height, weight;
-	double x, y, finalX, finalY;
+	double globalX, globalY, finalX, finalY;
 
 	Cell(string const &name, int const &width, int const &height)
-		:name(name), width(width), height(height), weight(width), x(0), y(0), finalX(0), finalY(0) {}
+		:name(name), width(width), height(height), weight(width), globalX(0), globalY(0), finalX(0), finalY(0) {}
 };
 
 struct Cluster

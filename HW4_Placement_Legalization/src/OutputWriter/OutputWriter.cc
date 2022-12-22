@@ -13,7 +13,7 @@ void OutputWriter::WriteResult(char argv[])
   }
   for(auto &terminal: input->terminalList)
   {
-    out << terminal->name << " " << static_cast<int>(terminal->x) << " " << static_cast<int>(terminal->y) << "\n";
+    out << terminal->name << " " << static_cast<int>(terminal->globalX) << " " << static_cast<int>(terminal->globalY) << "\n";
   }
 }
 
