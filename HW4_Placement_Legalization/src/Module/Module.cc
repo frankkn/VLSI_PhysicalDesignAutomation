@@ -2,7 +2,7 @@
 #include "./Module.h"
 using namespace std;
 
-void Subrow::updateInfo(int const &new_x_min, int const &new_x_max)
+void SubRow::updateInfo(int const &new_x_min, int const &new_x_max)
 {
   x_min = new_x_min;
   x_max = new_x_max;
