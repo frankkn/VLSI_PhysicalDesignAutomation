@@ -7,10 +7,10 @@ struct Cell
 {
 	string name;
 	int width, height, weight;
-	double x, y, optimalX, optimalY;
+	double x, y, finalX, finalY;
 
 	Cell(string const &name, int const &width, int const &height)
-			: name(name), width(width), height(height), weight(width), x(0), y(0), optimalX(0), optimalY(0) {}
+		:name(name), width(width), height(height), weight(width), x(0), y(0), finalX(0), finalY(0) {}
 };
 
 struct Cluster
@@ -20,8 +20,8 @@ struct Cluster
 	vector<Cell*> member;
 	Cluster *predecessor;
 
-	Cluster(double const &x, Cluster *predecessor, int const &weight, double const &q, int const &width)
-			: x(x), q(q), width(width), weight(weight), predecessor(predecessor) {}
+	Cluster(Cluster *predecessor, double const &x, int const &weight, double const &q, int const &width)
+		:predecessor(predecessor), x(x), q(q), width(width), weight(weight) {}
 };
 
 struct SubRow
@@ -32,13 +32,12 @@ struct SubRow
 	void updateInfo(int const &new_x_min, int const &new_x_max);
 
 	SubRow(int const &x_min, int const &x_max):x_min(x_min), x_max(x_max), capacity(x_max - x_min), lastCluster(nullptr) {}
-
 };
 
 struct Row
 {
 	int width, height, y;
-	vector<SubRow*> subRows;
+	vector<SubRow*> subrows;
 
 	Row(int &width, int &height, int &y):width(width), height(height), y(y) {}
 };

@@ -45,3 +45,12 @@ e.g. test on adaptec1 and verify the answer
 ```
 $ ../verifier/verify ../testcase/adaptec1/adaptec1.aux ../output/adaptec1.result
 ```
+
+## Compile, Run and Test via run.sh
+In this directory, enter the following command:
+```
+$ ./run.sh
+$ y
+$ ibm01
+```
+It will compile, run and test(verify) the answer.

@@ -9,7 +9,7 @@ void OutputWriter::WriteResult(char argv[])
   ofstream out("../output/" + outputPath + ".result");
   for(auto &cell: input->cellList)
   {
-    out << cell->name << " " << static_cast<int>(cell->optimalX) << " " << static_cast<int>(cell->optimalY) << "\n";
+    out << cell->name << " " << static_cast<int>(cell->finalX) << " " << static_cast<int>(cell->finalY) << "\n";
   }
   for(auto &terminal: input->terminalList)
   {

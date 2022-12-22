@@ -6,6 +6,8 @@ UDLIBS = ./ArgParser/ArgParser.cc ./Abacus/Abacus.cc ./Module/Module.cc ./Output
 all: main
 
 main: main.cpp
+	rm -f ../bin/hw4
+	rm -f ../output/*
 	$(CC) -o ../bin/hw4 main.cpp $(UDLIBS) $(OPT) $(LIBS)
 
 clean:
