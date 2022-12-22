@@ -147,7 +147,7 @@ void Parser::readScl(string const &sclPath)
       }
     }
     auto row = new Row(siteWidth, height, y);
-    auto subrow = new SubRow(x, x + siteWidth * siteNum);
+    auto subrow = new Subrow(x, x + siteWidth * siteNum);
     row->subrows.emplace_back(subrow);
     rowList.emplace_back(row);
   }
