@@ -288,13 +288,16 @@ void AbacusLegalizer::transformPosition()
 		for (auto const &subrow: row->subrows)
 		{
 			auto cluster = subrow->lastCluster;
-			while(cluster != nullptr)
+			while(cluster!= nullptr)
 			{
 				double x_displacement = cluster->x - subrow->x_min;
-				if(x_displacement - floor(x_displacement / siteWidth) * siteWidth <= siteWidth / 2.0)
+				int nearest_site = floor(x_displacement / siteWidth) * siteWidth;
+				// cluster is closer to left site 
+				if(x_displacement - nearest_site <= siteWidth/2)
 				{
 					cluster->x = floor(x_displacement / siteWidth) * siteWidth + subrow->x_min;
 				}
+				// cluster is closer to right site
 				else
 				{
 					cluster->x = ceil(x_displacement / siteWidth) * siteWidth + subrow->x_min;
@@ -370,21 +373,20 @@ void AbacusLegalizer::calDisplacement()
 	{
 		double x = cell->x_final - cell->x_global;
 		double y = cell->y_final - cell->y_global;
-		double dis = sqrt(x*x + y*y);
-		totalDist += dis;
-		if(maxDist < dis)
+		double euclideanDist = sqrt(x*x + y*y);
+		totalDist += euclideanDist;
+		if(maxDist < euclideanDist)
 		{
-			maxDist = dis;
+			maxDist = euclideanDist;
 		}
 	}
-	printf("Max displacement of cells   = %.2f\n", maxDist);
 	printf("Total displacement of cells = %.2f\n", totalDist);
+	printf("Max displacement of cells   = %.2f\n", maxDist);
 }
 
 OutputWriter *AbacusLegalizer::run()
 {
 	cutSubRow();
 	abacusDP();
-	calDisplacement();
 	return new OutputWriter(input);
 }
