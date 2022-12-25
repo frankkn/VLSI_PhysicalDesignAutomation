@@ -9,14 +9,14 @@ using namespace std;
 
 void AbacusLegalizer::cutSubRow()
 {
-	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->x < b->x; });
+	sort(input->terminalList.begin(), input->terminalList.end(), [&](auto&a, auto&b){ return a->x_global < b->x_global; });
 	for(auto &row: input->rowList)
 	{
 		for(auto &terminal: input->terminalList)
     {
       auto curSubrow = row->subrows.back();
-      if(terminal->y > row->y || terminal->y + terminal->height <= row->y) { continue; }
-      int t_min_x = terminal->x, t_max_x = terminal->x + terminal->width;
+      if(terminal->y_global > row->y || terminal->y_global + terminal->height <= row->y) { continue; }
+      int t_min_x = terminal->x_global, t_max_x = terminal->x_global + terminal->width;
       if(curSubrow->x_min >= t_min_x)
       {
         if(curSubrow->x_max > t_max_x)
@@ -54,7 +54,7 @@ int AbacusLegalizer::locateCellRow(Cell *cell)
 	int row_idx = -1;
 	for(int i = 0; i < input->rowList.size(); ++i)
 	{
-		double cur_dist = abs(cell->y - input->rowList[i]->y);
+		double cur_dist = abs(cell->y_global - input->rowList[i]->y);
 		if (cur_dist < min_dist)
 		{
 				min_dist = cur_dist;
@@ -80,17 +80,17 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 	for(int i = 0; i < row->subrows.size(); ++i)
 	{
 		auto curSubrow = row->subrows[i];
-		if(cell->x >= curSubrow->x_max)	continue;
-		if(cell->x >= curSubrow->x_min)
+		if(cell->x_global >= curSubrow->x_max)	continue;
+		if(cell->x_global >= curSubrow->x_min)
 		{
 			if(cell->width <= curSubrow->capacity)
 			{
 				return i;
 			}
-			if(i+1 < row->subrows.size() && cell->width <= row->subrows[i+1]->capacity)
-			{
-				return i+1;
-			}
+			// if(i+1 < row->subrows.size() && cell->width <= row->subrows[i+1]->capacity)
+			// {
+			// 	return i+1;
+			// }
 		}
 		else
 		{
@@ -108,8 +108,8 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 			else
 			{
 				// Determine which direction (Left:i-1; Right:i) to move
-				auto left_dist = cell->x - row->subrows[i-1]->x_max + cell->width;
-				auto right_dist = curSubrow->x_min - cell->x;
+				auto left_dist = cell->x_global - row->subrows[i-1]->x_max + cell->width;
+				auto right_dist = curSubrow->x_min - cell->x_global;
 				if(left_dist < right_dist)
 				{
 					if(cell->width <= row->subrows[i-1]->capacity)
@@ -139,11 +139,11 @@ int AbacusLegalizer::locateCellSubRow(Row *row, Cell *cell)
 	return -1;
 }
 
-void AbacusLegalizer::addCell(Cluster* cluster, Cell* cell, double finalX)
+void AbacusLegalizer::addCell(Cluster* cluster, Cell* cell, double x_final)
 {
   cluster->member.emplace_back(cell);
   cluster->weight += cell->weight;
-  cluster->q += cell->weight*(finalX - cluster->width);
+  cluster->q += cell->weight*(x_final - cluster->width);
   cluster->width += cell->width;
 }
 
@@ -185,30 +185,30 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 	auto const &row = input->rowList.at(rowIdx);
 	if(subrowIdx == -1)
 	{
-		cell->finalX = cell->finalY = DBL_MAX;
+		cell->x_final = cell->y_final = DBL_MAX;
 		return;
 	}
 
 	auto const &subRow = row->subrows[subrowIdx];
-	double finalX = cell->x;
-	if(cell->x < subRow->x_min)
+	double x_final = cell->x_global;
+	if(cell->x_global < subRow->x_min)
 	{
-		finalX = subRow->x_min;
+		x_final = subRow->x_min;
 	}
-	else if(cell->x > subRow->x_max - cell->width)
+	else if(cell->x_global > subRow->x_max - cell->width)
 	{
-		finalX = subRow->x_max - cell->width;
+		x_final = subRow->x_max - cell->width;
 	}
 	auto cluster = subRow->lastCluster;
-	if(cluster == nullptr || cluster->x + cluster->width <= finalX)
+	if(cluster == nullptr || cluster->x + cluster->width <= x_final)
 	{
-		cell->finalX = finalX;
+		cell->x_final = x_final;
 	}
 	else
 	{
 		// Simulate adding cell into cluster
 		int curWeight = cluster->weight + cell->weight;
-		double curQ = cluster->q + cell->weight * (finalX - cluster->width);
+		double curQ = cluster->q + cell->weight * (x_final - cluster->width);
 		int curWidth = cluster->width + cell->width;
 		double curX = 0.0;
 		while(1)
@@ -235,9 +235,9 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 				break;
 			}
 		}
-		cell->finalX = curX + curWidth - cell->width;
+		cell->x_final = curX + curWidth - cell->width;
 	}
-	cell->finalY = row->y;
+	cell->y_final = row->y;
 }
 
 void AbacusLegalizer::placeFinalRow(Cell *cell, int &rowIdx, int &subRowIdx)
@@ -245,33 +245,33 @@ void AbacusLegalizer::placeFinalRow(Cell *cell, int &rowIdx, int &subRowIdx)
 	auto subRow = input->rowList[rowIdx]->subrows[subRowIdx];
 	subRow->capacity -= cell->width;
 
-	double finalX = cell->x;
-	if(cell->x < subRow->x_min)
-		finalX = subRow->x_min;
-	else if (cell->x > subRow->x_max - cell->width)
-		finalX = subRow->x_max - cell->width;
+	double x_final = cell->x_global;
+	if(cell->x_global < subRow->x_min)
+		x_final = subRow->x_min;
+	else if (cell->x_global > subRow->x_max - cell->width)
+		x_final = subRow->x_max - cell->width;
 
 	auto cluster = subRow->lastCluster;
-	if(cluster == nullptr || cluster->x + cluster->width <= finalX)
+	if(cluster == nullptr || cluster->x + cluster->width <= x_final)
 	{
-		cluster = new Cluster(subRow->lastCluster, finalX, 0, 0, 0);
-		addCell(cluster, cell, finalX);
+		cluster = new Cluster(subRow->lastCluster, x_final, 0, 0, 0);
+		addCell(cluster, cell, x_final);
 		subRow->lastCluster = cluster;
 	}
 	else
 	{
-		addCell(cluster, cell, finalX);
+		addCell(cluster, cell, x_final);
 		subRow->lastCluster = collapse(cluster, subRow);
 	}
 }
 
 double AbacusLegalizer::determineCost(Cell *cell)
 {
-	if (cell->finalX == DBL_MAX||cell->finalY == DBL_MAX)
+	if (cell->x_final == DBL_MAX||cell->y_final == DBL_MAX)
 	{
 		return DBL_MAX;
 	}
-	double x = cell->finalX - cell->x, y = cell->finalY - cell->y;
+	double x = cell->x_final - cell->x_global, y = cell->y_final - cell->y_global;
 	return sqrt(x*x + y*y);
 }
 
@@ -294,12 +294,12 @@ void AbacusLegalizer::transformPosition()
 				{
 					cluster->x = ceil(shiftX / siteWidth) * siteWidth + subRow->x_min;
 				}
-				int finalX = cluster->x;
+				int x_final = cluster->x;
 				for (auto &cell : cluster->member)
 				{
-					cell->finalX = finalX;
-					cell->finalY = row->y;
-					finalX += cell->width;
+					cell->x_final = x_final;
+					cell->y_final = row->y;
+					x_final += cell->width;
 				}
 				cluster = cluster->prevCluster;
 			}
@@ -309,7 +309,7 @@ void AbacusLegalizer::transformPosition()
 
 void AbacusLegalizer::searchUpRow(Cell* cell, int &upRowIdx, int &bestRowIdx, int &bestSubrowIdx, double &cBest)
 {
-	while(upRowIdx < input->rowList.size()-1 && abs(cell->y - input->rowList[upRowIdx]->y) < cBest)
+	while(upRowIdx < input->rowList.size()-1 && abs(cell->y_global - input->rowList[upRowIdx]->y) < cBest)
 	{
 		int upSubrowIdx = locateCellSubRow(input->rowList[upRowIdx], cell);
 		placeTrialRow(cell, upRowIdx, upSubrowIdx);
@@ -326,7 +326,7 @@ void AbacusLegalizer::searchUpRow(Cell* cell, int &upRowIdx, int &bestRowIdx, in
 
 void AbacusLegalizer::searchDownRow(Cell* cell, int &downRowIdx, int &bestRowIdx, int &bestSubrowIdx, double &cBest)
 {
-	while(downRowIdx>0 && abs(cell->y - input->rowList[downRowIdx]->y) < cBest)
+	while(downRowIdx>0 && abs(cell->y_global - input->rowList[downRowIdx]->y) < cBest)
 	{
 		int downSubrowIdx = locateCellSubRow(input->rowList[downRowIdx], cell);
 		placeTrialRow(cell, downRowIdx, downSubrowIdx);
@@ -343,7 +343,7 @@ void AbacusLegalizer::searchDownRow(Cell* cell, int &downRowIdx, int &bestRowIdx
 
 void AbacusLegalizer::abacusDP()
 {
-	sort(input->cellList.begin(), input->cellList.end(), [&](auto &a, auto&b){ return a->x < b->x;});
+	sort(input->cellList.begin(), input->cellList.end(), [&](auto &a, auto&b){ return a->x_global < b->x_global;});
 	for(auto const &cell : input->cellList)
 	{
 		int bestRowIdx = locateCellRow(cell);
@@ -363,8 +363,8 @@ void AbacusLegalizer::calDisplacement()
 	double totalDist = 0, maxDist = 0;
 	for(auto &cell: input->cellList)
 	{
-		double x = cell->finalX - cell->x;
-		double y = cell->finalY - cell->y;
+		double x = cell->x_final - cell->x_global;
+		double y = cell->y_final - cell->y_global;
 		double dis = sqrt(x*x + y*y);
 		totalDist += dis;
 		if(maxDist < dis)

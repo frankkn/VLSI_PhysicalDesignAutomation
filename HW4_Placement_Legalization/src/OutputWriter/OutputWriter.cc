@@ -9,11 +9,11 @@ void OutputWriter::WriteResult(char argv[])
   ofstream out("../output/" + outputPath + ".result");
   for(auto &cell: input->cellList)
   {
-    out << cell->name << " " << static_cast<int>(cell->finalX) << " " << static_cast<int>(cell->finalY) << "\n";
+    out << cell->name << " " << static_cast<int>(cell->x_final) << " " << static_cast<int>(cell->y_final) << "\n";
   }
   for(auto &terminal: input->terminalList)
   {
-    out << terminal->name << " " << static_cast<int>(terminal->x) << " " << static_cast<int>(terminal->y) << "\n";
+    out << terminal->name << " " << static_cast<int>(terminal->x_global) << " " << static_cast<int>(terminal->y_global) << "\n";
   }
 }
 
