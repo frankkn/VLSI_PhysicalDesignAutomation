@@ -31,13 +31,14 @@ struct Subrow
 
 	void updateInfo(int const &new_x_min, int const &new_x_max);
 
-	Subrow(int const &x_min, int const &x_max):x_min(x_min), x_max(x_max), capacity(x_max - x_min), lastCluster(nullptr) {}
+	Subrow(int const &x_min, int const &x_max)
+		:x_min(x_min), x_max(x_max), capacity(x_max - x_min), lastCluster(nullptr) {}
 };
 
 struct Row
 {
 	int width, height, y;
-	vector<Subrow*> subrows;
+	vector<Subrow*>subrows;
 
 	Row(int &width, int &height, int &y):width(width), height(height), y(y) {}
 };
@@ -45,8 +46,8 @@ struct Row
 struct Input
 {
 	int maxDisplacement;
-	vector<Cell *>cellList, terminalList;
-	vector<Row *>rowList;
+	vector<Cell*>cellList, terminalList;
+	vector<Row*>rowList;
 
 	Input(int &maxDisplacement, vector<Cell*> &cellList, vector<Cell*> &terminalList, vector<Row*> &rowList)
 		:maxDisplacement(maxDisplacement), cellList(cellList), terminalList(terminalList), rowList(rowList) {}

@@ -1,7 +1,7 @@
 CC = g++
 OPT = -O3
 LIBS = -std=c++17
-UDLIBS = ./ArgParser/ArgParser.cc ./Abacus/Abacus.cc ./Module/Module.cc ./OutputWriter/OutputWriter.cc
+UDLIBS = ./ArgParser/ArgParser.cc ./Abacus/Abacus.cc ./Module/Module.cc ./OutputWriter/OutputWriter.cc ./Clock/Clock.cc
 
 all: main
 
