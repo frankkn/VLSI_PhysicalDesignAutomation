@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	clock.EndClock("Abacus time");
 	
 	clock.StartClock("Output time");
-	OW->WriteResult(argv[2]);
+	OW->WriteResult(argv);
 	clock.EndClock("Output time");
 
 	clock.EndClock("Total time");

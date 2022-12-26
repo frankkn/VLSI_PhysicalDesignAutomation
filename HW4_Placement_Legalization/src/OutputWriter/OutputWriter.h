@@ -7,5 +7,5 @@ class OutputWriter
 
 public:
 	OutputWriter(Input *input):input(input) {}
-	void WriteResult(char argv[]);
+	void WriteResult(char *argv[]);
 };
