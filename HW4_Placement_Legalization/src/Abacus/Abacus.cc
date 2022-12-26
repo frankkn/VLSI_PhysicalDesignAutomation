@@ -141,37 +141,37 @@ int AbacusLegalizer::locateCellSubRow(Cell *cell, Row *row)
 
 void AbacusLegalizer::addCell(Cluster *cluster, Cell *cell, double x_final)
 {
-  cluster->member.emplace_back(cell);
-  cluster->weight += cell->weight;
-  cluster->q += cell->weight*(x_final - cluster->width);
-  cluster->width += cell->width;
+  cluster->nodes.emplace_back(cell);
+  cluster->e_c += cell->weight;
+  cluster->q_c += cell->weight*(x_final - cluster->w_c);
+  cluster->w_c += cell->width;
 }
 
 // Add c into its predecessor cPrime
 void AbacusLegalizer::addCluster(Cluster *prevCluster, Cluster *cluster)
 {
-  prevCluster->member.insert(prevCluster->member.end(), cluster->member.begin(), cluster->member.end());
-  prevCluster->weight += cluster->weight;
-  prevCluster->q += cluster->q - cluster->weight * prevCluster->width;
-  prevCluster->width += cluster->width;
+  prevCluster->nodes.insert(prevCluster->nodes.end(), cluster->nodes.begin(), cluster->nodes.end());
+  prevCluster->e_c += cluster->e_c;
+  prevCluster->q_c += cluster->q_c - cluster->e_c * prevCluster->w_c;
+  prevCluster->w_c += cluster->w_c;
 }
 
 Cluster* AbacusLegalizer::collapse(Cluster *cluster, Subrow *subrow)
 {
 	// Place cluster c
-	cluster->x = cluster->q / cluster->weight;
+	cluster->x_c = cluster->q_c / cluster->e_c;
 	// Limit position between x_min and x_max - w_c(c)
-	if (cluster->x < subrow->x_min)
+	if (cluster->x_c < subrow->x_min)
 	{
-		cluster->x = subrow->x_min;
+		cluster->x_c = subrow->x_min;
 	}
-	if (cluster->x > subrow->x_max - cluster->width)
+	if (cluster->x_c > subrow->x_max - cluster->w_c)
 	{
-		cluster->x = subrow->x_max - cluster->width;
+		cluster->x_c = subrow->x_max - cluster->w_c;
 	}
 	// Overlap between c and its predecessor c'?
 	auto prevCluster = cluster->prevCluster;
-	if (prevCluster != nullptr && prevCluster->x + prevCluster->width > cluster->x)
+	if (prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cluster->x_c)
 	{
     addCluster(prevCluster, cluster);
 		delete cluster;
@@ -183,9 +183,9 @@ Cluster* AbacusLegalizer::collapse(Cluster *cluster, Subrow *subrow)
 void AbacusLegalizer::addVirtualCell(Cell * cell, Cluster *cluster, double x_final, Subrow *subrow)
 {	
 	//Simulate adding cell into cluster
-	int cur_weight = cluster->weight + cell->weight;
-	double cur_q = cluster->q + cell->weight * (x_final - cluster->width);
-	int cur_width = cluster->width + cell->width;
+	int cur_weight = cluster->e_c + cell->weight;
+	double cur_q = cluster->q_c + cell->weight * (x_final - cluster->w_c);
+	int cur_width = cluster->w_c + cell->width;
 	double cur_x = 0.0;
 	while(1)
 	{
@@ -199,11 +199,11 @@ void AbacusLegalizer::addVirtualCell(Cell * cell, Cluster *cluster, double x_fin
 			cur_x = subrow->x_max - cur_width;
 		}
 		auto const &prevCluster = cluster->prevCluster;
-		if(prevCluster != nullptr && prevCluster->x + prevCluster->width > cur_x)
+		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cur_x)
 		{
-			cur_q = prevCluster->q + cur_q - cur_weight * prevCluster->width;
-			cur_weight = prevCluster->weight + cur_weight;
-			cur_width = prevCluster->width + cur_width;
+			cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
+			cur_weight = prevCluster->e_c + cur_weight;
+			cur_width = prevCluster->w_c + cur_width;
 			cluster = prevCluster;
 		}
 		else
@@ -234,7 +234,7 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 		x_final = subrow->x_max - cell->width;
 	}
 	auto cluster = subrow->lastCluster;
-	if(cluster == nullptr || cluster->x + cluster->width <= x_final)
+	if(cluster == nullptr || cluster->x_c + cluster->w_c <= x_final)
 	{
 		cell->x_final = x_final;
 	}
@@ -257,7 +257,7 @@ void AbacusLegalizer::placeFinalRow(Cell *cell, int &rowIdx, int &subRowIdx)
 		x_final = subrow->x_max - cell->width;
 
 	auto cluster = subrow->lastCluster;
-	if(cluster == nullptr || cluster->x + cluster->width <= x_final)
+	if(cluster == nullptr || cluster->x_c + cluster->w_c <= x_final)
 	{
 		cluster = new Cluster(subrow->lastCluster, x_final, 0, 0, 0);
 		addCell(cluster, cell, x_final);
@@ -290,20 +290,20 @@ void AbacusLegalizer::transformPosition()
 			auto cluster = subrow->lastCluster;
 			while(cluster!= nullptr)
 			{
-				double x_displacement = cluster->x - subrow->x_min;
+				double x_displacement = cluster->x_c - subrow->x_min;
 				int nearest_site = floor(x_displacement / siteWidth) * siteWidth;
 				// cluster is closer to left site 
 				if(x_displacement - nearest_site <= siteWidth/2)
 				{
-					cluster->x = floor(x_displacement / siteWidth) * siteWidth + subrow->x_min;
+					cluster->x_c = floor(x_displacement / siteWidth) * siteWidth + subrow->x_min;
 				}
 				// cluster is closer to right site
 				else
 				{
-					cluster->x = ceil(x_displacement / siteWidth) * siteWidth + subrow->x_min;
+					cluster->x_c = ceil(x_displacement / siteWidth) * siteWidth + subrow->x_min;
 				}
-				int x_final = cluster->x;
-				for(auto &cell : cluster->member)
+				int x_final = cluster->x_c;
+				for(auto &cell : cluster->nodes)
 				{
 					cell->x_final = x_final;
 					cell->y_final = row->y;

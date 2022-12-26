@@ -15,13 +15,13 @@ struct Cell
 
 struct Cluster
 {
-	double x, q;
-	int width, weight;
-	vector<Cell*> member;
+	double x_c, q_c;
+	int e_c, w_c; // weight/width of cluster
+	vector<Cell*> nodes;
 	Cluster *prevCluster;
 
-	Cluster(Cluster *prevCluster, double const &x, int const &weight, double const &q, int const &width)
-		:prevCluster(prevCluster), x(x), q(q), width(width), weight(weight) {}
+	Cluster(Cluster *prevCluster, double const &x_c, int const &e_c, double const &q_c, int const &w_c)
+		:prevCluster(prevCluster), x_c(x_c), e_c(e_c), q_c(q_c), w_c(w_c) {}
 };
 
 struct Subrow

@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Abacus/Abacus.h"
 #include "ArgParser/ArgParser.h"
 #include "Module/Module.h"
