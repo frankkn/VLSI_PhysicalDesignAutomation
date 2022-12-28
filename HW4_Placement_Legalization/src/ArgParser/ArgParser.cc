@@ -156,11 +156,13 @@ void Parser::readScl(string const &sclPath)
 Input *Parser::parse(char argv[])
 {
   string auxPath = string(argv);
+  string name = auxPath.substr(auxPath.find_last_of('/')+1);
+  name.erase(name.find_first_of('.')-1, name.size()-1);
   string nodePath, plPath, sclPath;
   readAux(auxPath, nodePath, plPath, sclPath);
   string prefix = auxPath.erase(auxPath.find_last_of('/')+1, auxPath.size()-1);
   readNode(prefix + nodePath);
   readPl(prefix + plPath);
   readScl(prefix + sclPath);
-	return new Input(this->maxDisplacement, this->cellList, this->terminalList, this->rowList);
+	return new Input(maxDisplacement, cellList, terminalList, rowList, name);
 }

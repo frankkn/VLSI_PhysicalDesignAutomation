@@ -188,7 +188,41 @@ void::AbacusLegalizer::testClusterOverlap(Cluster* cluster, Subrow *subrow)
 	if(cluster->x_tmp > subrow->x_max - cluster->w_tmp) cluster->x_tmp = subrow->x_max - cluster->w_tmp;
 }
 
-void AbacusLegalizer::addVirtualCell(Cell * cell, Cluster *cluster, double x_final, Subrow *subrow)
+void AbacusLegalizer::addVirtualCell1(Cell * cell, Cluster *cluster, double x_final, Subrow *subrow)
+{	
+	//Simulate adding cell into cluster
+	int cur_weight = cluster->e_c + cell->weight;
+	double cur_q = cluster->q_c + cell->weight * (x_final - cluster->w_c);
+	int cur_width = cluster->w_c + cell->width;
+	double cur_x = 0.0;
+	while(1)
+	{
+		cur_x = cur_q / cur_weight;
+		if(cur_x < subrow->x_min)
+		{
+			cur_x = subrow->x_min;
+		}
+		if(cur_x > subrow->x_max - cur_width)
+		{		
+			cur_x = subrow->x_max - cur_width;
+		}
+		auto const &prevCluster = cluster->prevCluster;
+		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cur_x)
+		{
+			cur_weight = prevCluster->e_c + cur_weight;
+			cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
+			cur_width = prevCluster->w_c + cur_width;
+			cluster = prevCluster;
+		}
+		else
+		{
+			break;
+		}
+	}
+	cell->x_final = cur_x + cur_width - cell->width;
+}
+
+void AbacusLegalizer::addVirtualCell2(Cell * cell, Cluster *cluster, double x_final, Subrow *subrow)
 {	
 	int cur_weight = cluster->e_c + cell->weight;
 	double cur_q = cluster->q_c + cell->weight * (cell->x_global - cluster->w_c);
@@ -245,7 +279,14 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 	}
 	else
 	{
-		addVirtualCell(cell, cluster, x_final, subrow);
+		if(input->name == "adaptec")
+		{
+			addVirtualCell1(cell, cluster, x_final, subrow);
+		}
+		else
+		{
+			addVirtualCell2(cell, cluster, x_final, subrow);
+		}
 	}
 	cell->y_final = row->y;
 }

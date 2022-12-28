@@ -46,10 +46,11 @@ struct Row
 
 struct Input
 {
+	string name;
 	int maxDisplacement;
 	vector<Cell*>cellList, terminalList;
 	vector<Row*>rowList;
 
-	Input(int &maxDisplacement, vector<Cell*> &cellList, vector<Cell*> &terminalList, vector<Row*> &rowList)
-		:maxDisplacement(maxDisplacement), cellList(cellList), terminalList(terminalList), rowList(rowList) {}
+	Input(int &maxDisplacement, vector<Cell*> &cellList, vector<Cell*> &terminalList, vector<Row*> &rowList, string &name)
+		:maxDisplacement(maxDisplacement), cellList(cellList), terminalList(terminalList), rowList(rowList), name(name) {}
 };
