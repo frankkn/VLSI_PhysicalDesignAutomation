@@ -201,8 +201,8 @@ void AbacusLegalizer::addVirtualCell(Cell * cell, Cluster *cluster, double x_fin
 		auto const &prevCluster = cluster->prevCluster;
 		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cur_x)
 		{
-			cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
 			cur_weight = prevCluster->e_c + cur_weight;
+			cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
 			cur_width = prevCluster->w_c + cur_width;
 			cluster = prevCluster;
 		}
