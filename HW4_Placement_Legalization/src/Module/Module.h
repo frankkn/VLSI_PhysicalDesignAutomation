@@ -17,6 +17,7 @@ struct Cluster
 {
 	double x_c, q_c;
 	int e_c, w_c; // weight/width of cluster
+	double x_tmp, e_tmp, q_tmp, w_tmp;
 	vector<Cell*> nodes;
 	Cluster *prevCluster;
 

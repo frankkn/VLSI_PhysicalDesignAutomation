@@ -150,7 +150,8 @@ void AbacusLegalizer::addCell(Cluster *cluster, Cell *cell, double x_final)
 // Add c into its predecessor cPrime
 void AbacusLegalizer::addCluster(Cluster *prevCluster, Cluster *cluster)
 {
-  prevCluster->nodes.insert(prevCluster->nodes.end(), cluster->nodes.begin(), cluster->nodes.end());
+  // prevCluster->nodes.insert(prevCluster->nodes.end(), cluster->nodes.begin(), cluster->nodes.end());
+	copy (cluster->nodes.begin(), cluster->nodes.end(), back_inserter(prevCluster->nodes));
   prevCluster->e_c += cluster->e_c;
   prevCluster->q_c += cluster->q_c - cluster->e_c * prevCluster->w_c;
   prevCluster->w_c += cluster->w_c;
@@ -180,30 +181,32 @@ Cluster* AbacusLegalizer::collapse(Cluster *cluster, Subrow *subrow)
 	return cluster;
 }
 
+void::AbacusLegalizer::testClusterOverlap(Cluster* cluster, Subrow *subrow)
+{
+	cluster->x_tmp = cluster->q_tmp / cluster->e_tmp;
+	if(cluster->x_tmp < subrow->x_min) cluster->x_tmp = subrow->x_min;
+	if(cluster->x_tmp > subrow->x_max - cluster->w_tmp) cluster->x_tmp = subrow->x_max - cluster->w_tmp;
+}
+
 void AbacusLegalizer::addVirtualCell(Cell * cell, Cluster *cluster, double x_final, Subrow *subrow)
 {	
-	//Simulate adding cell into cluster
 	int cur_weight = cluster->e_c + cell->weight;
-	double cur_q = cluster->q_c + cell->weight * (x_final - cluster->w_c);
+	double cur_q = cluster->q_c + cell->weight * (cell->x_global - cluster->w_c);
 	int cur_width = cluster->w_c + cell->width;
-	double cur_x = 0.0;
-	while(1)
+
+	cluster->e_tmp = cur_weight;
+	cluster->q_tmp = cur_q;
+	cluster->w_tmp = cur_width;
+
+	while (true)
 	{
-		cur_x = cur_q / cur_weight;
-		if(cur_x < subrow->x_min)
-		{
-			cur_x = subrow->x_min;
-		}
-		if(cur_x > subrow->x_max - cur_width)
-		{		
-			cur_x = subrow->x_max - cur_width;
-		}
+		testClusterOverlap(cluster, subrow);
 		auto const &prevCluster = cluster->prevCluster;
-		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cur_x)
+		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cluster->x_tmp)
 		{
-			cur_weight = prevCluster->e_c + cur_weight;
-			cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
-			cur_width = prevCluster->w_c + cur_width;
+			cluster->e_tmp = prevCluster->e_c + cluster->e_tmp;
+			cluster->q_tmp = prevCluster->q_c + cluster->q_tmp - cluster->e_tmp * prevCluster->w_c;
+			cluster->w_tmp = prevCluster->w_c + cluster->w_tmp;
 			cluster = prevCluster;
 		}
 		else
@@ -211,7 +214,7 @@ void AbacusLegalizer::addVirtualCell(Cell * cell, Cluster *cluster, double x_fin
 			break;
 		}
 	}
-	cell->x_final = cur_x + cur_width - cell->width;
+	cell->x_final = cluster->x_tmp + cluster->w_tmp - cell->width;
 }
 
 void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
@@ -224,6 +227,7 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 	}
 
 	auto const &subrow = row->subrows[subrowIdx];
+
 	double x_final = cell->x_global;
 	if(cell->x_global < subrow->x_min)
 	{
@@ -233,6 +237,7 @@ void AbacusLegalizer::placeTrialRow(Cell *cell, int &rowIdx, int &subrowIdx)
 	{
 		x_final = subrow->x_max - cell->width;
 	}
+
 	auto cluster = subrow->lastCluster;
 	if(cluster == nullptr || cluster->x_c + cluster->w_c <= x_final)
 	{
@@ -388,5 +393,6 @@ OutputWriter *AbacusLegalizer::run()
 {
 	cutSubRow();
 	abacusDP();
+	// calDisplacement();
 	return new OutputWriter(input);
 }
