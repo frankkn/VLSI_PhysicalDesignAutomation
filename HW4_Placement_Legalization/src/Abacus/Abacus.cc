@@ -209,8 +209,9 @@ void AbacusLegalizer::addVirtualCell1(Cell * cell, Cluster *cluster, double x_fi
 		auto const &prevCluster = cluster->prevCluster;
 		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cur_x)
 		{
-			cur_weight = prevCluster->e_c + cur_weight;
 			cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
+			cur_weight = prevCluster->e_c + cur_weight;
+			// cur_q = prevCluster->q_c + cur_q - cur_weight * prevCluster->w_c;
 			cur_width = prevCluster->w_c + cur_width;
 			cluster = prevCluster;
 		}
@@ -238,8 +239,9 @@ void AbacusLegalizer::addVirtualCell2(Cell * cell, Cluster *cluster, double x_fi
 		auto const &prevCluster = cluster->prevCluster;
 		if(prevCluster != nullptr && prevCluster->x_c + prevCluster->w_c > cluster->x_tmp)
 		{
-			cluster->e_tmp = prevCluster->e_c + cluster->e_tmp;
 			cluster->q_tmp = prevCluster->q_c + cluster->q_tmp - cluster->e_tmp * prevCluster->w_c;
+			cluster->e_tmp = prevCluster->e_c + cluster->e_tmp;
+			// cluster->q_tmp = prevCluster->q_c + cluster->q_tmp - cluster->e_tmp * prevCluster->w_c;
 			cluster->w_tmp = prevCluster->w_c + cluster->w_tmp;
 			cluster = prevCluster;
 		}
@@ -434,6 +436,6 @@ OutputWriter *AbacusLegalizer::run()
 {
 	cutSubRow();
 	abacusDP();
-	// calDisplacement();
+	calDisplacement();
 	return new OutputWriter(input);
 }
