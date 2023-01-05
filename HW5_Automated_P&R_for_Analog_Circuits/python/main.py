@@ -20,18 +20,20 @@ VIA34_LIB_NAME = 'Via34'
 design_name = 'CS_APR'
 die_x1 = 0
 die_y1 = 0
-die_x2 =
-die_y2 =
+die_x2 = CS_WIDTH * 4 + M3_SPACING * (3*4-1) + M3_WIDTH * 2 * 4 
+die_y2 = CS_HEIGHT * 4 + M4_SPACING * (2*4-1) + M4_WIDTH * 1 * 4
 die = Die(design_name, die_x1, die_y1, die_x2, die_y2)
 
 ##### Step 2: create CS array #####
 cs_array = [[Component for j in range(4)] for i in range(4)]
+Dx = (CS_WIDTH + M3_SPACING * 3 + M3_WIDTH * 2)
+Dy = (CS_HEIGHT + M4_SPACING * 2 + M4_WIDTH)
 for i in range(4):
     for j in range(4):
         cs_lib_name = CS_LIB_NAME
         cs_instance_name = 'Transistor' + str(i * 4 + j)
-        x =
-        y =
+        x = i * Dx
+        y = j * Dy + (M4_SPACING + M4_WIDTH)
         cs_array[i][j] = Component(cs_lib_name, cs_instance_name, x, y)
 
 ##### Step 3: create vertical ME3 #####
@@ -41,10 +43,10 @@ for i in range(4):
     for j in range(2):
         inst_name = 'Metal3_' + str(i * 2 + j)
         layer = 'ME3'
-        x1 =
-        x2 =
-        y1 =
-        y2 =
+        x1 = cs_array[i][0]._x + Dx + j * (M3_WIDTH + M3_SPACING)
+        x2 = x1 + M3_WIDTH 
+        y1 = 0
+        y2 = die_y2
         ME3_specialnet[i][j] = SpecialNet(inst_name, layer, x1, y1, x2, y2)
 
 ##### Step 4: create ME4 drain #####
@@ -76,10 +78,10 @@ for i in range(2):
         ME4_specialnet_drain[i][3-j] = SpecialNet(inst_name, layer, x1, y1, x2, y2)
         # right top corner units
         inst_name = 'Metal4_drain_' + str(i * 2 + j + 3 * 4)
-        x1 =
-        x2 =
-        y1 =
-        y2 =
+        x1 = cs_array[3-i][3-j]._x + CS_X1_TO_DRAIN
+        x2 = ME3_specialnet[3-i][j]._x2
+        y1 = cs_array[3-i][3-j]._y + CS_Y1_TO_DRAIN
+        y2 = y1 + M4_WIDTH
         ME4_specialnet_drain[3-i][3-j] = SpecialNet(inst_name, layer, x1, y1, x2, y2)
 
 ##### Step 5: create ME4 port #####
@@ -88,10 +90,10 @@ ME4_specialnet_port = [SpecialNet for i in range(4)]
 for i in range(4):
     inst_name = 'Metal4_port_' + str(i)
     layer = 'ME4'
-    x1 =
-    x2 =
-    y1 =
-    y2 =
+    x1 = 0
+    x2 = die_x2
+    y1 = i * Dy
+    y2 = y1 + M4_WIDTH
     ME4_specialnet_port[i] = SpecialNet(inst_name, layer, x1, y1, x2, y2)
 
 ##### Step 6: create Via34 from ME4 drain #####
@@ -117,8 +119,8 @@ for i in range(2):
         Via34_drain2ME3[i][3-j] = Component(lib_name, inst_name, x, y)
         # right top corner units
         inst_name = 'Via34_drain2ME3_' + str(i * 2 + j + 3 * 4)
-        x =
-        y =
+        x = ME3_specialnet[3-i][j]._x1
+        y = cs_array[i][3-j]._y + CS_Y1_TO_DRAIN
         Via34_drain2ME3[3-i][3-j] = Component(lib_name, inst_name, x, y)
 
 ##### Step 7: create Via34 to ME4 port #####
@@ -128,6 +130,7 @@ for i in range(2):
 # 2. lib_name = VIA34_LIB_NAME
 # 3. inst_name = 'Via34_port2ME3_'
 # TODO
+    
 
 
 # write info to def file
