@@ -137,12 +137,12 @@ for i in range(2):
         # left one
         inst_name = 'Via34_port2ME3_' + str(i + j + 0 * 2)
         x = ME3_specialnet[i][j]._x1
-        y = ME4_specialnet_port[i+j*2].y1
+        y = ME4_specialnet_port[i+j*2]._y1
         Via34_port2ME3[i][j] = Component(lib_name, inst_name, x, y)
         # right one
         inst_name = 'Via34_port2ME3_' + str(i + j + 1 * 2)
         x = ME3_specialnet[3-i][j]._x1
-        y = ME4_specialnet_port[i+j*2].y1
+        y = ME4_specialnet_port[i+j*2]._y1
         Via34_port2ME3[i][j] = Component(lib_name, inst_name, x, y)
 
 

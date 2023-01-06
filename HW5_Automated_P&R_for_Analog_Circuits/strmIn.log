@@ -1,0 +1,14 @@
+********************************************************************************
+Product   : Virtuoso(R) XStream In
+Program   : @(#)$CDS: strmin version 6.1.8-64b 05/03/2022 19:59 (cpgbld01) $
+          : sub-version  IC6.1.8-64b.500.25 
+Started at: 06-Jan-2023  14:43:53
+User Name : g110062619
+Host Name : ic51
+Directory : /users/course/2022F/PDA13400000/g110062619/Physical Design Automation/HW5_Automated_P&R_for_Analog_Circuits
+CADENCE Design Systems, Inc.
+********************************************************************************
+Info: Cellview Rev Num:99,  Tech Rev Num:59
+
+ERROR (XSTRM-13): Failed to open input Stream file './GDSII/cells.gds'. Check that the file exists in the run directory and that you have permission to read it.
+INFO (XSTRM-273): Translation failed. '1' error(s) and '0' warning(s) found.
