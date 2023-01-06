@@ -121,7 +121,7 @@ for i in range(2):
         # right top corner units
         inst_name = 'Via34_drain2ME3_' + str(i * 2 + j + 3 * 4)
         x = ME3_specialnet[3-i][j]._x1
-        y = cs_array[i][3-j]._y + CS_Y1_TO_DRAIN
+        y = cs_array[3-i][3-j]._y + CS_Y1_TO_DRAIN
         Via34_drain2ME3[3-i][3-j] = Component(lib_name, inst_name, x, y)
 
 ##### Step 7: create Via34 to ME4 port #####
@@ -135,16 +135,16 @@ Via34_port2ME3 = [[Component for j in range(2)] for i in range(4)]
 for i in range(2):
     for j in range(2):
         lib_name = VIA34_LIB_NAME
-        # left one
-        inst_name = 'Via34_port2ME3_' + str(i + j + 0 * 2)
-        x = ME3_specialnet[i][j]._x1
-        y = ME4_specialnet_port[i+j*2]._y1
-        Via34_port2ME3[i][j] = Component(lib_name, inst_name, x, y)
+        # left one  
+        inst_name = 'Via34_port2ME3_' + str(i*4+j*2)
+        x = Via34_drain2ME3[j][i]._x
+        y = ME4_specialnet_port[i*2+j]._y1
+        Via34_port2ME3[i*2+j][0] = Component(lib_name, inst_name, x, y)
         # right one
-        inst_name = 'Via34_port2ME3_' + str(i + j + 1 * 2)
-        x = ME3_specialnet[3-i][j]._x1
-        y = ME4_specialnet_port[i+j*2]._y1
-        Via34_port2ME3[i*2+j][j] = Component(lib_name, inst_name, x, y)
+        inst_name = 'Via34_port2ME3_' + str(i*4+j*2+1)
+        x = Via34_drain2ME3[3-j][i]._x
+        y = ME4_specialnet_port[i*2+j]._y1
+        Via34_port2ME3[i*2+j][1] = Component(lib_name, inst_name, x, y)
 
 # write info to def file
 component_list = []
@@ -154,7 +154,7 @@ for i in range(4):
 
 # 4. add 'Via34_port2ME3' component to 'component_list'
 # TODO
-for i in range(2):
+for i in range(4):
     for j in range(2):
         component_list.append(Via34_port2ME3[i][j])
 
