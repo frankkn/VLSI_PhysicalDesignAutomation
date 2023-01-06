@@ -39,11 +39,12 @@ for i in range(4):
 ##### Step 3: create vertical ME3 #####
 # ME3 nets
 ME3_specialnet = [[SpecialNet for j in range(2)] for i in range(4)]
+Dx2 = CS_WIDTH + M3_SPACING
 for i in range(4):
     for j in range(2):
         inst_name = 'Metal3_' + str(i * 2 + j)
         layer = 'ME3'
-        x1 = cs_array[i][0]._x + Dx + j * (M3_WIDTH + M3_SPACING)
+        x1 = cs_array[i][0]._x + Dx2 + j * (M3_WIDTH + M3_SPACING)
         x2 = x1 + M3_WIDTH 
         y1 = 0
         y2 = die_y2
