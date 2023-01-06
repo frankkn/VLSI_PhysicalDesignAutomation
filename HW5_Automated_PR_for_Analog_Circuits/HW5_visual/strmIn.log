@@ -1,0 +1,80 @@
+********************************************************************************
+Product   : Virtuoso(R) XStream In
+Program   : @(#)$CDS: strmin version 6.1.8-64b 05/03/2022 19:59 (cpgbld01) $
+          : sub-version  IC6.1.8-64b.500.25 
+Started at: 06-Jan-2023  15:13:03
+User Name : g110062619
+Host Name : ic51
+Directory : /users/course/2022F/PDA13400000/g110062619/Physical Design Automation/HW5/HW5_visual
+CADENCE Design Systems, Inc.
+********************************************************************************
+Info: Cellview Rev Num:99,  Tech Rev Num:59
+
+INFO (XSTRM-289): Performing automatic layer mapping because either the layer mapping information is not provided or the XST_AUTO_LM  value is used with the '-layerMap' option.
+
+Summary of Options:
+	library				CSarray
+	strmFile			/users/course/2022F/PDA13400000/g110062619/Physical Design Automation/HW5/HW5_visual/GDSII/cells.gds
+	logFile				strmIn.log
+	view				layout
+	case				Preserve
+	propSeparator			,
+
+INFO (XSTRM-220): 1. Translating STRUCTURE Via34 as cellView CSarray/Via34/layout.
+INFO (XSTRM-61): Creating a new layer L50 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L50:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L51 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L51:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L52 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L52:drawing' in the technology file.
+INFO (XSTRM-220): 2. Translating STRUCTURE M1_M2$$170021932 as cellView CSarray/M1_M2$$170021932/layout.
+INFO (XSTRM-61): Creating a new layer L13 in the technology file.
+INFO (XSTRM-60): Creating a new purpose P251_XSTIN in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L13:P251_XSTIN' in the technology file.
+INFO (XSTRM-61): Creating a new layer L48 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L48:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L46 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L46:drawing' in the technology file.
+INFO (XSTRM-220): 3. Translating STRUCTURE M2_M3$$170023980 as cellView CSarray/M2_M3$$170023980/layout.
+INFO (XSTRM-61): Creating a new layer L49 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L49:drawing' in the technology file.
+INFO (XSTRM-220): 4. Translating STRUCTURE M3_M4$$170026028 as cellView CSarray/M3_M4$$170026028/layout.
+INFO (XSTRM-220): 5. Translating STRUCTURE MSBCS as cellView CSarray/MSBCS/layout.
+INFO (XSTRM-61): Creating a new layer L94 in the technology file.
+INFO (XSTRM-60): Creating a new purpose P80 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L94:P80' in the technology file.
+INFO (XSTRM-61): Creating a new layer L18 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L18:P251_XSTIN' in the technology file.
+INFO (XSTRM-61): Creating a new layer L1 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L1:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L11 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L11:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L12 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L12:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L37 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L37:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L39 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L39:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L118 in the technology file.
+INFO (XSTRM-60): Creating a new purpose P30 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L118:P30' in the technology file.
+INFO (XSTRM-220): 6. Translating STRUCTURE Via45 as cellView CSarray/Via45/layout.
+INFO (XSTRM-61): Creating a new layer L53 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L53:drawing' in the technology file.
+INFO (XSTRM-61): Creating a new layer L54 in the technology file.
+INFO (XSTRM-62): Creating a new layer-purpose pair 'L54:drawing' in the technology file.
+
+Summary of Objects Translated:
+	Instances:                              5
+	Arrays:                                 0
+	Polygons:                               0
+	Paths:                                  0
+	PathSegs:                               0
+	Rectangles:                             99
+	Text:                                   6
+	Node:                                   0
+	Line:                                   0
+	Cells:                                  6
+
+Elapsed Time: 0.4s   User Time: 0.1s   CPU Time: 0.1s   Peak VM: 76932KB  CPUs Used: 2
+INFO (XSTRM-234): Translation completed. '0' error(s) and '0' warning(s) found.

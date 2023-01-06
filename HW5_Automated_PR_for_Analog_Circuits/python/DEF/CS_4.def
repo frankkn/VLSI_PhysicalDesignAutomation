@@ -46,12 +46,12 @@ COMPONENTS 36 ;
   + PLACED ( 26730 27230 ) N ;
 - Via34_port2ME3_2 Via34
   + PLACED ( 35640 0 ) N ;
-- Via34_port2ME3_3 Via34
-  + PLACED ( 36390 17160 ) N ;
-- Via34_port2ME3_3 Via34
-  + PLACED ( 26730 8580 ) N ;
-- Via34_port2ME3_4 Via34
-  + PLACED ( 27480 25740 ) N ;
+- Via34_port2ME3_1 Via34
+  + PLACED ( 9660 17160 ) N ;
+- Via34_port2ME3_1 Via34
+  + PLACED ( 17820 8580 ) N ;
+- Via34_port2ME3_2 Via34
+  + PLACED ( 18570 25740 ) N ;
 - Via34_drain2ME3_0 Via34
   + PLACED ( 8910 5590 ) N ;
 - Via34_drain2ME3_1 Via34

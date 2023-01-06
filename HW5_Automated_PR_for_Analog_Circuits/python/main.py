@@ -130,7 +130,7 @@ for i in range(2):
 # 2. lib_name = VIA34_LIB_NAME
 # 3. inst_name = 'Via34_port2ME3_'
 # TODO
-Via34_port2ME3 = [[Component for j in range(2)] for i in range(2)]
+Via34_port2ME3 = [[Component for j in range(2)] for i in range(4)]
 for i in range(2):
     for j in range(2):
         lib_name = VIA34_LIB_NAME
@@ -143,8 +143,7 @@ for i in range(2):
         inst_name = 'Via34_port2ME3_' + str(i + j + 1 * 2)
         x = ME3_specialnet[3-i][j]._x1
         y = ME4_specialnet_port[i+j*2]._y1
-        Via34_port2ME3[i][j] = Component(lib_name, inst_name, x, y)
-
+        Via34_port2ME3[i*2+j][j] = Component(lib_name, inst_name, x, y)
 
 # write info to def file
 component_list = []
