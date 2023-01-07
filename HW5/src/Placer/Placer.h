@@ -6,6 +6,7 @@ class Placer
 {
   Input *input;
   void createDieBoundary();
+  void createCSPlacement();
 
   public:
     Placer(Input *input): input(input) {}
