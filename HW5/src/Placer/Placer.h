@@ -5,6 +5,7 @@
 class Placer
 {
   Input *input;
+  void createDieBoundary();
 
   public:
     Placer(Input *input): input(input) {}

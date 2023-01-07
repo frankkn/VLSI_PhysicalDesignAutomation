@@ -73,8 +73,8 @@ struct GlobalParameter
 struct Input
 {
 	int numCS;
-  Die die;
-  GlobalParameter GP;
+  Die *die;
+  GlobalParameter *GP;
   vector<Component> cs_array, Via34_drain2ME3, Via34_port2ME3;
   vector<SpecialNet> ME3_specialnet, ME4_specialnet_drain, ME4_specialnet_port;
 
