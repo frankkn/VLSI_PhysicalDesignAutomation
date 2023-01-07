@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include "Module/Module.h"
 #include "Placer/Placer.h"
@@ -7,6 +8,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
   auto input = new Input(argv);
+  cout << input->GP.CS_HEIGHT << endl;
   Placer placer(input);
   OutputWriter* OW = placer.run();
   OW->WriteResult(argv);

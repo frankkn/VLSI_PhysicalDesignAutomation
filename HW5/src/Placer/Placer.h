@@ -4,9 +4,9 @@
 
 class Placer
 {
-  Input* input;
+  Input *input;
 
   public:
-    Placer(Input* input): input(input) {}
-    OutputWriter* run();
+    Placer(Input *input): input(input) {}
+    OutputWriter *run();
 };

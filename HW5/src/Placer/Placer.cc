@@ -3,6 +3,6 @@ using namespace std;
 
 OutputWriter *Placer::run()
 {
-
-	return new OutputWriter();
+	
+	return new OutputWriter(input);
 }

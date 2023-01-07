@@ -3,8 +3,9 @@
 
 class OutputWriter
 {
+  Input *input;
 
-public:
-	OutputWriter() {}
-	void WriteResult(char *argv[]);
+  public:
+    OutputWriter(Input* input):input(input) {}
+  	void WriteResult(char *argv[]);
 };
