@@ -8,9 +8,9 @@ using namespace std;
 int main(int argc, char **argv)
 {
   auto input = new Input(argv);
-  cout << input->GP.CS_HEIGHT << endl;
-  Placer placer(input);
-  OutputWriter* OW = placer.run();
-  OW->WriteResult(argv);
+  cout << input->GP.CS_WIDTH << endl;
+  // Placer placer(input);
+  // OutputWriter* OW = placer.run();
+  // OW->WriteResult(argv);
 	return 0;
 }
