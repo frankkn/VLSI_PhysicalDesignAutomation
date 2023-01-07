@@ -7,6 +7,7 @@ class Placer
   Input *input;
   void createDieBoundary();
   void createCSPlacement();
+  void createVerticalME3();
 
   public:
     Placer(Input *input): input(input) {}

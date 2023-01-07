@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <string>
 #include <vector>
 using namespace std;
@@ -16,7 +17,7 @@ struct Die
     this->y2 = _y2;
   }
 
-  Die() {}
+  Die():design_name(), x1(0), y1(0), x2(0), y2(0) {}
   Die(string const &design_name, int const &x1, int const &y1, int const &x2, int const &y2)
     :design_name(design_name), x1(x1), y1(y1), x2(x2), y2(y2) {}
 };
@@ -76,7 +77,19 @@ struct Input
   Die *die;
   GlobalParameter *GP;
   vector<vector<Component*>> cs_array, Via34_drain2ME3, Via34_port2ME3;
-  vector<SpecialNet*> ME3_specialnet, ME4_specialnet_drain, ME4_specialnet_port;
+  vector<vector<SpecialNet*>> ME3_specialnet, ME4_specialnet_drain;
+  vector<SpecialNet*> ME4_specialnet_port;
 
-	Input(char **argv):numCS(stoi(argv[1])) {}
+	Input(char **argv):numCS(stoi(argv[1]))
+  {
+    die = new Die();
+    GP = new GlobalParameter();
+    int tmp = sqrt(numCS);
+    cs_array.resize(tmp*2, vector<Component*>(tmp*2));
+    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2));
+    Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp));
+    ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp));
+    ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2));
+    ME4_specialnet_port.resize(tmp/2 * tmp * 2);
+  }
 };
