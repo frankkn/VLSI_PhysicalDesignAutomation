@@ -77,8 +77,8 @@ struct Input
   Die *die;
   GlobalParameter *GP;
   vector<vector<Component*>> cs_array, Via34_drain2ME3, Via34_port2ME3;
-  vector<vector<SpecialNet*>> ME3_specialnet, ME4_specialnet_drain;
-  vector<SpecialNet*> ME4_specialnet_port;
+  vector<vector<SpecialNet*>> ME3_specialnet, ME4_specialnet_drain, ME4_specialnet_port;
+  // vector<SpecialNet*> ME4_specialnet_port;
 
 	Input(char **argv):numCS(stoi(argv[1]))
   {
@@ -90,6 +90,6 @@ struct Input
     Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp));
     ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp));
     ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2));
-    ME4_specialnet_port.resize(tmp/2 * tmp * 2);
+    ME4_specialnet_port.resize(tmp*2, vector<SpecialNet*>(tmp/2));
   }
 };

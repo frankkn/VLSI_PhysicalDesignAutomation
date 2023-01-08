@@ -14,9 +14,10 @@ void Placer::createDieBoundary()
 void Placer::createCSPlacement()
 {
 	int n = input->numCS;
+	int tmp = sqrt(n);
 	auto GP = input->GP;
-	int Dx = GP->CS_WIDTH + GP->M3_SPACING*3 + GP->M3_WIDTH*2;
-	int Dy = GP->CS_HEIGHT + GP->M4_SPACING*2 + GP->M4_WIDTH;
+	int Dx = GP->CS_WIDTH + GP->M3_SPACING*(tmp+1) + GP->M3_WIDTH*(tmp);
+	int Dy = GP->CS_HEIGHT + GP->M4_SPACING*(tmp/2+1) + GP->M4_WIDTH*(tmp/2);
 	for(int i = 0; i < n; ++i)
 	{
 		for(int j = 0; j < n; ++j)
@@ -94,11 +95,34 @@ void Placer::createME4Drain()
 	}
 }
 
+void Placer::createME4Port()
+{
+	int tmp = sqrt(input->numCS);
+	auto GP = input->GP;
+	int Dy = GP->CS_HEIGHT + GP->M4_SPACING*(tmp/2+1) + GP->M4_WIDTH*(tmp/2);
+	for(int i = 0; i < (tmp*2); ++i)
+	{
+		for(int j = 0; j < tmp/2; ++j)
+		{
+			auto cur_ME4Port = input->ME4_specialnet_port[i][j];
+			cur_ME4Port->inst_name = "Metal4_port_" + to_string(i*2+j);
+			cur_ME4Port->layer = "ME4";
+			cur_ME4Port->x1 = 0;
+			cur_ME4Port->x2 = input->die->x2;
+			cur_ME4Port->y1 = i * Dy + j * (GP->M4_WIDTH + GP->M4_SPACING);
+			cur_ME4Port->y2 = cur_ME4Port->y1 + GP->M4_WIDTH;
+		}
+	}
+}
+
 OutputWriter *Placer::run()
 {
 	createDieBoundary();
 	createCSPlacement();
 	createVerticalME3();
 	createME4Drain();
+	createME4Port();
+  createVia34_drain2ME3();
+  createVia34_port2ME3();
 	return new OutputWriter(input);
 }
