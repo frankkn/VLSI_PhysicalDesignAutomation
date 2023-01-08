@@ -50,10 +50,55 @@ void Placer::createVerticalME3()
 	}
 }
 
+void Placer::createME4Drain()
+{
+	int tmp = sqrt(input->numCS);
+	auto GP = input->GP;
+	for(int i = 0; i < tmp; ++i)
+	{
+		for(int j = 0; j < tmp; ++j)
+		{
+			// left bottom corner units
+			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain->layer = "ME4";
+			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 0 * input->numCS);
+			cur_ME4Drain->x1 = input->cs_array[i][j]->x + GP->CS_X1_TO_DRAIN;
+			cur_ME4Drain->x2 = input->ME3_specialnet[i][j]->x2;
+			cur_ME4Drain->y1 = input->cs_array[i][j]->y + GP->CS_Y1_TO_DRAIN;
+			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
+			// right bottom corner units
+			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain->layer = "ME4";
+			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 1 * input->numCS);
+			cur_ME4Drain->x1 = input->cs_array[(tmp*2-1)-i][j]->x + GP->CS_X1_TO_DRAIN;
+			cur_ME4Drain->x2 = input->ME3_specialnet[(tmp*2-1)-i][j]->x2;
+			cur_ME4Drain->y1 = input->cs_array[(tmp*2-1)-i][j]->y + GP->CS_Y1_TO_DRAIN;
+			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
+			// left top corner units
+			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain->layer = "ME4";
+			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 2 * input->numCS);
+			cur_ME4Drain->x1 = input->cs_array[i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
+			cur_ME4Drain->x2 = input->ME3_specialnet[i][(tmp*2-1)-j]->x2;
+			cur_ME4Drain->y1 = input->cs_array[i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
+			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
+			// right top corner units
+			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain->layer = "ME4";
+			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 3 * input->numCS);
+			cur_ME4Drain->x1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
+			cur_ME4Drain->x2 = input->ME3_specialnet[(tmp*2-1)-i][j]->x2;
+			cur_ME4Drain->y1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
+			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
+		}
+	}
+}
+
 OutputWriter *Placer::run()
 {
 	createDieBoundary();
 	createCSPlacement();
 	createVerticalME3();
+	createME4Drain();
 	return new OutputWriter(input);
 }
