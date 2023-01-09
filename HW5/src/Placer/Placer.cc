@@ -4,7 +4,7 @@ using namespace std;
 
 void Placer::createDieBoundary()
 {
-	input->die->design_name = 'CS_APR';
+	input->die->design_name = "CS_APR";
 	input->die->x1 = input->die->y1 = 0;
 	int tmp = sqrt(input->numCS);
 	input->die->x2 = input->GP->CS_WIDTH * (tmp*2) + input->GP->M3_SPACING * ((tmp+1)*(tmp*2-1)+tmp) + input->GP->M3_WIDTH * (tmp*(tmp*2));
@@ -68,7 +68,7 @@ void Placer::createME4Drain()
 			cur_ME4Drain->y1 = input->cs_array[i][j]->y + GP->CS_Y1_TO_DRAIN;
 			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
 			// right bottom corner units
-			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain = input->ME4_specialnet_drain[(tmp*2-1)-i][j];
 			cur_ME4Drain->layer = "ME4";
 			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 1 * input->numCS);
 			cur_ME4Drain->x1 = input->cs_array[(tmp*2-1)-i][j]->x + GP->CS_X1_TO_DRAIN;
@@ -76,7 +76,7 @@ void Placer::createME4Drain()
 			cur_ME4Drain->y1 = input->cs_array[(tmp*2-1)-i][j]->y + GP->CS_Y1_TO_DRAIN;
 			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
 			// left top corner units
-			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain = input->ME4_specialnet_drain[i][(tmp*2-1)-j];
 			cur_ME4Drain->layer = "ME4";
 			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 2 * input->numCS);
 			cur_ME4Drain->x1 = input->cs_array[i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
@@ -84,7 +84,7 @@ void Placer::createME4Drain()
 			cur_ME4Drain->y1 = input->cs_array[i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
 			cur_ME4Drain->y2 = cur_ME4Drain->y1 + GP->M4_WIDTH;
 			// right top corner units
-			auto cur_ME4Drain = input->ME4_specialnet_drain[i][j];
+			cur_ME4Drain = input->ME4_specialnet_drain[(tmp*2-1)-i][(tmp*2-1)-j];
 			cur_ME4Drain->layer = "ME4";
 			cur_ME4Drain->inst_name = "Metal4_drain" + (i * tmp + j + 3 * input->numCS);
 			cur_ME4Drain->x1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
@@ -122,7 +122,7 @@ OutputWriter *Placer::run()
 	createVerticalME3();
 	createME4Drain();
 	createME4Port();
-  createVia34_drain2ME3();
-  createVia34_port2ME3();
+  // createVia34_drain2ME3();
+  // createVia34_port2ME3();
 	return new OutputWriter(input);
 }
