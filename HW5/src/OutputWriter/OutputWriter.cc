@@ -4,6 +4,6 @@ using namespace std;
 
 void OutputWriter::WriteResult(char *argv[])
 {
-  ofstream out(argv[2]);
+  // ofstream out(argv[2]);
   
 }

@@ -14,14 +14,13 @@ void Placer::createDieBoundary()
 
 void Placer::createCSPlacement()
 {
-	int n = input->numCS;
-	int tmp = sqrt(n);
+	int tmp = sqrt(input->numCS);
 	auto GP = input->GP;
 	int Dx = GP->CS_WIDTH + GP->M3_SPACING*(tmp+1) + GP->M3_WIDTH*(tmp);
 	int Dy = GP->CS_HEIGHT + GP->M4_SPACING*(tmp/2+1) + GP->M4_WIDTH*(tmp/2);
-	for(int i = 0; i < n; ++i)
+	for(int i = 0; i < tmp*2; ++i)
 	{
-		for(int j = 0; j < n; ++j)
+		for(int j = 0; j < tmp*2; ++j)
 		{
 			// The following 5 commented lines are INCORRECT! 
 			// Only nullptr in cs_array's constructor
@@ -55,7 +54,7 @@ void Placer::createVerticalME3()
 			int x2 = x1 + GP->M3_WIDTH;
 			int y1 = 0;
 			int y2 = input->die->y2;
-			input->ME3_specialnet[i][j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
+			input->ME3_specialnet[i][j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 		}
 	}
 }
@@ -153,6 +152,27 @@ void Placer::createVia34_drain2ME3()
 	}
 }
 
+void Placer::createVia34_port2ME3()
+{
+	int tmp = sqrt(input->numCS);
+	string lib_name = "VIA34_LIB_NAME";
+	for(int i = 0; i < tmp*2; ++i)
+	{
+		for(int j = 0; j < tmp/2; ++j)
+		{
+			// left one 
+			// string inst_name = "Via34_port2ME3" + to_string(i*tmp + j*2);
+			// int x = input->Via34_drain2ME3[i/2][i%2*tmp/2+j]->x; 
+			// int y = input->ME4_specialnet_port[i][j]->y1;
+			// input->Via34_port2ME3[i*tmp/2+j][0] = new Component(lib_name, inst_name, x, y);
+			// right one
+			// inst_name = "Via34_port2ME3" + to_string(i*tmp + j*2 + 1);
+			// x = input->Via34_drain2ME3[tmp*2-i][i%2*tmp/2+j]->x;
+			// y = input->ME4_specialnet_port[i][j]->y1;
+			// input->Via34_port2ME3[i*tmp/2+j][1]  = new Component(lib_name, inst_name, x, y);
+		}
+	}
+}
 
 
 OutputWriter *Placer::run()
@@ -160,9 +180,9 @@ OutputWriter *Placer::run()
 	createDieBoundary();
 	createCSPlacement();
 	createVerticalME3();
-	createME4Drain();
-	createME4Port();
-  createVia34_drain2ME3();
+	// createME4Drain();
+	// createME4Port();
+  // createVia34_drain2ME3();
   // createVia34_port2ME3();
 	return new OutputWriter(input);
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <iostream>
 #include <string>
 #include <vector>
 using namespace std;
@@ -50,8 +51,8 @@ struct SpecialNet
     this->y2 = _y2;
   }
 
-  SpecialNet(string const &inst_name, string const &layer, int const &x1 = 0, int const &x2 = 0, int const &y1 = 0, int const &y2 = 0)
-    :inst_name(inst_name), layer(layer), x1(x1), x2(x2), y1(y1), y2(y2) {}
+  SpecialNet(string const &inst_name, string const &layer, int const &x1 = 0, int const &y1 = 0, int const &x2 = 0, int const &y2 = 0)
+    :inst_name(inst_name), layer(layer), x1(x1), y1(y1), x2(x2), y2(y2) {}
 };
 
 struct GlobalParameter
@@ -86,10 +87,12 @@ struct Input
     GP = new GlobalParameter();
     int tmp = sqrt(numCS);
     cs_array.resize(tmp*2, vector<Component*>(tmp*2, nullptr));
-    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2, nullptr));
-    Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp, nullptr));
+
     ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp, nullptr));
     ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2, nullptr));
     ME4_specialnet_port.resize(tmp*2, vector<SpecialNet*>(tmp/2, nullptr));
+
+    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2, nullptr));
+    Via34_port2ME3.resize(numCS, vector<Component*>(2, nullptr));
   }
 };
