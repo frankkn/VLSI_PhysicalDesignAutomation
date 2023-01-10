@@ -85,11 +85,11 @@ struct Input
     die = new Die();
     GP = new GlobalParameter();
     int tmp = sqrt(numCS);
-    cs_array.resize(tmp*2, vector<Component*>(tmp*2, new Component("","")));
-    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2, new Component("","")));
-    Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp, new Component("","")));
-    ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp, new SpecialNet(" ", " ")));
-    ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2, new SpecialNet(" ", " ")));
-    ME4_specialnet_port.resize(tmp*2, vector<SpecialNet*>(tmp/2, new SpecialNet(" ", " ")));
+    cs_array.resize(tmp*2, vector<Component*>(tmp*2, nullptr));
+    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2, nullptr));
+    Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp, nullptr));
+    ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp, nullptr));
+    ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2, nullptr));
+    ME4_specialnet_port.resize(tmp*2, vector<SpecialNet*>(tmp/2, nullptr));
   }
 };
