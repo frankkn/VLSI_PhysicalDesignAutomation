@@ -161,15 +161,15 @@ void Placer::createVia34_port2ME3()
 		for(int j = 0; j < tmp/2; ++j)
 		{
 			// left one 
-			// string inst_name = "Via34_port2ME3" + to_string(i*tmp + j*2);
-			// int x = input->Via34_drain2ME3[i/2][i%2*tmp/2+j]->x; 
-			// int y = input->ME4_specialnet_port[i][j]->y1;
-			// input->Via34_port2ME3[i*tmp/2+j][0] = new Component(lib_name, inst_name, x, y);
+			string inst_name = "Via34_port2ME3" + to_string(i*tmp + j*2);
+			int x = input->Via34_drain2ME3[i/2][i%2*tmp/2+j]->x; 
+			int y = input->ME4_specialnet_port[i][j]->y1;
+			input->Via34_port2ME3[i*tmp/2+j][0] = new Component(lib_name, inst_name, x, y);
 			// right one
-			// inst_name = "Via34_port2ME3" + to_string(i*tmp + j*2 + 1);
-			// x = input->Via34_drain2ME3[tmp*2-i][i%2*tmp/2+j]->x;
-			// y = input->ME4_specialnet_port[i][j]->y1;
-			// input->Via34_port2ME3[i*tmp/2+j][1]  = new Component(lib_name, inst_name, x, y);
+			inst_name = "Via34_port2ME3" + to_string(i*tmp + j*2 + 1);
+			x = input->Via34_drain2ME3[tmp*2-i][i%2*tmp/2+j]->x;
+			y = input->ME4_specialnet_port[i][j]->y1;
+			input->Via34_port2ME3[i*tmp/2+j][1]  = new Component(lib_name, inst_name, x, y);
 		}
 	}
 }
