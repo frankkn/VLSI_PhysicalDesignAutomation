@@ -121,6 +121,40 @@ void Placer::createME4Port()
 	}
 }
 
+void Placer::createVia34_drain2ME3()
+{
+	int tmp = sqrt(input->numCS);
+	string lib_name = "VIA34_LIB_NAME";
+	for(int i = 0; i < tmp; ++i)
+	{
+		for(int j = 0; j < tmp; ++j)
+		{
+			// left bottom corner units
+			string inst_name = "Via34_drain2ME3_" + to_string(i * tmp + j + 0 * input->numCS);
+			int x = input->ME3_specialnet[i][j]->x1;
+			int y = input->cs_array[i][j]->y + input->GP->CS_Y1_TO_DRAIN;
+			input->Via34_drain2ME3[i][j] = new Component(lib_name, inst_name, x, y);
+			// right bottom corner units
+			inst_name = "Via34_drain2ME3_" + to_string(i * tmp + j + 1 * input->numCS);
+			x = input->ME3_specialnet[(tmp*2-1)-i][j]->x1;
+			y = input->cs_array[(tmp*2-1)-i][j]->y + input->GP->CS_Y1_TO_DRAIN;
+			input->Via34_drain2ME3[(tmp*2-1)-i][j] = new Component(lib_name, inst_name, x, y);
+			// left top corner units
+			inst_name = "Via34_drain2ME3_" + to_string(i * tmp + j + 2 * input->numCS);
+			x = input->ME3_specialnet[i][j]->x1;
+			y = input->cs_array[i][(tmp*2-1)-j]->y + input->GP->CS_Y1_TO_DRAIN;
+			input->Via34_drain2ME3[i][(tmp*2-1)-j] = new Component(lib_name, inst_name, x, y);
+			// right top corner units
+			inst_name = "Via34_drain2ME3_" + to_string(i * tmp + j + 3 * input->numCS);
+			x = input->ME3_specialnet[(tmp*2-1)-i][j]->x1;
+			y = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->y + input->GP->CS_Y1_TO_DRAIN;
+			input->Via34_drain2ME3[(tmp*2-1)-i][(tmp*2-1)-j] = new Component(lib_name, inst_name, x, y);
+		}
+	}
+}
+
+
+
 OutputWriter *Placer::run()
 {
 	createDieBoundary();
@@ -128,7 +162,7 @@ OutputWriter *Placer::run()
 	createVerticalME3();
 	createME4Drain();
 	createME4Port();
-  // createVia34_drain2ME3();
+  createVia34_drain2ME3();
   // createVia34_port2ME3();
 	return new OutputWriter(input);
 }
