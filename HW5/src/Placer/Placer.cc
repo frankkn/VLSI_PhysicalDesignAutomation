@@ -180,9 +180,9 @@ OutputWriter *Placer::run()
 	createDieBoundary();
 	createCSPlacement();
 	createVerticalME3();
-	// createME4Drain();
-	// createME4Port();
-  // createVia34_drain2ME3();
+	createME4Drain();
+	createME4Port();
+  createVia34_drain2ME3();
   // createVia34_port2ME3();
 	return new OutputWriter(input);
 }
