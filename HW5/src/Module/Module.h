@@ -33,7 +33,7 @@ struct Component
     this->y = _y;
   }
 
-  Component(string const &lib_name, string const &inst_name)
+  Component(string const &lib_name, string const &inst_name, int const &x = 0, int const &y = 0)
     :lib_name(lib_name), inst_name(inst_name), x(x), y(y) {}
 };
 
@@ -50,8 +50,8 @@ struct SpecialNet
     this->y2 = _y2;
   }
 
-  SpecialNet(string const &inst_name, string const &layer, int const &x1, int const &y1, int const &x2, int const &y2)
-    :inst_name(inst_name), layer(layer), x1(x1), y1(y1), x2(x2), y2(y2) {}
+  SpecialNet(string const &inst_name, string const &layer, int const &x1 = 0, int const &x2 = 0, int const &y1 = 0, int const &y2 = 0)
+    :inst_name(inst_name), layer(layer), x1(x1), x2(x2), y1(y1), y2(y2) {}
 };
 
 struct GlobalParameter
@@ -85,11 +85,11 @@ struct Input
     die = new Die();
     GP = new GlobalParameter();
     int tmp = sqrt(numCS);
-    cs_array.resize(tmp*2, vector<Component*>(tmp*2));
-    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2));
-    Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp));
-    ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp));
-    ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2));
-    ME4_specialnet_port.resize(tmp*2, vector<SpecialNet*>(tmp/2));
+    cs_array.resize(tmp*2, vector<Component*>(tmp*2, new Component("","")));
+    Via34_drain2ME3.resize(tmp*2, vector<Component*>(tmp*2, new Component("","")));
+    Via34_port2ME3.resize(tmp*2, vector<Component*>(tmp, new Component("","")));
+    ME3_specialnet.resize(tmp*2, vector<SpecialNet*>(tmp, new SpecialNet(" ", " ")));
+    ME4_specialnet_drain.resize(tmp*2, vector<SpecialNet*>(tmp*2, new SpecialNet(" ", " ")));
+    ME4_specialnet_port.resize(tmp*2, vector<SpecialNet*>(tmp/2, new SpecialNet(" ", " ")));
   }
 };

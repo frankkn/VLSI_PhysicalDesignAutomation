@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include "Placer.h"
 using namespace std;
 
@@ -22,11 +23,18 @@ void Placer::createCSPlacement()
 	{
 		for(int j = 0; j < n; ++j)
 		{
-			auto cur_cs = input->cs_array[i][j];
-			cur_cs->lib_name = input->GP->CS_LIB_NAME;
-			cur_cs->inst_name = "Transistor" + to_string(i*4+j);
-			cur_cs->x = i * Dx;
-			cur_cs->y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH);
+			// The following 5 commented lines are INCORRECT! 
+			// Only "new Component()" once in cs_array's constructor
+			// auto cur_cs = input->cs_array[i][j];
+			// cur_cs->lib_name = input->GP->CS_LIB_NAME;
+			// cur_cs->inst_name = "Transistor" + to_string(i*4+j);
+			// cur_cs->x = i * Dx;
+			// cur_cs->y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH);
+			string lib_name = input->GP->CS_LIB_NAME;
+			string inst_name = "Transistor" + to_string(i*4+j);
+			int x = i * Dx;
+			int y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH);
+			input->cs_array[i][j] = new Component(lib_name, inst_name, x, y);
 		}
 	}
 }
@@ -40,13 +48,13 @@ void Placer::createVerticalME3()
 	{
 		for(int j = 0; j < tmp; ++j)
 		{
-			auto cur_ME3 = input->ME3_specialnet[i][j];
-			cur_ME3->inst_name = "Matal3_" + to_string(i*2+j);
-			cur_ME3->layer = "ME3";
-			cur_ME3->x1 = input->cs_array[i][0]->x + Dx2 + j * (GP->M3_WIDTH + GP->M3_SPACING);
-			cur_ME3->x2 = cur_ME3->x1 + GP->M3_WIDTH;
-			cur_ME3->y1 = 0;
-			cur_ME3->y2 = input->die->y2;
+			string inst_name = "Matal3_" + to_string(i*2+j);
+			string layer = "ME3";
+			int x1 = input->cs_array[i][0]->x + Dx2 + j * (GP->M3_WIDTH + GP->M3_SPACING);
+			int x2 = x1 + GP->M3_WIDTH;
+			int y1 = 0;
+			int y2 = input->die->y2;
+			input->ME3_specialnet[i][j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
 		}
 	}
 }
@@ -120,8 +128,8 @@ OutputWriter *Placer::run()
 	createDieBoundary();
 	createCSPlacement();
 	createVerticalME3();
-	createME4Drain();
-	createME4Port();
+	// createME4Drain();
+	// createME4Port();
   // createVia34_drain2ME3();
   // createVia34_port2ME3();
 	return new OutputWriter(input);
