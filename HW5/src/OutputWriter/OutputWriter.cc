@@ -70,7 +70,7 @@ void OutputWriter::WriteResult(char *argv[])
     for(auto col = row->begin(); col != row->end(); col++)
     {
       out << "- " << (*col)->inst_name << "\n";
-      out << "  + ROUTED ME4 1000 ( " << (*col)->x1 << " " << ((*col)->y1 + (*col)->y2) /2 << " ) ( " << (*col)->x2 << " * ) ;\n";
+      out << "  + ROUTED ME4 1000 ( " << (*col)->x1 << " " << ( (*col)->y1 + (*col)->y2 ) /2 << " ) ( " << (*col)->x2 << " * ) ;\n";
     }
   }
   out << "END SPECIALNETS\n\n";

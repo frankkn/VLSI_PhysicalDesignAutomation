@@ -31,7 +31,7 @@ void Placer::createCSPlacement()
 			// cur_cs->y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH);
 
 			string lib_name = input->GP->CS_LIB_NAME;
-			string inst_name = "Transistor" + to_string(i*4+j);
+			string inst_name = "Transistor" + to_string(i*tmp*2+j);
 			int x = i * Dx;
 			int y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH);
 			input->cs_array[i][j] = new Component(lib_name, inst_name, x, y);
@@ -48,7 +48,7 @@ void Placer::createVerticalME3()
 	{
 		for(int j = 0; j < tmp; ++j)
 		{
-			string inst_name = "Metal3_" + to_string(i*2+j);
+			string inst_name = "Metal3_" + to_string(i*tmp+j);
 			string layer = "ME3";
 			int x1 = input->cs_array[i][0]->x + Dx2 + j * (GP->M3_WIDTH + GP->M3_SPACING);
 			int x2 = x1 + GP->M3_WIDTH;
@@ -74,28 +74,28 @@ void Placer::createME4Drain()
 			int x2 = input->ME3_specialnet[i][j]->x2;
 			int y1 = input->cs_array[i][j]->y + GP->CS_Y1_TO_DRAIN;
 			int y2 = y1 + GP->M4_WIDTH;
-			input->ME4_specialnet_drain[i][j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
+			input->ME4_specialnet_drain[i][j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 			// right bottom corner units
 			inst_name = "Metal4_drain_" + to_string(i * tmp + j + 1 * input->numCS);
 			x1 = input->cs_array[(tmp*2-1)-i][j]->x + GP->CS_X1_TO_DRAIN;
 			x2 = input->ME3_specialnet[(tmp*2-1)-i][j]->x2;
 			y1 = input->cs_array[(tmp*2-1)-i][j]->y + GP->CS_Y1_TO_DRAIN;
 			y2 = y1 + GP->M4_WIDTH;
-			input->ME4_specialnet_drain[(tmp*2-1)-i][j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
+			input->ME4_specialnet_drain[(tmp*2-1)-i][j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 			// left top corner units
 			inst_name = "Metal4_drain_" + to_string(i * tmp + j + 2 * input->numCS);
 			x1 = input->cs_array[i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
 			x2 = input->ME3_specialnet[i][j]->x2;
 			y1 = input->cs_array[i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
 			y2 = y1 + GP->M4_WIDTH;
-			input->ME4_specialnet_drain[i][(tmp*2-1)-j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
+			input->ME4_specialnet_drain[i][(tmp*2-1)-j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 			// right top corner units
 			inst_name = "Metal4_drain_" + to_string(i * tmp + j + 3 * input->numCS);
 			x1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
 			x2 = input->ME3_specialnet[(tmp*2-1)-i][j]->x2;
 			y1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
 			y2 = y1 + GP->M4_WIDTH;
-			input->ME4_specialnet_drain[(tmp*2-1)-i][(tmp*2-1)-j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
+			input->ME4_specialnet_drain[(tmp*2-1)-i][(tmp*2-1)-j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 		}
 	}
 }
@@ -115,7 +115,7 @@ void Placer::createME4Port()
 			int x2 = input->die->x2;
 			int y1 = i * Dy + j * (GP->M4_WIDTH + GP->M4_SPACING);
 			int y2 = y1 + GP->M4_WIDTH;
-			input->ME4_specialnet_port[i][j] = new SpecialNet(inst_name, layer, x1, x2, y1, y2);
+			input->ME4_specialnet_port[i][j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 		}
 	}
 }
