@@ -8,8 +8,8 @@ void Placer::createDieBoundary()
 	input->die->design_name = "CS_APR";
 	input->die->x1 = input->die->y1 = 0;
 	int tmp = sqrt(input->numCS);
-	input->die->x2 = input->GP->CS_WIDTH * (tmp*2) + input->GP->M3_SPACING * ((tmp+1)*(tmp*2-1)+tmp) + input->GP->M3_WIDTH * (tmp*(tmp*2));
-	input->die->y2 = input->GP->CS_HEIGHT * (tmp*2) + input->GP->M4_SPACING * ((tmp/2+1)*(tmp*2-1)+tmp/2) + input->GP->M4_WIDTH * ((tmp/2)*(tmp*2)); 
+	input->die->x2 = input->GP->CS_WIDTH * (tmp*2) + input->GP->M3_SPACING * ((tmp+1)*(tmp*2)-1) + input->GP->M3_WIDTH * (tmp*(tmp*2));
+	input->die->y2 = input->GP->CS_HEIGHT * (tmp*2) + input->GP->M4_SPACING * ((tmp/2+1)*(tmp*2)-1) + input->GP->M4_WIDTH * ((tmp/2)*(tmp*2)); 
 }
 
 void Placer::createCSPlacement()
@@ -33,7 +33,7 @@ void Placer::createCSPlacement()
 			string lib_name = input->GP->CS_LIB_NAME;
 			string inst_name = "Transistor" + to_string(i*tmp*2+j);
 			int x = i * Dx;
-			int y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH);
+			int y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH) * tmp;
 			input->cs_array[i][j] = new Component(lib_name, inst_name, x, y);
 		}
 	}
@@ -93,7 +93,8 @@ void Placer::createME4Drain()
 			inst_name = "Metal4_drain_" + to_string(i * tmp + j + 3 * input->numCS);
 			x1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->x + GP->CS_X1_TO_DRAIN;
 			x2 = input->ME3_specialnet[(tmp*2-1)-i][j]->x2;
-			y1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
+			// y1 = input->cs_array[(tmp*2-1)-i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
+			y1 = input->cs_array[i][(tmp*2-1)-j]->y + GP->CS_Y1_TO_DRAIN;
 			y2 = y1 + GP->M4_WIDTH;
 			input->ME4_specialnet_drain[(tmp*2-1)-i][(tmp*2-1)-j] = new SpecialNet(inst_name, layer, x1, y1, x2, y2);
 		}
@@ -109,7 +110,7 @@ void Placer::createME4Port()
 	{
 		for(int j = 0; j < tmp/2; ++j)
 		{
-			string inst_name = "Metal4_port_" + to_string(i*2+j);
+			string inst_name = "Metal4_port_" + to_string(i*tmp/2+j);
 			string layer = "ME4";
 			int x1 = 0;
 			int x2 = input->die->x2;
@@ -162,12 +163,12 @@ void Placer::createVia34_port2ME3()
 		{
 			// left one 
 			string inst_name = "Via34_port2ME3_" + to_string(i*tmp + j*2);
-			int x = input->Via34_drain2ME3[i/2][i%2*tmp/2+j]->x; 
+			int x = input->Via34_drain2ME3[i%2*tmp/2+j][i%tmp]->x; 
 			int y = input->ME4_specialnet_port[i][j]->y1;
 			input->Via34_port2ME3[i*tmp/2+j][0] = new Component(lib_name, inst_name, x, y);
 			// right one
 			inst_name = "Via34_port2ME3_" + to_string(i*tmp + j*2 + 1);
-			x = input->Via34_drain2ME3[tmp*2-i-1][i%2*tmp/2+j]->x;
+			x = input->Via34_drain2ME3[(tmp*2-1)-(i%2*tmp/2+j)][i%tmp]->x;
 			y = input->ME4_specialnet_port[i][j]->y1;
 			input->Via34_port2ME3[i*tmp/2+j][1]  = new Component(lib_name, inst_name, x, y);
 		}
