@@ -1,0 +1,564 @@
+VERSION 5.6 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN CS_APR ;
+
+UNITS DISTANCE MICRONS 1000 ;
+
+PROPERTYDEFINITIONS
+  COMPONENTPIN text STRING ;
+END PROPERTYDEFINITIONS
+
+DIEAREA ( 0 0 ) ( 82970 80070 ) ;
+
+COMPONENTS 160 ;
+- Transistor0 MSBCS
+  + PLACED ( 0 5960 ) N ;
+- Transistor1 MSBCS
+  + PLACED ( 0 16030 ) N ;
+- Transistor2 MSBCS
+  + PLACED ( 0 26100 ) N ;
+- Transistor3 MSBCS
+  + PLACED ( 0 36170 ) N ;
+- Transistor4 MSBCS
+  + PLACED ( 0 46240 ) N ;
+- Transistor5 MSBCS
+  + PLACED ( 0 56310 ) N ;
+- Transistor6 MSBCS
+  + PLACED ( 0 66380 ) N ;
+- Transistor7 MSBCS
+  + PLACED ( 0 76450 ) N ;
+- Transistor8 MSBCS
+  + PLACED ( 10410 5960 ) N ;
+- Transistor9 MSBCS
+  + PLACED ( 10410 16030 ) N ;
+- Transistor10 MSBCS
+  + PLACED ( 10410 26100 ) N ;
+- Transistor11 MSBCS
+  + PLACED ( 10410 36170 ) N ;
+- Transistor12 MSBCS
+  + PLACED ( 10410 46240 ) N ;
+- Transistor13 MSBCS
+  + PLACED ( 10410 56310 ) N ;
+- Transistor14 MSBCS
+  + PLACED ( 10410 66380 ) N ;
+- Transistor15 MSBCS
+  + PLACED ( 10410 76450 ) N ;
+- Transistor16 MSBCS
+  + PLACED ( 20820 5960 ) N ;
+- Transistor17 MSBCS
+  + PLACED ( 20820 16030 ) N ;
+- Transistor18 MSBCS
+  + PLACED ( 20820 26100 ) N ;
+- Transistor19 MSBCS
+  + PLACED ( 20820 36170 ) N ;
+- Transistor20 MSBCS
+  + PLACED ( 20820 46240 ) N ;
+- Transistor21 MSBCS
+  + PLACED ( 20820 56310 ) N ;
+- Transistor22 MSBCS
+  + PLACED ( 20820 66380 ) N ;
+- Transistor23 MSBCS
+  + PLACED ( 20820 76450 ) N ;
+- Transistor24 MSBCS
+  + PLACED ( 31230 5960 ) N ;
+- Transistor25 MSBCS
+  + PLACED ( 31230 16030 ) N ;
+- Transistor26 MSBCS
+  + PLACED ( 31230 26100 ) N ;
+- Transistor27 MSBCS
+  + PLACED ( 31230 36170 ) N ;
+- Transistor28 MSBCS
+  + PLACED ( 31230 46240 ) N ;
+- Transistor29 MSBCS
+  + PLACED ( 31230 56310 ) N ;
+- Transistor30 MSBCS
+  + PLACED ( 31230 66380 ) N ;
+- Transistor31 MSBCS
+  + PLACED ( 31230 76450 ) N ;
+- Transistor32 MSBCS
+  + PLACED ( 41640 5960 ) N ;
+- Transistor33 MSBCS
+  + PLACED ( 41640 16030 ) N ;
+- Transistor34 MSBCS
+  + PLACED ( 41640 26100 ) N ;
+- Transistor35 MSBCS
+  + PLACED ( 41640 36170 ) N ;
+- Transistor36 MSBCS
+  + PLACED ( 41640 46240 ) N ;
+- Transistor37 MSBCS
+  + PLACED ( 41640 56310 ) N ;
+- Transistor38 MSBCS
+  + PLACED ( 41640 66380 ) N ;
+- Transistor39 MSBCS
+  + PLACED ( 41640 76450 ) N ;
+- Transistor40 MSBCS
+  + PLACED ( 52050 5960 ) N ;
+- Transistor41 MSBCS
+  + PLACED ( 52050 16030 ) N ;
+- Transistor42 MSBCS
+  + PLACED ( 52050 26100 ) N ;
+- Transistor43 MSBCS
+  + PLACED ( 52050 36170 ) N ;
+- Transistor44 MSBCS
+  + PLACED ( 52050 46240 ) N ;
+- Transistor45 MSBCS
+  + PLACED ( 52050 56310 ) N ;
+- Transistor46 MSBCS
+  + PLACED ( 52050 66380 ) N ;
+- Transistor47 MSBCS
+  + PLACED ( 52050 76450 ) N ;
+- Transistor48 MSBCS
+  + PLACED ( 62460 5960 ) N ;
+- Transistor49 MSBCS
+  + PLACED ( 62460 16030 ) N ;
+- Transistor50 MSBCS
+  + PLACED ( 62460 26100 ) N ;
+- Transistor51 MSBCS
+  + PLACED ( 62460 36170 ) N ;
+- Transistor52 MSBCS
+  + PLACED ( 62460 46240 ) N ;
+- Transistor53 MSBCS
+  + PLACED ( 62460 56310 ) N ;
+- Transistor54 MSBCS
+  + PLACED ( 62460 66380 ) N ;
+- Transistor55 MSBCS
+  + PLACED ( 62460 76450 ) N ;
+- Transistor56 MSBCS
+  + PLACED ( 72870 5960 ) N ;
+- Transistor57 MSBCS
+  + PLACED ( 72870 16030 ) N ;
+- Transistor58 MSBCS
+  + PLACED ( 72870 26100 ) N ;
+- Transistor59 MSBCS
+  + PLACED ( 72870 36170 ) N ;
+- Transistor60 MSBCS
+  + PLACED ( 72870 46240 ) N ;
+- Transistor61 MSBCS
+  + PLACED ( 72870 56310 ) N ;
+- Transistor62 MSBCS
+  + PLACED ( 72870 66380 ) N ;
+- Transistor63 MSBCS
+  + PLACED ( 72870 76450 ) N ;
+- Via34_port2ME3_0 Via34
+  + PLACED ( 7410 0 ) N ;
+- Via34_port2ME3_1 Via34
+  + PLACED ( 80280 0 ) N ;
+- Via34_port2ME3_2 Via34
+  + PLACED ( 17820 1490 ) N ;
+- Via34_port2ME3_3 Via34
+  + PLACED ( 69870 1490 ) N ;
+- Via34_port2ME3_4 Via34
+  + PLACED ( 28980 10070 ) N ;
+- Via34_port2ME3_5 Via34
+  + PLACED ( 60210 10070 ) N ;
+- Via34_port2ME3_6 Via34
+  + PLACED ( 39390 11560 ) N ;
+- Via34_port2ME3_7 Via34
+  + PLACED ( 49800 11560 ) N ;
+- Via34_port2ME3_8 Via34
+  + PLACED ( 8910 20140 ) N ;
+- Via34_port2ME3_9 Via34
+  + PLACED ( 81780 20140 ) N ;
+- Via34_port2ME3_10 Via34
+  + PLACED ( 19320 21630 ) N ;
+- Via34_port2ME3_11 Via34
+  + PLACED ( 71370 21630 ) N ;
+- Via34_port2ME3_12 Via34
+  + PLACED ( 30480 30210 ) N ;
+- Via34_port2ME3_13 Via34
+  + PLACED ( 61710 30210 ) N ;
+- Via34_port2ME3_14 Via34
+  + PLACED ( 40890 31700 ) N ;
+- Via34_port2ME3_15 Via34
+  + PLACED ( 51300 31700 ) N ;
+- Via34_port2ME3_16 Via34
+  + PLACED ( 7410 40280 ) N ;
+- Via34_port2ME3_17 Via34
+  + PLACED ( 80280 40280 ) N ;
+- Via34_port2ME3_18 Via34
+  + PLACED ( 17820 41770 ) N ;
+- Via34_port2ME3_19 Via34
+  + PLACED ( 69870 41770 ) N ;
+- Via34_port2ME3_20 Via34
+  + PLACED ( 28980 50350 ) N ;
+- Via34_port2ME3_21 Via34
+  + PLACED ( 60210 50350 ) N ;
+- Via34_port2ME3_22 Via34
+  + PLACED ( 39390 51840 ) N ;
+- Via34_port2ME3_23 Via34
+  + PLACED ( 49800 51840 ) N ;
+- Via34_port2ME3_24 Via34
+  + PLACED ( 8910 60420 ) N ;
+- Via34_port2ME3_25 Via34
+  + PLACED ( 81780 60420 ) N ;
+- Via34_port2ME3_26 Via34
+  + PLACED ( 19320 61910 ) N ;
+- Via34_port2ME3_27 Via34
+  + PLACED ( 71370 61910 ) N ;
+- Via34_port2ME3_28 Via34
+  + PLACED ( 30480 70490 ) N ;
+- Via34_port2ME3_29 Via34
+  + PLACED ( 61710 70490 ) N ;
+- Via34_port2ME3_30 Via34
+  + PLACED ( 40890 71980 ) N ;
+- Via34_port2ME3_31 Via34
+  + PLACED ( 51300 71980 ) N ;
+- Via34_drain2ME3_0 Via34
+  + PLACED ( 7410 10060 ) N ;
+- Via34_drain2ME3_1 Via34
+  + PLACED ( 8160 20130 ) N ;
+- Via34_drain2ME3_2 Via34
+  + PLACED ( 8910 30200 ) N ;
+- Via34_drain2ME3_3 Via34
+  + PLACED ( 9660 40270 ) N ;
+- Via34_drain2ME3_35 Via34
+  + PLACED ( 9660 50340 ) N ;
+- Via34_drain2ME3_34 Via34
+  + PLACED ( 8910 60410 ) N ;
+- Via34_drain2ME3_33 Via34
+  + PLACED ( 8160 70480 ) N ;
+- Via34_drain2ME3_32 Via34
+  + PLACED ( 7410 80550 ) N ;
+- Via34_drain2ME3_4 Via34
+  + PLACED ( 17820 10060 ) N ;
+- Via34_drain2ME3_5 Via34
+  + PLACED ( 18570 20130 ) N ;
+- Via34_drain2ME3_6 Via34
+  + PLACED ( 19320 30200 ) N ;
+- Via34_drain2ME3_7 Via34
+  + PLACED ( 20070 40270 ) N ;
+- Via34_drain2ME3_39 Via34
+  + PLACED ( 20070 50340 ) N ;
+- Via34_drain2ME3_38 Via34
+  + PLACED ( 19320 60410 ) N ;
+- Via34_drain2ME3_37 Via34
+  + PLACED ( 18570 70480 ) N ;
+- Via34_drain2ME3_36 Via34
+  + PLACED ( 17820 80550 ) N ;
+- Via34_drain2ME3_8 Via34
+  + PLACED ( 28230 10060 ) N ;
+- Via34_drain2ME3_9 Via34
+  + PLACED ( 28980 20130 ) N ;
+- Via34_drain2ME3_10 Via34
+  + PLACED ( 29730 30200 ) N ;
+- Via34_drain2ME3_11 Via34
+  + PLACED ( 30480 40270 ) N ;
+- Via34_drain2ME3_43 Via34
+  + PLACED ( 30480 50340 ) N ;
+- Via34_drain2ME3_42 Via34
+  + PLACED ( 29730 60410 ) N ;
+- Via34_drain2ME3_41 Via34
+  + PLACED ( 28980 70480 ) N ;
+- Via34_drain2ME3_40 Via34
+  + PLACED ( 28230 80550 ) N ;
+- Via34_drain2ME3_12 Via34
+  + PLACED ( 38640 10060 ) N ;
+- Via34_drain2ME3_13 Via34
+  + PLACED ( 39390 20130 ) N ;
+- Via34_drain2ME3_14 Via34
+  + PLACED ( 40140 30200 ) N ;
+- Via34_drain2ME3_15 Via34
+  + PLACED ( 40890 40270 ) N ;
+- Via34_drain2ME3_47 Via34
+  + PLACED ( 40890 50340 ) N ;
+- Via34_drain2ME3_46 Via34
+  + PLACED ( 40140 60410 ) N ;
+- Via34_drain2ME3_45 Via34
+  + PLACED ( 39390 70480 ) N ;
+- Via34_drain2ME3_44 Via34
+  + PLACED ( 38640 80550 ) N ;
+- Via34_drain2ME3_28 Via34
+  + PLACED ( 49050 10060 ) N ;
+- Via34_drain2ME3_29 Via34
+  + PLACED ( 49800 20130 ) N ;
+- Via34_drain2ME3_30 Via34
+  + PLACED ( 50550 30200 ) N ;
+- Via34_drain2ME3_31 Via34
+  + PLACED ( 51300 40270 ) N ;
+- Via34_drain2ME3_63 Via34
+  + PLACED ( 51300 50340 ) N ;
+- Via34_drain2ME3_62 Via34
+  + PLACED ( 50550 60410 ) N ;
+- Via34_drain2ME3_61 Via34
+  + PLACED ( 49800 70480 ) N ;
+- Via34_drain2ME3_60 Via34
+  + PLACED ( 49050 80550 ) N ;
+- Via34_drain2ME3_24 Via34
+  + PLACED ( 59460 10060 ) N ;
+- Via34_drain2ME3_25 Via34
+  + PLACED ( 60210 20130 ) N ;
+- Via34_drain2ME3_26 Via34
+  + PLACED ( 60960 30200 ) N ;
+- Via34_drain2ME3_27 Via34
+  + PLACED ( 61710 40270 ) N ;
+- Via34_drain2ME3_59 Via34
+  + PLACED ( 61710 50340 ) N ;
+- Via34_drain2ME3_58 Via34
+  + PLACED ( 60960 60410 ) N ;
+- Via34_drain2ME3_57 Via34
+  + PLACED ( 60210 70480 ) N ;
+- Via34_drain2ME3_56 Via34
+  + PLACED ( 59460 80550 ) N ;
+- Via34_drain2ME3_20 Via34
+  + PLACED ( 69870 10060 ) N ;
+- Via34_drain2ME3_21 Via34
+  + PLACED ( 70620 20130 ) N ;
+- Via34_drain2ME3_22 Via34
+  + PLACED ( 71370 30200 ) N ;
+- Via34_drain2ME3_23 Via34
+  + PLACED ( 72120 40270 ) N ;
+- Via34_drain2ME3_55 Via34
+  + PLACED ( 72120 50340 ) N ;
+- Via34_drain2ME3_54 Via34
+  + PLACED ( 71370 60410 ) N ;
+- Via34_drain2ME3_53 Via34
+  + PLACED ( 70620 70480 ) N ;
+- Via34_drain2ME3_52 Via34
+  + PLACED ( 69870 80550 ) N ;
+- Via34_drain2ME3_16 Via34
+  + PLACED ( 80280 10060 ) N ;
+- Via34_drain2ME3_17 Via34
+  + PLACED ( 81030 20130 ) N ;
+- Via34_drain2ME3_18 Via34
+  + PLACED ( 81780 30200 ) N ;
+- Via34_drain2ME3_19 Via34
+  + PLACED ( 82530 40270 ) N ;
+- Via34_drain2ME3_51 Via34
+  + PLACED ( 82530 50340 ) N ;
+- Via34_drain2ME3_50 Via34
+  + PLACED ( 81780 60410 ) N ;
+- Via34_drain2ME3_49 Via34
+  + PLACED ( 81030 70480 ) N ;
+- Via34_drain2ME3_48 Via34
+  + PLACED ( 80280 80550 ) N ;
+END COMPONENTS
+
+SPECIALNETS 112 ;
+- Metal3_0
+  + ROUTED ME3 440 ( 7630 0 ) ( * 80070 ) ;
+- Metal3_1
+  + ROUTED ME3 440 ( 8380 0 ) ( * 80070 ) ;
+- Metal3_2
+  + ROUTED ME3 440 ( 9130 0 ) ( * 80070 ) ;
+- Metal3_3
+  + ROUTED ME3 440 ( 9880 0 ) ( * 80070 ) ;
+- Metal3_4
+  + ROUTED ME3 440 ( 18040 0 ) ( * 80070 ) ;
+- Metal3_5
+  + ROUTED ME3 440 ( 18790 0 ) ( * 80070 ) ;
+- Metal3_6
+  + ROUTED ME3 440 ( 19540 0 ) ( * 80070 ) ;
+- Metal3_7
+  + ROUTED ME3 440 ( 20290 0 ) ( * 80070 ) ;
+- Metal3_8
+  + ROUTED ME3 440 ( 28450 0 ) ( * 80070 ) ;
+- Metal3_9
+  + ROUTED ME3 440 ( 29200 0 ) ( * 80070 ) ;
+- Metal3_10
+  + ROUTED ME3 440 ( 29950 0 ) ( * 80070 ) ;
+- Metal3_11
+  + ROUTED ME3 440 ( 30700 0 ) ( * 80070 ) ;
+- Metal3_12
+  + ROUTED ME3 440 ( 38860 0 ) ( * 80070 ) ;
+- Metal3_13
+  + ROUTED ME3 440 ( 39610 0 ) ( * 80070 ) ;
+- Metal3_14
+  + ROUTED ME3 440 ( 40360 0 ) ( * 80070 ) ;
+- Metal3_15
+  + ROUTED ME3 440 ( 41110 0 ) ( * 80070 ) ;
+- Metal3_16
+  + ROUTED ME3 440 ( 49270 0 ) ( * 80070 ) ;
+- Metal3_17
+  + ROUTED ME3 440 ( 50020 0 ) ( * 80070 ) ;
+- Metal3_18
+  + ROUTED ME3 440 ( 50770 0 ) ( * 80070 ) ;
+- Metal3_19
+  + ROUTED ME3 440 ( 51520 0 ) ( * 80070 ) ;
+- Metal3_20
+  + ROUTED ME3 440 ( 59680 0 ) ( * 80070 ) ;
+- Metal3_21
+  + ROUTED ME3 440 ( 60430 0 ) ( * 80070 ) ;
+- Metal3_22
+  + ROUTED ME3 440 ( 61180 0 ) ( * 80070 ) ;
+- Metal3_23
+  + ROUTED ME3 440 ( 61930 0 ) ( * 80070 ) ;
+- Metal3_24
+  + ROUTED ME3 440 ( 70090 0 ) ( * 80070 ) ;
+- Metal3_25
+  + ROUTED ME3 440 ( 70840 0 ) ( * 80070 ) ;
+- Metal3_26
+  + ROUTED ME3 440 ( 71590 0 ) ( * 80070 ) ;
+- Metal3_27
+  + ROUTED ME3 440 ( 72340 0 ) ( * 80070 ) ;
+- Metal3_28
+  + ROUTED ME3 440 ( 80500 0 ) ( * 80070 ) ;
+- Metal3_29
+  + ROUTED ME3 440 ( 81250 0 ) ( * 80070 ) ;
+- Metal3_30
+  + ROUTED ME3 440 ( 82000 0 ) ( * 80070 ) ;
+- Metal3_31
+  + ROUTED ME3 440 ( 82750 0 ) ( * 80070 ) ;
+- Metal4_drain_0
+  + ROUTED ME4 1000 ( 1260 10560 ) ( 7850 * ) ;
+- Metal4_drain_1
+  + ROUTED ME4 1000 ( 1260 20630 ) ( 8600 * ) ;
+- Metal4_drain_2
+  + ROUTED ME4 1000 ( 1260 30700 ) ( 9350 * ) ;
+- Metal4_drain_3
+  + ROUTED ME4 1000 ( 1260 40770 ) ( 10100 * ) ;
+- Metal4_drain_35
+  + ROUTED ME4 1000 ( 1260 50840 ) ( 10100 * ) ;
+- Metal4_drain_34
+  + ROUTED ME4 1000 ( 1260 60910 ) ( 9350 * ) ;
+- Metal4_drain_33
+  + ROUTED ME4 1000 ( 1260 70980 ) ( 8600 * ) ;
+- Metal4_drain_32
+  + ROUTED ME4 1000 ( 1260 81050 ) ( 7850 * ) ;
+- Metal4_drain_4
+  + ROUTED ME4 1000 ( 11670 10560 ) ( 18260 * ) ;
+- Metal4_drain_5
+  + ROUTED ME4 1000 ( 11670 20630 ) ( 19010 * ) ;
+- Metal4_drain_6
+  + ROUTED ME4 1000 ( 11670 30700 ) ( 19760 * ) ;
+- Metal4_drain_7
+  + ROUTED ME4 1000 ( 11670 40770 ) ( 20510 * ) ;
+- Metal4_drain_39
+  + ROUTED ME4 1000 ( 11670 50840 ) ( 20510 * ) ;
+- Metal4_drain_38
+  + ROUTED ME4 1000 ( 11670 60910 ) ( 19760 * ) ;
+- Metal4_drain_37
+  + ROUTED ME4 1000 ( 11670 70980 ) ( 19010 * ) ;
+- Metal4_drain_36
+  + ROUTED ME4 1000 ( 11670 81050 ) ( 18260 * ) ;
+- Metal4_drain_8
+  + ROUTED ME4 1000 ( 22080 10560 ) ( 28670 * ) ;
+- Metal4_drain_9
+  + ROUTED ME4 1000 ( 22080 20630 ) ( 29420 * ) ;
+- Metal4_drain_10
+  + ROUTED ME4 1000 ( 22080 30700 ) ( 30170 * ) ;
+- Metal4_drain_11
+  + ROUTED ME4 1000 ( 22080 40770 ) ( 30920 * ) ;
+- Metal4_drain_43
+  + ROUTED ME4 1000 ( 22080 50840 ) ( 30920 * ) ;
+- Metal4_drain_42
+  + ROUTED ME4 1000 ( 22080 60910 ) ( 30170 * ) ;
+- Metal4_drain_41
+  + ROUTED ME4 1000 ( 22080 70980 ) ( 29420 * ) ;
+- Metal4_drain_40
+  + ROUTED ME4 1000 ( 22080 81050 ) ( 28670 * ) ;
+- Metal4_drain_12
+  + ROUTED ME4 1000 ( 32490 10560 ) ( 39080 * ) ;
+- Metal4_drain_13
+  + ROUTED ME4 1000 ( 32490 20630 ) ( 39830 * ) ;
+- Metal4_drain_14
+  + ROUTED ME4 1000 ( 32490 30700 ) ( 40580 * ) ;
+- Metal4_drain_15
+  + ROUTED ME4 1000 ( 32490 40770 ) ( 41330 * ) ;
+- Metal4_drain_47
+  + ROUTED ME4 1000 ( 32490 50840 ) ( 41330 * ) ;
+- Metal4_drain_46
+  + ROUTED ME4 1000 ( 32490 60910 ) ( 40580 * ) ;
+- Metal4_drain_45
+  + ROUTED ME4 1000 ( 32490 70980 ) ( 39830 * ) ;
+- Metal4_drain_44
+  + ROUTED ME4 1000 ( 32490 81050 ) ( 39080 * ) ;
+- Metal4_drain_28
+  + ROUTED ME4 1000 ( 42900 10560 ) ( 49490 * ) ;
+- Metal4_drain_29
+  + ROUTED ME4 1000 ( 42900 20630 ) ( 50240 * ) ;
+- Metal4_drain_30
+  + ROUTED ME4 1000 ( 42900 30700 ) ( 50990 * ) ;
+- Metal4_drain_31
+  + ROUTED ME4 1000 ( 42900 40770 ) ( 51740 * ) ;
+- Metal4_drain_63
+  + ROUTED ME4 1000 ( 42900 50840 ) ( 51740 * ) ;
+- Metal4_drain_62
+  + ROUTED ME4 1000 ( 42900 60910 ) ( 50990 * ) ;
+- Metal4_drain_61
+  + ROUTED ME4 1000 ( 42900 70980 ) ( 50240 * ) ;
+- Metal4_drain_60
+  + ROUTED ME4 1000 ( 42900 81050 ) ( 49490 * ) ;
+- Metal4_drain_24
+  + ROUTED ME4 1000 ( 53310 10560 ) ( 59900 * ) ;
+- Metal4_drain_25
+  + ROUTED ME4 1000 ( 53310 20630 ) ( 60650 * ) ;
+- Metal4_drain_26
+  + ROUTED ME4 1000 ( 53310 30700 ) ( 61400 * ) ;
+- Metal4_drain_27
+  + ROUTED ME4 1000 ( 53310 40770 ) ( 62150 * ) ;
+- Metal4_drain_59
+  + ROUTED ME4 1000 ( 53310 50840 ) ( 62150 * ) ;
+- Metal4_drain_58
+  + ROUTED ME4 1000 ( 53310 60910 ) ( 61400 * ) ;
+- Metal4_drain_57
+  + ROUTED ME4 1000 ( 53310 70980 ) ( 60650 * ) ;
+- Metal4_drain_56
+  + ROUTED ME4 1000 ( 53310 81050 ) ( 59900 * ) ;
+- Metal4_drain_20
+  + ROUTED ME4 1000 ( 63720 10560 ) ( 70310 * ) ;
+- Metal4_drain_21
+  + ROUTED ME4 1000 ( 63720 20630 ) ( 71060 * ) ;
+- Metal4_drain_22
+  + ROUTED ME4 1000 ( 63720 30700 ) ( 71810 * ) ;
+- Metal4_drain_23
+  + ROUTED ME4 1000 ( 63720 40770 ) ( 72560 * ) ;
+- Metal4_drain_55
+  + ROUTED ME4 1000 ( 63720 50840 ) ( 72560 * ) ;
+- Metal4_drain_54
+  + ROUTED ME4 1000 ( 63720 60910 ) ( 71810 * ) ;
+- Metal4_drain_53
+  + ROUTED ME4 1000 ( 63720 70980 ) ( 71060 * ) ;
+- Metal4_drain_52
+  + ROUTED ME4 1000 ( 63720 81050 ) ( 70310 * ) ;
+- Metal4_drain_16
+  + ROUTED ME4 1000 ( 74130 10560 ) ( 80720 * ) ;
+- Metal4_drain_17
+  + ROUTED ME4 1000 ( 74130 20630 ) ( 81470 * ) ;
+- Metal4_drain_18
+  + ROUTED ME4 1000 ( 74130 30700 ) ( 82220 * ) ;
+- Metal4_drain_19
+  + ROUTED ME4 1000 ( 74130 40770 ) ( 82970 * ) ;
+- Metal4_drain_51
+  + ROUTED ME4 1000 ( 74130 50840 ) ( 82970 * ) ;
+- Metal4_drain_50
+  + ROUTED ME4 1000 ( 74130 60910 ) ( 82220 * ) ;
+- Metal4_drain_49
+  + ROUTED ME4 1000 ( 74130 70980 ) ( 81470 * ) ;
+- Metal4_drain_48
+  + ROUTED ME4 1000 ( 74130 81050 ) ( 80720 * ) ;
+- Metal4_port_0
+  + ROUTED ME4 1000 ( 0 500 ) ( 82970 * ) ;
+- Metal4_port_1
+  + ROUTED ME4 1000 ( 0 1990 ) ( 82970 * ) ;
+- Metal4_port_2
+  + ROUTED ME4 1000 ( 0 10570 ) ( 82970 * ) ;
+- Metal4_port_3
+  + ROUTED ME4 1000 ( 0 12060 ) ( 82970 * ) ;
+- Metal4_port_4
+  + ROUTED ME4 1000 ( 0 20640 ) ( 82970 * ) ;
+- Metal4_port_5
+  + ROUTED ME4 1000 ( 0 22130 ) ( 82970 * ) ;
+- Metal4_port_6
+  + ROUTED ME4 1000 ( 0 30710 ) ( 82970 * ) ;
+- Metal4_port_7
+  + ROUTED ME4 1000 ( 0 32200 ) ( 82970 * ) ;
+- Metal4_port_8
+  + ROUTED ME4 1000 ( 0 40780 ) ( 82970 * ) ;
+- Metal4_port_9
+  + ROUTED ME4 1000 ( 0 42270 ) ( 82970 * ) ;
+- Metal4_port_10
+  + ROUTED ME4 1000 ( 0 50850 ) ( 82970 * ) ;
+- Metal4_port_11
+  + ROUTED ME4 1000 ( 0 52340 ) ( 82970 * ) ;
+- Metal4_port_12
+  + ROUTED ME4 1000 ( 0 60920 ) ( 82970 * ) ;
+- Metal4_port_13
+  + ROUTED ME4 1000 ( 0 62410 ) ( 82970 * ) ;
+- Metal4_port_14
+  + ROUTED ME4 1000 ( 0 70990 ) ( 82970 * ) ;
+- Metal4_port_15
+  + ROUTED ME4 1000 ( 0 72480 ) ( 82970 * ) ;
+END SPECIALNETS
+
+END DESIGN
