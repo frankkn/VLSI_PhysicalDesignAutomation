@@ -33,7 +33,7 @@ void Placer::createCSPlacement()
 			string lib_name = input->GP->CS_LIB_NAME;
 			string inst_name = "Transistor" + to_string(i*tmp*2+j);
 			int x = i * Dx;
-			int y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH) * tmp;
+			int y = j * Dy + (GP->M4_SPACING+GP->M4_WIDTH) * tmp/2;
 			input->cs_array[i][j] = new Component(lib_name, inst_name, x, y);
 		}
 	}
