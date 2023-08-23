@@ -1,4 +1,4 @@
-# Physical Design Automation
+# VLSI Physical Design Automation
 Course projects for CS6135 of NTHU.
 (2022 NTHU VLSI Physical Design Automation)
 
